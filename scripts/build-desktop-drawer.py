@@ -39,8 +39,9 @@ def main():
     shared=(PROJECT/'device/linexin-dock/ShengDock.qml').read_bytes().replace(b'\r\n',b'\n')
     inner=(PROJECT/'device/linexin-dock/DrawerDock.qml').read_bytes().replace(b'\r\n',b'\n')
     icon=(PROJECT/'device/linexin-dock/apps-grid.svg').read_bytes().replace(b'\r\n',b'\n')
+    burp_icon=(PROJECT/'device/theme/icons/burpsuite-rounded.svg').read_bytes().replace(b'\r\n',b'\n')
     recipe=pathlib.Path(__file__).read_bytes().replace(b'\r\n',b'\n')
-    revision=hashlib.sha256(overlay+patch+shared+inner+icon+recipe).hexdigest()[:12]
+    revision=hashlib.sha256(overlay+patch+shared+inner+icon+burp_icon+recipe).hexdigest()[:12]
     with tempfile.TemporaryDirectory(prefix='sheng-linexin-source-') as tmp:
         stage=pathlib.Path(tmp)
         for name,content in files.items():
@@ -58,6 +59,7 @@ def main():
     files['contents/ui/CompactRepresentation.qml']=overlay
     files['contents/ui/ShengDock.qml']=shared
     files['contents/icons/sheng-apps-grid.svg']=icon
+    files['contents/icons/sheng-burp-rounded.svg']=burp_icon
     files['contents/ui/main.qml']=files['contents/ui/main.qml'].replace(b'    id: kicker',b'    id: kicker\n    Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground',1)
     config=files['contents/config/main.xml'].decode()
     config=config.replace('<group name="General">','<group name="General">\n    <entry name="launchers" type="StringList"><default></default></entry>',1)
@@ -78,6 +80,11 @@ def main():
     end=dashboard.index('        // =============================================\n        //       SYSTEM ACTIONS',start)
     dashboard=dashboard[:start]+inner.decode()+'\n\n'+dashboard[end:]
     dashboard=dashboard.replace('runningRepeater','runningDockContainer.taskRepeater')
+    dashboard=dashboard.replace('source: model.icon || ""','source: /^Burp Suite/.test(String(model.name || "")) ? Qt.resolvedUrl("../icons/sheng-burp-rounded.svg") : (model.icon || "")')
+    dashboard=dashboard.replace('source: model.icon\n','source: /^Burp Suite/.test(String(model.name || "")) ? Qt.resolvedUrl("../icons/sheng-burp-rounded.svg") : model.icon\n')
+    for delegate in ['ItemGridDelegate.qml','ItemListDelegate.qml']:
+        name='contents/ui/'+delegate
+        files[name]=files[name].replace(b'source: model.decoration',b'source: /^Burp Suite/.test(String(model.display || "")) ? Qt.resolvedUrl("../icons/sheng-burp-rounded.svg") : model.decoration')
     old="||t==='org.kde.plasma.expandingiconstaskmanager'){"
     new="||t==='org.kde.plasma.expandingiconstaskmanager'||t.indexOf('org.sheng.linexin.launcher')===0){"
     if old not in dashboard:raise SystemExit('Upstream Task Manager integration changed')

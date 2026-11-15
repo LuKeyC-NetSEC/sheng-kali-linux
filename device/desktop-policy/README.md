@@ -17,7 +17,7 @@
 本地历史隐私验证产物不随仓库分发。抽屉安装器在 `~/.local/state/sheng-desktop-drawer/backup-*` 备份面板配置，不依赖作者私有缓存。构建包需提供本机已编译的隐私 BPF 程序；从仓库根运行：
 
 ```sh
-python3 device/desktop-policy/build-device-package.py /usr/libexec/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-4_arm64.deb
+python3 device/desktop-policy/build-device-package.py /usr/libexec/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-5_arm64.deb
 ```
 
 此包安装会话服务、桌面手势和隐私后端。控制中心与 KWin 效果分别使用 `out/packages/` 下的 `.plasmoid` 和任务卡片 `.zip` 包，保留现有插件 ID／部件布局配置。当前实现针对本机 `kali` 用户（UID 1000）。

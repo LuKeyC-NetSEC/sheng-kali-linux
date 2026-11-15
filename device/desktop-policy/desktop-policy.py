@@ -20,6 +20,9 @@ class Policy(dbus.service.Object):
         try: previous = json.loads((STATE/'state.json').read_text())
         except (OSError,ValueError): previous = {}
         self.dock_hidden = bool(previous.get('dock_hidden',False))
+        self.dock_revealed = False
+        self.reveal_timeout = 0
+        self.visibility_published = None
         self.pointers = []
         self.pending = 0
         self.sync_pending = 0
@@ -107,19 +110,50 @@ class Policy(dbus.service.Object):
     def PointerPresenceChanged(self, present):
         pass
 
+    @dbus.service.signal('org.sheng.DesktopPolicy', signature='b')
+    def DockVisibilityChanged(self, hidden):
+        pass
+
     def apply_dock(self):
-        hiding = 'autohide' if self.dock_hidden else 'windowsgobelow'
+        effective_hidden = self.dock_hidden and not self.dock_revealed
+        hiding = 'autohide' if effective_hidden else 'windowsgobelow'
         self.script('panels().forEach(function(p){p.currentConfigGroup=["General"];if(p.readConfig("ShengThemeRole","")==="dock" && p.hiding!=="'+hiding+'")p.hiding="'+hiding+'";});')
+        if self.visibility_published != effective_hidden:
+            self.visibility_published = effective_hidden
+            self.DockVisibilityChanged(effective_hidden)
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='b', out_signature='')
     def SetDockHidden(self, hidden):
+        if self.dock_hidden != bool(hidden):
+            self.cancel_reveal()
         self.dock_hidden = bool(hidden)
         self.apply_dock()
         self.save_state()
 
+    def cancel_reveal(self):
+        if self.reveal_timeout:
+            GLib.source_remove(self.reveal_timeout)
+            self.reveal_timeout = 0
+        self.dock_revealed = False
+
+    @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
+    def RevealDock(self):
+        if not self.dock_hidden:
+            return
+        self.cancel_reveal()
+        self.dock_revealed = True
+        self.apply_dock()
+        self.reveal_timeout = GLib.timeout_add(8000, self.finish_reveal)
+
+    def finish_reveal(self):
+        self.reveal_timeout = 0
+        self.dock_revealed = False
+        self.apply_dock()
+        return False
+
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='s')
     def GetState(self):
-        return json.dumps({'pointer_present':bool(self.pointers), 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden},ensure_ascii=False)
+        return json.dumps({'pointer_present':bool(self.pointers), 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden, 'dock_revealed':self.dock_revealed},ensure_ascii=False)
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
     def OpenControlCenter(self):

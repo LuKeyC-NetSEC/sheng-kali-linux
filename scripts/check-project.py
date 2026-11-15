@@ -51,7 +51,7 @@ def main():
             elif path.suffix == '.json':
                 json.loads(data)
                 counts['json'] += 1
-            elif path.suffix in ('.xml', '.svg'):
+            elif path.suffix in ('.xml', '.svg') or (path.suffix == '.conf' and '<fontconfig' in data):
                 ET.fromstring(data)
                 counts['xml'] += 1
             elif path.suffix == '.md':

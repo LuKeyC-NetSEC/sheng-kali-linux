@@ -16,6 +16,7 @@
 | Dock 的九圆点图标 | 打开/关闭抽屉 |
 | 普通应用最大化/全屏 | Dock 覆盖窗口后由底边向下隐藏，不为 Dock 预留窗口空间 |
 | 应用恢复小窗口/最小化 | Dock 从底部向上显示 |
+| 最大化后从物理底边上滑两次 | 首次只显示 3 秒白条，期间再次上滑才唤出覆盖式 Dock；见[详细说明](TOUCH_LOCKSCREEN_FONTS.md) |
 | 打开/关闭全屏抽屉 | 原来的同一个 Dock 保持位置，不复制另一份参与抽屉淡入/缩放 |
 
 All Apps / Alphabetically 等上游长列表沿用其滚动方式，没有 Dashboard 页码；左右分页针对 Dashboard。长按编辑、文件夹拖动与导航互斥。应用发现、分类与启动继续使用 KDE Kicker/KService 模型及上游功能，没有自行解析后用 shell 拼接 `Exec`。

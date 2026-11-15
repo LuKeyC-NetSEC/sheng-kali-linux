@@ -95,8 +95,8 @@ python3 device/recents/install-native-tabbox.py
 ```bash
 gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
 sudo out/bin/sheng-privacy-bpf probe
-python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-4_arm64.deb
-sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-4_arm64.deb
+python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-5_arm64.deb
+sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-5_arm64.deb
 ```
 
 包安装用户会话服务、隐私过滤器及桌面手势部件；还需将 `org.sheng.desktop-gesture` 添加到桌面，并加载上一步 KWin 效果（其 `DesktopPolicy.qml` 通知最大化/全屏）。Dock 按 `ShengThemeRole=dock` 或底部任务面板识别，不依赖作者面板 ID。
@@ -125,6 +125,8 @@ kpackagetool6 --type Plasma/Applet --install out/packages/sheng-control-center.p
 该脚本会迁移现有任务面板并创建顶栏，**不是可重复执行的配置管理器**；先备份并读取脚本，已存在 Sheng 顶栏时它会停止。默认壁纸路径需先放置你有权使用的图片，或改成自己的路径。不要从作者设备导出整份配置。
 
 在系统设置选择 BreezeLight、Breeze 样式、Colloid-Light、Breeze_Light 24px；关闭壁纸强调色，设置内屏 200% 缩放。Panel Colorizer：顶栏 ChromeOS 预设关闭背景，普通部件和托盘前景白色；Dock 使用 Translucent；按新 widget ID 将电池图标设为白色符号遮罩。配置未全部自动化，须人工/AI检查。`WeatherData.qml` 替换 Redmi Clock 对应组件，再在其根目录应用 `weather-ui.patch`。
+
+当前两段底边唤出、独立电池图形、圆角 Burp 图标、锁屏上滑和缺字修复，按[触控/字体增量说明](TOUCH_LOCKSCREEN_FONTS.md)部署。基础构建已补 Noto/Liberation 正文字体与 MDI ASCII 过滤配置，但完整 rootfs 未在本轮重新构建；锁屏 patch 和桌面部件仍为单独增量。
 
 ### 6. 可选应用与实验输入法
 

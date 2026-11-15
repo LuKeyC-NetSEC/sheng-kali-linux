@@ -96,7 +96,7 @@ Item {
                     }
                     Kirigami.Icon {
                         anchors.centerIn:parent;width:root.dockIconSize;height:width
-                        source:task.model.decoration;animated:false
+                        source:/^Burp Suite/.test(String(task.model.AppName||task.model.display||""))?Qt.resolvedUrl("../icons/sheng-burp-rounded.svg"):task.model.decoration;animated:false
                         Rectangle {
                             visible:!task.model.IsLauncher
                             anchors.horizontalCenter:parent.horizontalCenter;anchors.top:parent.bottom;anchors.topMargin:2

@@ -77,7 +77,7 @@ chroot "$ROOTFS" apt-get install -y --no-install-recommends \
     network-manager plasma-nm bluedevil wpasupplicant wireless-regdb iw \
     sddm plasma-keyboard qt6-virtualkeyboard-plugin konsole dolphin \
     pipewire-audio pulseaudio-utils playerctl brightnessctl brightness-udev wl-clipboard libgl1-mesa-dri mesa-vulkan-drivers xserver-xorg-input-libinput \
-    fonts-noto-cjk fonts-noto-color-emoji firefox-esr \
+    fonts-noto-core fonts-noto-ui-core fonts-noto-cjk fonts-noto-color-emoji fonts-liberation fontconfig firefox-esr \
     dbus-user-session python3-dbus python3-gi polkitd rfkill usbutils pciutils dnsmasq-base \
     e2fsprogs kmod qrtr-tools rmtfs tqftpserv bluez libkscreen-bin \
     systemd-timesyncd systemd-zram-generator util-linux-extra build-essential meson ninja-build pkg-config \
@@ -85,6 +85,9 @@ chroot "$ROOTFS" apt-get install -y --no-install-recommends \
     protobuf-compiler protobuf-c-compiler cmake extra-cmake-modules qt6-base-dev \
     libkf6coreaddons-dev libksysguard-dev libsensors-dev upower mesa-utils vulkan-tools \
     alsa-utils alsa-ucm-conf rtkit powerdevil plasma-pa hostapd kdialog
+install -Dm 0644 "$PROJECT/device/theme/fonts/31-sheng-material-icons-charset.conf" \
+    "$ROOTFS/etc/fonts/conf.d/31-sheng-material-icons-charset.conf"
+chroot "$ROOTFS" fc-cache -f
 chroot "$ROOTFS" update-alternatives --set regulatory.db /lib/firmware/regulatory.db-upstream
 mkdir -p "$ROOTFS/tmp/sheng-libssc-source" "$ROOTFS/tmp/sheng-packages" "$OUT_DIR/packages"
 tar -xzf "$ASSET_DIR/libssc.tar.gz" --strip-components=1 -C "$ROOTFS/tmp/sheng-libssc-source"
