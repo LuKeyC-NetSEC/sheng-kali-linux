@@ -16,7 +16,7 @@
 | Colloid | [vinceliuice/Colloid-icon-theme](https://github.com/vinceliuice/Colloid-icon-theme)，`ceac6608ecd0e40025cbc2ebbd32bf0e0f4ebc6a` | 外部主题，保留其许可 |
 | Redmi Clock / Lagtrain | KDE Store 2175475 / 2124802 | 仓库仅提供天气/布局修改，不包含原包 |
 | 水杉输入法 | [metasequoiaime/msime](https://github.com/metasequoiaime/msime/releases/tag/linux-v0.16.1) | 官方 ARM64 包外部安装；不分发运行数据/账户/模型缓存 |
-| Fcitx5 OSK | [fortime/fcitx5-osk](https://github.com/fortime/fcitx5-osk)，tag `0.2.1` → commit `76a33b65b1c72519788c09cfb9f94c1df0f61949` | 上游源码与许可证，集成打包保持原始版权 |
+| Fcitx5 OSK | [fortime/fcitx5-osk](https://github.com/fortime/fcitx5-osk)，tag `0.2.1` → commit `76a33b65b1c72519788c09cfb9f94c1df0f61949` | MIT；UI 补丁/衍生键集保持 MIT 声明，集成辅助脚本各自保留 SPDX |
 | Burp Suite | [PortSwigger 官方下载](https://portswigger.net/burp/releases) | 商业软件，仅提供性能参数；不分发安装包/许可证/激活工具 |
 | Miku 壁纸 | [桌面来源](device/theme/wallpaper.json)、[锁屏来源](device/theme/lockscreen-wallpaper.json) | 仅来源、作者与哈希；图片不随仓库分发，下载/使用自行核查原作者条件 |
 

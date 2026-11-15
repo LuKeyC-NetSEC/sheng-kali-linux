@@ -10,11 +10,22 @@ stage = pathlib.Path(sys.argv[1]).resolve()
 guard = pathlib.Path(sys.argv[2]).resolve()
 output = pathlib.Path(sys.argv[3]).resolve()
 assert (stage/'usr/bin/fcitx5-osk').is_file()
+for name in ['fcitx5-osk', 'fcitx5-osk-key-helper', 'fcitx5-osk-kwin-launcher']:
+    with (stage/'usr/bin'/name).open('rb') as stream:
+        header = stream.read(20)
+    if header[:6] != b'\x7fELF\x02\x01' or int.from_bytes(header[18:20], 'little') != 183:
+        raise SystemExit('Expected an ARM64 ELF binary: ' + name)
 old = stage/'usr/lib/aarch64-linux-gnu/systemd/system/fcitx5-osk-key-helper.service'
 target = stage/'usr/lib/systemd/system/fcitx5-osk-key-helper.service'
 target.parent.mkdir(parents=True,exist_ok=True)
 if old.exists(): old.rename(target)
 for original,relative,mode in [
+    (source.parents[1]/'scripts/osk-mode.py','usr/bin/sheng-osk-mode',0o755),
+    (source.parents[1]/'LICENSE','usr/share/doc/sheng-msime-integration/COPYING',0o644),
+    (source/'README.md','usr/share/doc/sheng-msime-integration/README.md',0o644),
+    (source/'hyperos-ui.patch','usr/share/doc/sheng-msime-integration/hyperos-ui.patch',0o644),
+    (source/'provenance.json','usr/share/doc/sheng-msime-integration/provenance.json',0o644),
+    (source/'ui/LICENSE','usr/share/doc/sheng-msime-integration/UI-LICENSE',0o644),
     (source/'sheng-msime-launcher','usr/libexec/sheng-msime-launcher',0o755),
     (source/'sheng-msime-fcitx5.desktop','usr/share/applications/sheng-msime-fcitx5.desktop',0o644),
     (source/'82-sheng-osk.rules','etc/udev/rules.d/82-sheng-osk.rules',0o644),
@@ -24,12 +35,17 @@ for original,relative,mode in [
     destination=stage/relative;destination.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(original,destination);destination.chmod(mode)
 control=stage/'DEBIAN';control.mkdir(exist_ok=True)
+for asset in (source/'ui').glob('*.toml'):
+    category = 'key_sets' if asset.name.endswith('-keys.toml') else 'layouts' if asset.name.endswith(('-landscape.toml', '-portrait.toml')) else 'themes'
+    destination = stage/'usr/share/fcitx5-osk'/category/asset.name
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(asset, destination)
 (control/'control').write_text('''Package: sheng-msime-integration
-Version: 0.2.1-2
+Version: 0.2.1-3
 Architecture: arm64
 Maintainer: Sheng tablet local setup
-Depends: msime-linux (>= 0.16.1), fcitx5, libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde
-Description: Water杉 input and touch keyboard integration for sheng
+Depends: msime-linux (>= 0.16.1), fcitx5, libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy
+Description: Metasequoia input and touch keyboard integration for sheng
  Pinned Fcitx5 OSK with physical-keyboard suppression and KWin launcher.
 ''')
 (control/'postinst').write_text('''#!/bin/sh

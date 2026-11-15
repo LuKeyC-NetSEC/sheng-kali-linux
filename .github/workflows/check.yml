@@ -37,3 +37,9 @@ jobs:
         run: |
           python3 scripts/build-control-center.py
           python3 scripts/build-task-cards.py
+          python3 scripts/prepare-osk-ui.py
+          python3 - <<'PY'
+          import pathlib, tomllib
+          for path in pathlib.Path('device/input-method').rglob('*.toml'):
+              tomllib.loads(path.read_text(encoding='utf-8'))
+          PY

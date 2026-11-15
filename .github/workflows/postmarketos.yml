@@ -2,6 +2,9 @@ name: Xiaomi Pad 6s Pro postmarketOS
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-image:
     strategy:
@@ -131,7 +134,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng without DE
         uses: actions/upload-artifact@v4
@@ -155,7 +158,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng with KDE Plasma Desktop
         uses: actions/upload-artifact@v4
@@ -180,7 +183,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng with KDE Plasma Mobile
         uses: actions/upload-artifact@v4
@@ -204,7 +207,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng with Lomiri
         uses: actions/upload-artifact@v4
@@ -227,7 +230,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng with GNOME
         uses: actions/upload-artifact@v4
@@ -252,7 +255,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: alghiffaryfa19
+          authorized-users: ${{ github.repository_owner }}
 
       - name: Upload artifacts xiaomi-sheng with GNOME Mobile
         uses: actions/upload-artifact@v4

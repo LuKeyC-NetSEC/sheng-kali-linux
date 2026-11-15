@@ -1,5 +1,7 @@
 # Sheng Kali Linux · 小米平板 6S Pro
 
+[![Source checks](https://github.com/LuKeyC-NetSEC/sheng-kali-linux/actions/workflows/check.yml/badge.svg)](https://github.com/LuKeyC-NetSEC/sheng-kali-linux/actions/workflows/check.yml)
+
 **在 Xiaomi Pad 6S Pro 12.4（`sheng` / `24018RPACC`）运行原生 Kali ARM64 + KDE Plasma Wayland。** 本仓库提供镜像构建、刷写校验、硬件修复和面向平板的桌面交互源码，便于开发者与 AI 协作部署。
 
 基于 [alghiffaryfa19/sheng-pmos-builds](https://github.com/alghiffaryfa19/sheng-pmos-builds) 扩展，保留上游提交历史和 GPL 许可证。这是社区适配，非小米或 Kali 官方支持项目。
@@ -29,7 +31,7 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 - 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。
 - 摄像头/麦克风/定位的统一隐私开关，含设备访问、门户请求与既有采集进程处理；范围和限制见[隐私说明](device/privacy/README.md)。
 - 电源短按锁屏；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。
-- 水杉 + Fcitx5 输入集成为**实验项**：PIN 键盘中文输入和接入时不弹软键盘已用户确认；断开后触屏自动弹出仍在修复。默认基础镜像仍使用 Plasma Keyboard。
+- 水杉 + Fcitx5 输入集成为**实验项**：PIN 中文输入、接入时禁止软键盘、无键盘时连续自动弹出和长按悬浮拖动已用户确认；澎湃风格新界面及触屏中文仍需单独验收。默认基础镜像仍使用 Plasma Keyboard。
 
 这些是当前实机的累计适配状态。**基础构建脚本未自动安装全部增量组件。** PIN 模块编译、热点面板编译、主题第三方资产与个别用户配置仍需按部署手册处理，不能仅刷入基础镜像就宣称完整复现。
 

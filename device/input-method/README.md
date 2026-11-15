@@ -1,6 +1,6 @@
 # 实验：水杉输入法与触屏键盘
 
-用户目标为实体键盘和触屏都使用水杉。当前实现：**水杉 Fcitx5 引擎 + Fcitx5 OSK 屏幕键盘 + KWin Wayland 输入面板**，不是水杉内置独立软键盘。用户已确认 PIN 键盘中文输入正常、接入时触屏不会弹出软键盘；断开实体键盘后自动弹出失败，仍属实验集成，不属于稳定基础镜像。
+用户目标为实体键盘和触屏都使用水杉。当前实现：**水杉 Fcitx5 引擎 + Fcitx5 OSK 屏幕键盘 + KWin Wayland 输入面板**，不是水杉内置独立软键盘。用户已确认 PIN 中文、接入时抑制软键盘、正式接口修复后的连续自动弹出和原版长按悬浮拖动正常；触屏中文和新的澎湃风格界面仍需独立验收，暂不属于稳定基础镜像。
 
 ## 固定来源
 
@@ -11,7 +11,7 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-2` 增加卸载回退；实机此前为 `0.2.1-1`，未因源码发布升级，也未将新版标记已验。
+`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-3` 包含卸载回退、字体依赖与模式切换器；原实机版本为 `0.2.1-1` 加后续 guard 修复。安装新版后仍按验证矩阵逐项验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
@@ -25,6 +25,34 @@ Plasma 会话只设置 `XMODIFIERS=@im=fcitx`，不全局强制 `QT_IM_MODULE`/`
 
 初次检查遇到锁屏，OSK 进入独立锁屏模式并正常停止普通会话 Fcitx；此状态不能当作输入失败证据。随后解锁，用户确认 PIN 的“nihao → 你好”成功及接入时抑制软键盘正确，但报告拔下后不能弹出。
 
-固定上游 launcher 的普通会话自动 Show 路径依赖 KWin tabletMode。guard 增补输入上下文激活/文本支持变化监听：无实体键盘、普通会话模式下按状态转换调用 OSK Show/Hide，不每秒强制弹出，也不清除中文组合上下文。锁屏仍由上游独立处理；兼容修复需真实拔插/触屏验收后才能标记通过。
+固定上游 launcher 的普通会话自动 Show 路径依赖 KWin tabletMode。guard 增补输入上下文激活/文本支持变化监听：无实体键盘、普通会话模式下按状态转换调用 Fcitx `/virtualkeyboard` 的 `ShowVirtualKeyboard`，同时恢复引擎的 OnScreenKeyboard 模式，避免只显示 OSK 窗口却保留 PhysicalKeyboard 模式。无实体键盘时 KWin 使用 AnyInput，接入后仍用 Never。不会每秒强制弹出或清除中文组合上下文；锁屏由上游独立处理。
+
+用户已确认第一版兼容逻辑可弹出，但并非每次成功；随后通过正式 Fcitx 接口恢复模式，用户确认连续点击每次弹出。功能键缺字与上游默认请求不存在的 NotoSerif NF 有关：补充 Noto CJK 和 Material Design 图标字体，触屏中文仍需单独验收。
+
+## 澎湃风格触屏界面
+
+[hyperos-ui.patch](hyperos-ui.patch) 在固定上游源码上重写键帽、工具栏与面板外观，不更换水杉引擎。触屏布局移除桌面键盘的 Ctrl/Alt/Super 长行，保留数字行、QWERTY、Shift、Tab、标点、空格和回车；字母不重复显示大小写标记。圆角键帽、蓝色回车、浅/深色面板与可见拖动手柄位于 [ui/](ui/)，字体来源为系统包，不复制小米字体或图像。
+
+工具栏提供中英切换、停靠/悬浮、设置与收起。悬浮模式保持原有长按约 1 秒拖动规则；横屏宽 640、竖屏宽 480 逻辑像素。拖动位置在该 OSK 进程中保留，进程重启后不承诺恢复原位置。没有移植小米商业输入引擎、云服务或系统玻璃材质。
+
+### 从公开源码构建
+
+在 ARM64 Linux 上安装 Rust/Cargo、CMake >=4.1、pkg-config、Wayland/EGL/XKB/OpenSSL/Fontconfig 等开发依赖，按上游 README 补齐具体发行版包名。来源、archive/patch SHA-256 与基础文件哈希见 [provenance.json](provenance.json)。
+
+```bash
+python3 scripts/prepare-osk-ui.py
+cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib/aarch64-linux-gnu
+cmake --build out/osk-cmake --parallel 2
+DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
+DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
+python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-3_arm64.deb
+sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-3_arm64.deb
+# 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
+sheng-osk-mode float --font-defaults --sheng-ui
+# 切回底部停靠
+sheng-osk-mode dock
+```
+
+先安装固定版本 msime-linux，并按前文设置 Fcitx profile 与 KWin InputMethod；集成包不复制用户词库或账户。构建器不会自动编译实验 KWin 插件。此处路径从仓库根开始；干净源码构建可能需要较长时间和大量缓存空间。
 
 待解锁后检查：实体中文组合/上屏、触屏中文、PIN接入不弹软键盘、拔下后恢复、锁屏解锁及挂起恢复。每项分开记录。未完成前保留 `/usr/share/applications/org.kde.plasma.keyboard.desktop` 回退入口，卸载集成包后确认 KWin InputMethod 与用户服务回到基础实现。不要为验收绕过锁屏或关闭已有应用。

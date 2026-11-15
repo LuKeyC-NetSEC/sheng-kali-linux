@@ -38,15 +38,17 @@ def apply_policy(bus):
     global _osk_visibility_state
     import dbus
     keyboards = physical_keyboards()
-    obj = bus.get_object('org.kde.KWin', '/VirtualKeyboard')
-    properties = dbus.Interface(obj, 'org.freedesktop.DBus.Properties')
-    interface = 'org.kde.kwin.VirtualKeyboard'
-    desired = 0 if keyboards else 1  # Never / NonMouseInput; preserve the input method itself.
-    if int(properties.Get(interface, 'mode')) != desired:
-        properties.Set(interface, 'mode', dbus.Int32(desired))
     config = configparser.ConfigParser(interpolation=None,strict=False)
     config.read(Path.home()/'.config/kwinrc')
     fcitx = 'fcitx' in config.get('Wayland','InputMethod',fallback='').lower()
+    obj = bus.get_object('org.kde.KWin', '/VirtualKeyboard')
+    properties = dbus.Interface(obj, 'org.freedesktop.DBus.Properties')
+    interface = 'org.kde.kwin.VirtualKeyboard'
+    # Fcitx's panel is separate from KWin's candidates. AnyInput avoids a
+    # stale last-input-device classification after detaching the PIN dock.
+    desired = 0 if keyboards else (2 if fcitx else 1)
+    if int(properties.Get(interface, 'mode')) != desired:
+        properties.Set(interface, 'mode', dbus.Int32(desired))
     # Fcitx candidates also use an input-panel overlay. Deactivating that
     # context would cancel physical-keyboard Chinese composition.
     if keyboards and not fcitx and bool(properties.Get(interface, 'visible')):
@@ -73,7 +75,13 @@ def apply_policy(bus):
             if state != _osk_visibility_state:
                 if not keyboards and not current and osk_mode == 0:
                     if active and supports:
-                        osk.Show()
+                        # Set Fcitx's OnScreenKeyboard mode as well as showing
+                        # the window. Calling OSK.Show alone leaves Fcitx in
+                        # PhysicalKeyboard mode after the last real key, so
+                        # later focus-in requests can fail to auto-show.
+                        bus.get_name_owner('org.fcitx.Fcitx5')
+                        controller = bus.get_object('org.fcitx.Fcitx5', '/virtualkeyboard')
+                        dbus.Interface(controller, 'org.fcitx.Fcitx.VirtualKeyboard1').ShowVirtualKeyboard()
                     else:
                         osk.Hide()
                 _osk_visibility_state = state

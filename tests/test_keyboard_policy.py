@@ -41,8 +41,11 @@ class Osk:
         # Acknowledgement occurs asynchronously, as on the real controller.
         self.requested_manual = value
 
-    def Show(self):
+    def ShowVirtualKeyboard(self):
         self.shown += 1
+
+    def Show(self):
+        raise AssertionError('Must activate Fcitx OSK mode, not only show its window')
 
     def Hide(self):
         self.hidden += 1
@@ -84,6 +87,7 @@ class KeyboardPolicyTests(unittest.TestCase):
         self.osk.manual = False
         self.apply()
         self.assertEqual(self.osk.shown, 1)
+        self.assertEqual(self.kwin.values['mode'], 2)
         # Dismissing the keyboard must survive periodic polling.
         for _ in range(4):
             self.apply()
