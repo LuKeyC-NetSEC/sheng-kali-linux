@@ -2,6 +2,10 @@
 
 当前平板只有一个虚拟桌面。活动应用最大化或全屏时，KWin 的 [DesktopPolicy.qml](../recents/contents/ui/DesktopPolicy.qml) 通知用户会话服务，将底部 Linexin Dock 的宿主面板切为自动隐藏；还原小窗口或最小化后恢复 `windowsgobelow` 覆盖显示，不占窗口可用空间。滑入/滑出由 Plasma 原生底边动画处理。Sheng 全屏抽屉排除在隐藏规则之外，由原生 KWin 插件保持同一个 Dock 在其上方，不复制另一份 Dock 参与动画。覆盖式最大化显隐及最终抽屉开关稳定性已获用户确认。
 
+临时唤出的 Dock：`DismissDock` 取消 8 秒计时，立即切回原生自动隐藏动画；由 KWin 观察 Dock 外部的真实按下事件触发，保留原窗口点击。Dock 显示时第三次底边上滑调用 `ShowDesktop`，以原生 `org.kde.KWin.showDesktop(true)` 返回桌面，不关闭或强制最小化应用。服务订阅 `showingDesktopChanged`，显示桌面时保持 Dock 可见，重新进入应用时按原最大化/全屏判定隐藏，防止旧计时器在桌面上收起 Dock。
+
+2026-11-15 已在上述 ARM64 会话增量安装策略文件和匹配的原生插件，用户确认外部点击、Dock 操作、第三段上滑及返回应用正常。策略只替换对应脚本并重启本用户服务；该设备的包版本记录仍为 `1.0-5`，新完整打包入口为 `1.0-6`。回退可恢复部署前备份的 `desktop-policy.py`，重启用户服务，并按原生插件 README 重新启用上一个 guard ID；应用会话保持运行。
+
 [desktop-policy.py](desktop-policy.py) 通过 KWin 输入设备信号识别鼠标、触摸板。PIN 键盘的输入节点在脱离后可能仍存在，额外以 `nanosic_hinge/keyboard_attached` 判断实际连接；该内存属性每 250 毫秒只读检查一次，变化时才更新配置。触摸板按用户要求计入鼠标。
 
 无鼠标和触摸板时，[桌面手势部件](desktop-gesture/contents/ui/main.qml) 将触屏下滑区域放到现有桌面窗口的整个右半区；桌面全区域上滑打开 Linexin 全屏抽屉，不要求断开 PIN。它在拖动完成时调用已有服务，不添加另一个主屏幕；应用窗口、状态栏、Dock 使用各自窗口的触控。应用内的整条最右侧入口已删除。原状态栏的下滑入口继续沿用。
@@ -17,7 +21,7 @@
 本地历史隐私验证产物不随仓库分发。抽屉安装器在 `~/.local/state/sheng-desktop-drawer/backup-*` 备份面板配置，不依赖作者私有缓存。构建包需提供本机已编译的隐私 BPF 程序；从仓库根运行：
 
 ```sh
-python3 device/desktop-policy/build-device-package.py /usr/libexec/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-5_arm64.deb
+python3 device/desktop-policy/build-device-package.py /usr/libexec/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-6_arm64.deb
 ```
 
 此包安装会话服务、桌面手势和隐私后端。控制中心与 KWin 效果分别使用 `out/packages/` 下的 `.plasmoid` 和任务卡片 `.zip` 包，保留现有插件 ID／部件布局配置。当前实现针对本机 `kali` 用户（UID 1000）。

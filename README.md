@@ -33,6 +33,7 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 - PIN 键盘/触摸板认证和唤醒修复；扬声器、音量键；Wi-Fi 上网与并发热点。
 - 6 GiB Zstd ZRAM + 8 GiB swapfile；不额外划分 swap 分区。
 - 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。
+- 临时 Dock 点击外部立即向下收起；底边连续上滑依次显示白条、Dock、返回原桌面，应用保留在后台。
 - 原 Plasma 桌面全区域触屏上滑打开 Linexin 全屏抽屉；防触屏框选、长按编辑、左右分页。抽屉与桌面显示同一个 Linexin Dock，开关时保持静止。
 - 摄像头/麦克风/定位的统一隐私开关，含设备访问、门户请求与既有采集进程处理；范围和限制见[隐私说明](device/privacy/README.md)。
 - 电源短按锁屏；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。

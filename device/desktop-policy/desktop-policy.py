@@ -21,6 +21,7 @@ class Policy(dbus.service.Object):
         except (OSError,ValueError): previous = {}
         self.dock_hidden = bool(previous.get('dock_hidden',False))
         self.dock_revealed = False
+        self.showing_desktop = self.read_showing_desktop()
         self.reveal_timeout = 0
         self.visibility_published = None
         self.pointers = []
@@ -31,12 +32,26 @@ class Policy(dbus.service.Object):
         BUS.add_signal_receiver(self.inputs_changed, dbus_interface='org.kde.KWin.InputDeviceManager', path='/org/kde/KWin/InputDevice')
         BUS.add_signal_receiver(self.owner_changed, signal_name='NameOwnerChanged', dbus_interface='org.freedesktop.DBus', arg0='org.kde.plasmashell')
         BUS.add_signal_receiver(self.inputs_changed, signal_name='NameOwnerChanged', dbus_interface='org.freedesktop.DBus', arg0='org.kde.KWin')
+        BUS.add_signal_receiver(self.showing_desktop_changed, signal_name='showingDesktopChanged', dbus_interface='org.kde.KWin', path='/KWin')
         self.rescan()
         GLib.timeout_add(250,self.watch_dock)
 
     def read_dock_attached(self):
         try: return pathlib.Path('/sys/class/misc/nanosic_hinge/keyboard_attached').read_text().strip() == '1'
         except OSError: return True
+
+    def read_showing_desktop(self):
+        try:
+            properties = dbus.Interface(BUS.get_object('org.kde.KWin', '/KWin'), 'org.freedesktop.DBus.Properties')
+            return bool(properties.Get('org.kde.KWin', 'showingDesktop'))
+        except dbus.DBusException:
+            return False
+
+    def showing_desktop_changed(self, showing):
+        self.showing_desktop = bool(showing)
+        if self.showing_desktop:
+            self.cancel_reveal()
+        self.apply_dock()
 
     def watch_dock(self):
         attached = self.read_dock_attached()
@@ -64,6 +79,7 @@ class Policy(dbus.service.Object):
 
     def rescan(self):
         self.pending = 0
+        self.showing_desktop = self.read_showing_desktop()
         found = []
         try:
             manager = dbus.Interface(BUS.get_object('org.kde.KWin', '/org/kde/KWin/InputDevice'), 'org.freedesktop.DBus.Properties')
@@ -115,7 +131,7 @@ class Policy(dbus.service.Object):
         pass
 
     def apply_dock(self):
-        effective_hidden = self.dock_hidden and not self.dock_revealed
+        effective_hidden = self.dock_hidden and not self.dock_revealed and not self.showing_desktop
         hiding = 'autohide' if effective_hidden else 'windowsgobelow'
         self.script('panels().forEach(function(p){p.currentConfigGroup=["General"];if(p.readConfig("ShengThemeRole","")==="dock" && p.hiding!=="'+hiding+'")p.hiding="'+hiding+'";});')
         if self.visibility_published != effective_hidden:
@@ -145,6 +161,25 @@ class Policy(dbus.service.Object):
         self.apply_dock()
         self.reveal_timeout = GLib.timeout_add(8000, self.finish_reveal)
 
+    @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
+    def DismissDock(self):
+        if not self.dock_revealed:
+            return
+        self.cancel_reveal()
+        self.apply_dock()
+
+    @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
+    def ShowDesktop(self):
+        if not (self.dock_hidden and self.dock_revealed):
+            return
+        self.cancel_reveal()
+        kwin = BUS.get_object('org.kde.KWin', '/KWin')
+        try:
+            dbus.Interface(kwin, 'org.kde.KWin').showDesktop(True)
+        except dbus.DBusException:
+            self.apply_dock()
+            raise
+
     def finish_reveal(self):
         self.reveal_timeout = 0
         self.dock_revealed = False
@@ -153,7 +188,7 @@ class Policy(dbus.service.Object):
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='s')
     def GetState(self):
-        return json.dumps({'pointer_present':bool(self.pointers), 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden, 'dock_revealed':self.dock_revealed},ensure_ascii=False)
+        return json.dumps({'pointer_present':bool(self.pointers), 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden, 'dock_revealed':self.dock_revealed, 'showing_desktop':self.showing_desktop},ensure_ascii=False)
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
     def OpenControlCenter(self):

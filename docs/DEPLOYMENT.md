@@ -95,8 +95,8 @@ python3 device/recents/install-native-tabbox.py
 ```bash
 gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
 sudo out/bin/sheng-privacy-bpf probe
-python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-5_arm64.deb
-sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-5_arm64.deb
+python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-6_arm64.deb
+sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-6_arm64.deb
 ```
 
 包安装用户会话服务、隐私过滤器及桌面手势部件；还需将 `org.sheng.desktop-gesture` 添加到桌面，并加载上一步 KWin 效果（其 `DesktopPolicy.qml` 通知最大化/全屏）。Dock 按 `ShengThemeRole=dock` 或底部任务面板识别，不依赖作者面板 ID。

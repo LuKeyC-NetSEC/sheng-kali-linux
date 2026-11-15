@@ -28,6 +28,7 @@ class DesktopTouchGuard final : public Effect {
     class Filter final : public InputEventFilter {
     public:
         explicit Filter(DesktopTouchGuard *owner):InputEventFilter(InputFilterOrder::ScreenEdge),m_owner(owner){}
+        bool pointerButton(PointerButtonEvent *e)override{if(e->state==PointerButtonState::Pressed)m_owner->dockPress(input()->findToplevel(e->position));return false;}
         bool touchDown(TouchDownEvent *e)override{return m_owner->down(e);}
         bool touchMotion(TouchMotionEvent *e)override{return m_owner->motion(e);}
         bool touchUp(TouchUpEvent *e)override{return m_owner->up(e);}
@@ -50,6 +51,7 @@ public:
         QTimer::singleShot(0,this,&DesktopTouchGuard::readPresence);
         connect(workspace(),&Workspace::windowAdded,this,[this](Window *){syncDrawerDock();});
         connect(workspace(),&Workspace::windowRemoved,this,[this](Window *){syncDrawerDock();});
+        connect(workspace(),&Workspace::showingDesktopChanged,this,[this](bool showing,bool){if(showing)clearRevealConstraint();});
         QTimer::singleShot(0,this,&DesktopTouchGuard::syncDrawerDock);
     }
     ~DesktopTouchGuard()override{clearRevealConstraint();clearDrawerDock();m_hint.reset();m_filter.reset();QDBusConnection::sessionBus().unregisterObject("/org/sheng/DesktopTouch");QDBusConnection::sessionBus().unregisterService("org.sheng.DesktopTouch");}
@@ -62,14 +64,17 @@ public:
         m_contacts.insert(event->id,desktop);
         if(m_contacts.size()>1)m_multi=true;
         auto *output=workspace()->outputAt(event->pos);
-        if(m_contacts.size()==1&&m_dockHidden&&output&&!waylandServer()->isScreenLocked()
+        const bool homeEdge=m_revealDock&&!m_dockHidden&&!m_dismissPending&&m_revealDock->output()==output;
+        if(m_contacts.size()==1&&(m_dockHidden||homeEdge)&&output&&!waylandServer()->isScreenLocked()
             &&event->pos.y()>=output->geometry().bottom()-9&&bottomDock(output)){
             m_edgeId=event->id;m_edgeOrigin=m_edgeLast=event->pos;m_edgeOutput=output;m_multi=false;
+            m_edgeHome=homeEdge;
             m_edgeSecond=m_hint&&m_hintTimer.isActive()&&m_hintOutput==output;
             ++m_edgePresses;
-            return true; // Reserve only the bottom 10 logical pixels of a hidden Dock.
+            return true; // The same bottom edge advances hint -> Dock -> desktop.
         }
-        if(window&&window->isDock()&&!waylandServer()->isScreenLocked()&&m_revealDock==window)dispatch("RevealDock");
+        dockPress(window);
+        if(window&&window->isDock()&&!waylandServer()->isScreenLocked()&&m_revealDock==window&&!m_dismissPending)dispatch("RevealDock");
         if(m_contacts.size()==1&&desktop&&!waylandServer()->isScreenLocked()){
             m_id=event->id;m_window=window;m_origin=m_last=event->pos;m_cancelled=false;m_multi=false;++m_presses;
         }
@@ -96,14 +101,16 @@ public:
         m_contacts.remove(event->id);
         if(event->id==m_edgeId){
             const auto delta=m_edgeLast-m_edgeOrigin;
-            if(!m_multi&&m_dockHidden&&m_edgeOutput&&!waylandServer()->isScreenLocked()
+            if(!m_multi&&m_edgeOutput&&!waylandServer()->isScreenLocked()
                 &&delta.y()<-36&&-delta.y()>std::abs(delta.x())*1.25){
-                if(m_edgeSecond&&m_hint&&m_hintTimer.isActive()){
+                if(m_edgeHome){
+                    if(m_revealDock&&!m_dockHidden&&!m_dismissPending){++m_homeGestures;m_dismissPending=true;dispatch("ShowDesktop");}
+                }else if(m_dockHidden&&m_edgeSecond&&m_hint&&m_hintTimer.isActive()){
                     m_hintTimer.stop();m_hint.reset();m_hintOutput=nullptr;
                     clearRevealConstraint();m_revealBelow=workspace()->activeWindow();m_revealDock=bottomDock(m_edgeOutput);
                     if(m_revealBelow&&m_revealDock)workspace()->constrain(m_revealBelow,m_revealDock);
                     ++m_reveals;dispatch("RevealDock");
-                }else showDockHint(m_edgeOutput);
+                }else if(m_dockHidden)showDockHint(m_edgeOutput);
             }
             m_edgeId=-1;m_edgeOutput=nullptr;
             if(m_contacts.isEmpty())m_multi=false;
@@ -125,19 +132,31 @@ public:
         return false;
     }
     void clear(){m_contacts.clear();m_id=m_edgeId=-1;m_edgeOutput=nullptr;m_window=nullptr;m_cancelled=false;m_multi=false;}
+    void dockPress(Window *window)
+    {
+        if(!m_revealDock||!window||m_dismissPending||waylandServer()->isScreenLocked())return;
+        // Native Dock menus/popups and its fullscreen app drawer belong to the
+        // Dock interaction. A click in the already-focused app also dismisses.
+        int depth=0;
+        for(auto *owner=window;owner&&depth++<16;owner=owner->transientFor()){
+            if(owner==m_revealDock||owner==m_drawer)return;
+        }
+        m_dismissPending=true;++m_dismissals;
+        dispatch("DismissDock"); // Observe only: never consume the application's press.
+    }
 public slots:
     void pointerPresence(bool present){m_pointer=present;}
     void dockVisibility(bool hidden){m_dockHidden=hidden;if(hidden)clearRevealConstraint();else{m_hintTimer.stop();m_hint.reset();m_hintOutput=nullptr;}}
-    QString GetStatus()const{return QString::fromUtf8(QJsonDocument(QJsonObject{{"scope","desktop-and-bottom-edge"},{"desktopPresses",m_presses},{"cancelledDrags",m_cancelCount},{"actions",m_actions},{"trackedPoints",m_contacts.size()},{"pointerPresent",m_pointer},{"drawerDockLinked",!m_drawer.isNull()&&!m_dock.isNull()},{"dockHidden",m_dockHidden},{"dockHintVisible",m_hint!=nullptr},{"bottomEdgePresses",m_edgePresses},{"dockReveals",m_reveals}}).toJson(QJsonDocument::Compact));}
+    QString GetStatus()const{return QString::fromUtf8(QJsonDocument(QJsonObject{{"scope","desktop-and-bottom-edge"},{"desktopPresses",m_presses},{"cancelledDrags",m_cancelCount},{"actions",m_actions},{"trackedPoints",m_contacts.size()},{"pointerPresent",m_pointer},{"drawerDockLinked",!m_drawer.isNull()&&!m_dock.isNull()},{"dockHidden",m_dockHidden},{"dockHintVisible",m_hint!=nullptr},{"bottomEdgePresses",m_edgePresses},{"dockReveals",m_reveals},{"dockOutsideDismissals",m_dismissals},{"dockHomeGestures",m_homeGestures}}).toJson(QJsonDocument::Compact));}
 private:
     std::unique_ptr<OffscreenQuickScene> m_hint;
     QTimer m_hintTimer;
     QPointer<LogicalOutput> m_hintOutput,m_edgeOutput;
     QPointer<Window> m_revealBelow,m_revealDock;
     QPointF m_edgeOrigin,m_edgeLast;
-    int m_edgeId=-1,m_edgePresses=0,m_reveals=0;
-    bool m_dockHidden=false,m_edgeSecond=false;
-    void clearRevealConstraint(){if(m_revealBelow&&m_revealDock)workspace()->unconstrain(m_revealBelow,m_revealDock);m_revealBelow=nullptr;m_revealDock=nullptr;}
+    int m_edgeId=-1,m_edgePresses=0,m_reveals=0,m_dismissals=0,m_homeGestures=0;
+    bool m_dockHidden=false,m_edgeSecond=false,m_edgeHome=false,m_dismissPending=false;
+    void clearRevealConstraint(){if(m_revealBelow&&m_revealDock)workspace()->unconstrain(m_revealBelow,m_revealDock);m_revealBelow=nullptr;m_revealDock=nullptr;m_dismissPending=false;}
     Window *bottomDock(LogicalOutput *output)const{
         for(auto *win:workspace()->windows())if(!win->isDeleted()&&win->isDock()&&win->resourceClass()==QByteArrayLiteral("plasmashell")
             &&win->output()==output&&win->frameGeometry().center().y()>output->geometry().center().y()
@@ -184,7 +203,7 @@ private:
     int m_id=-1,m_presses=0,m_cancelCount=0,m_actions=0;
     bool m_pointer=true,m_cancelled=false,m_multi=false;
     void dispatch(const QString &method){auto message=QDBusMessage::createMethodCall("org.sheng.DesktopPolicy","/org/sheng/DesktopPolicy","org.sheng.DesktopPolicy",method);QDBusConnection::sessionBus().asyncCall(message);}
-    void readPresence(){auto msg=QDBusMessage::createMethodCall("org.sheng.DesktopPolicy","/org/sheng/DesktopPolicy","org.sheng.DesktopPolicy","GetState");auto *w=new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg),this);connect(w,&QDBusPendingCallWatcher::finished,this,[this](QDBusPendingCallWatcher *w){QDBusPendingReply<QString> reply=*w;if(!reply.isError()){const auto state=QJsonDocument::fromJson(reply.value().toUtf8()).object();m_pointer=state["pointer_present"].toBool(true);dockVisibility(state["dock_hidden"].toBool()&&!state["dock_revealed"].toBool());}w->deleteLater();});}
+    void readPresence(){auto msg=QDBusMessage::createMethodCall("org.sheng.DesktopPolicy","/org/sheng/DesktopPolicy","org.sheng.DesktopPolicy","GetState");auto *w=new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg),this);connect(w,&QDBusPendingCallWatcher::finished,this,[this](QDBusPendingCallWatcher *w){QDBusPendingReply<QString> reply=*w;if(!reply.isError()){const auto state=QJsonDocument::fromJson(reply.value().toUtf8()).object();m_pointer=state["pointer_present"].toBool(true);dockVisibility(state["dock_hidden"].toBool()&&!state["dock_revealed"].toBool()&&!state["showing_desktop"].toBool());}w->deleteLater();});}
 };
 KWIN_EFFECT_FACTORY_SUPPORTED(DesktopTouchGuard,"metadata.json",return waylandServer()!=nullptr;)
 }
