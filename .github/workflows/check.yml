@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Source, documentation links and publication checks
-        run: python3 scripts/check-project.py
+        run: |
+          python3 scripts/check-project.py
+          python3 -m unittest discover -s tests -v
       - name: Shell syntax
         shell: bash
         run: |

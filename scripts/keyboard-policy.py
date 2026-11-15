@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import sys
 
+_osk_visibility_state = None
+
 
 def physical_keyboards():
     result = []
@@ -33,6 +35,7 @@ def physical_keyboards():
 
 
 def apply_policy(bus):
+    global _osk_visibility_state
     import dbus
     keyboards = physical_keyboards()
     obj = bus.get_object('org.kde.KWin', '/VirtualKeyboard')
@@ -51,14 +54,33 @@ def apply_policy(bus):
     if fcitx:
         try:
             name = 'fyi.fortime.Fcitx5Osk'
-            bus.get_name_owner(name)  # Do not start the GUI merely to poll it.
+            owner = str(bus.get_name_owner(name))  # Do not start the GUI merely to poll it.
             target = bus.get_object(name,'/fyi/fortime/Fcitx5Osk/Controller')
             osk = dbus.Interface(target,'fyi.fortime.Fcitx5Osk.Controller1')
-            current = dbus.Interface(target,'org.freedesktop.DBus.Properties').Get('fyi.fortime.Fcitx5Osk.Controller1','ManualMode')
+            osk_properties = dbus.Interface(target,'org.freedesktop.DBus.Properties')
+            current = osk_properties.Get('fyi.fortime.Fcitx5Osk.Controller1','ManualMode')
             if bool(current) != bool(keyboards): osk.ChangeManualMode(dbus.Boolean(bool(keyboards)))
             if keyboards: osk.ForceHide()
+            # Upstream's normal-session launcher only calls Show() when
+            # KWin reports tabletMode. PIN detachment is handled independently
+            # here, so text-input activation must also drive the OSK directly.
+            # Show is edge-triggered: polling must not reopen a keyboard that
+            # the user dismissed. Leave lockscreen mode to its own launcher.
+            active = bool(properties.Get(interface, 'active'))
+            supports = bool(properties.Get(interface, 'activeClientSupportsTextInput'))
+            osk_mode = int(osk_properties.Get('fyi.fortime.Fcitx5Osk.Controller1','Mode'))
+            state = (owner, bool(keyboards), bool(current), active, supports, osk_mode)
+            if state != _osk_visibility_state:
+                if not keyboards and not current and osk_mode == 0:
+                    if active and supports:
+                        osk.Show()
+                    else:
+                        osk.Hide()
+                _osk_visibility_state = state
         except dbus.DBusException:
-            pass
+            _osk_visibility_state = None
+    else:
+        _osk_visibility_state = None
     return {'physical_keyboard_present': bool(keyboards), 'keyboards': keyboards,
             'virtual_keyboard_mode': desired}
 
@@ -89,6 +111,14 @@ def main():
                             dbus_interface='org.kde.kwin.VirtualKeyboard', path='/VirtualKeyboard')
     bus.add_signal_receiver(reconcile, signal_name='visibleChanged',
                             dbus_interface='org.kde.kwin.VirtualKeyboard', path='/VirtualKeyboard')
+    bus.add_signal_receiver(reconcile, signal_name='activeChanged',
+                            dbus_interface='org.kde.kwin.VirtualKeyboard', path='/VirtualKeyboard')
+    bus.add_signal_receiver(reconcile, signal_name='activeClientSupportsTextInputChanged',
+                            dbus_interface='org.kde.kwin.VirtualKeyboard', path='/VirtualKeyboard')
+    bus.add_signal_receiver(reconcile, signal_name='PropertiesChanged',
+                            dbus_interface='org.freedesktop.DBus.Properties',
+                            path='/fyi/fortime/Fcitx5Osk/Controller',
+                            arg0='fyi.fortime.Fcitx5Osk.Controller1')
     bus.add_signal_receiver(reconcile, signal_name='NameOwnerChanged',
                             dbus_interface='org.freedesktop.DBus',arg0='fyi.fortime.Fcitx5Osk')
     GLib.timeout_add_seconds(1, reconcile)

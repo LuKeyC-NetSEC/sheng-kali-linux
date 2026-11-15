@@ -13,7 +13,7 @@
 | 触屏 | `xiaomi-sheng-thp 0.3.9`、libssc | 固定资产与哈希见 sources.json |
 | PIN | `sheng-dock-fix 1.2-2`、模块 `1.2-shengfix` | 必须配合安全存储认证服务 |
 | 控制中心 | `0.7.7-sheng-privacy4` | 固定 Kontrol Center 上游 + 本地 patch |
-| 输入法实验 | msime-linux 0.16.1、Fcitx5 5.1.23、OSK 0.2.1 | 中文实际输入待解锁验收，非默认镜像 |
+| 输入法实验 | msime-linux 0.16.1、Fcitx5 5.1.23、OSK 0.2.1 | PIN 中文/抑制软键盘已确认，触屏弹出待修复，非默认镜像 |
 
 ## 硬件范围
 
