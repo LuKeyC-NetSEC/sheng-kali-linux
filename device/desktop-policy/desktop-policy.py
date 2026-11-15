@@ -86,7 +86,7 @@ class Policy(dbus.service.Object):
         present = bool(self.pointers)
         if self.published != present:
             value = 'true' if present else 'false'
-            result = self.script('var n=0; panels().concat(desktops()).forEach(function(p){p.widgets().forEach(function(w){if(w.type==="org.kontrol.center" || w.type==="org.sheng.desktop-gesture"){w.currentConfigGroup=["Appearance"];w.writeConfig("pointerPresent",'+value+');w.reloadConfig();n++;}})}); print(n);')
+            result = self.script('var n=0; panels().concat(desktops()).forEach(function(p){p.widgets().forEach(function(w){if(w.type==="org.kontrol.center" || w.type.indexOf("org.sheng.desktop-gesture")===0){w.currentConfigGroup=["Appearance"];w.writeConfig("pointerPresent",'+value+');w.reloadConfig();n++;}})}); print(n);')
             if result.strip() not in ('', '0'):
                 self.published = present
             elif not self.sync_pending:

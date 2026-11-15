@@ -41,7 +41,7 @@ with tempfile.TemporaryDirectory(prefix='sheng-tablet-controls-package-') as dir
         target.parent.mkdir(parents=True,exist_ok=True);target.write_text('<busconfig>\n</busconfig>\n')
     control = stage/'DEBIAN';control.mkdir()
     (control/'control').write_text('''Package: sheng-tablet-controls
-Version: 1.0-1
+Version: 1.0-2
 Architecture: arm64
 Maintainer: Sheng tablet local setup
 Depends: libc6 (>= 2.38), python3, python3-dbus, python3-gi, systemd, udev, polkitd, dbus, qdbus-qt6, alsa-utils, pulseaudio-utils, pipewire-bin
