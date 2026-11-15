@@ -23,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive', type=pathlib.Path, help='Optional verified upstream archive')
     parser.add_argument('--output-dir', type=pathlib.Path, default=PROJECT / 'out/osk-source')
+    parser.add_argument('--futo-ui', action='store_true', help='Also apply the native FUTO UI/UX port (requires its runtime package)')
     args = parser.parse_args()
     pin = json.loads((LOCAL / 'provenance.json').read_text(encoding='utf-8'))
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -60,6 +61,24 @@ def main():
         target = args.output_dir / 'pkg/share/fcitx5-osk' / category / source.name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
+    if args.futo_ui:
+        futo = PROJECT / 'device/futo-keyboard'
+        futo_pin = json.loads((futo / 'provenance.json').read_text(encoding='utf-8'))
+        ui_patch = (futo / 'futo-ui.patch').read_bytes().replace(b'\r\n', b'\n')
+        if sha(ui_patch) != futo_pin['ui_patch_sha256']:
+            raise SystemExit('FUTO UI patch SHA-256 mismatch')
+        for name, expected in futo_pin['ui_files'].items():
+            if sha((futo / name).read_bytes().replace(b'\r\n', b'\n')) != expected:
+                raise SystemExit('Unexpected FUTO UI source: ' + name)
+        subprocess.run(['git', 'apply', '--check', '-'], input=ui_patch, cwd=args.output_dir, check=True)
+        subprocess.run(['git', 'apply', '-'], input=ui_patch, cwd=args.output_dir, check=True)
+        shutil.copyfile(futo / 'ui/futo_ui.rs', args.output_dir / 'fcitx5-osk/src/futo_ui.rs')
+        shutil.copyfile(futo / 'FUTO-LICENSE.md', args.output_dir / 'FUTO-LICENSE.md')
+        (args.output_dir / 'NOTICE.FUTO').write_text('Native Linux FUTO UI/UX adaptation, not an official FUTO build.\n'
+            'Upstream references: ' + futo_pin['repository'] + '@' + futo_pin['commit'] + '\n'
+            'ActionBar.kt, v2keyboard/Keyboard.kt, DefaultLightDark.kt and layout schemas.\n'
+            'FUTO Source First terms and per-file notices remain applicable to upstream content.\n'
+            'New Linux rendering/integration: MIT. Support the original: https://keyboard.futo.org/\n', encoding='utf-8')
     (args.output_dir / 'NOTICE.sheng').write_text(
         'Fcitx5 OSK by fortime, MIT.\nSheng touch UI modifications, MIT.\n'
         'Upstream commit: ' + pin['osk_commit'] + '\n'

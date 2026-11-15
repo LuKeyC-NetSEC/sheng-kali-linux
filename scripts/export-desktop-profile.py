@@ -43,7 +43,7 @@ WIDGETS = {
     'Redmi.Clock': {'General': ['colorHex', 'boldfonts', 'showSeconds', 'fontSize', 'timeFormat', 'dateFormat', 'use24hFormat']},
 }
 OSK_KEYS = ['placement', 'landscape_width', 'portrait_width', 'default_font', 'default_nerd_font', 'default_landscape_layout', 'default_portrait_layout', 'theme', 'light_theme', 'dark_theme', 'ignore_fcitx_show']
-PACKAGES = ['kwin-wayland', 'plasma-workspace', 'plasma-desktop', 'libqt6core6t64', 'sheng-tablet-controls', 'sheng-msime-integration', 'fcitx5', 'fonts-noto-core', 'fonts-noto-cjk', 'fonts-materialdesignicons-legacy']
+PACKAGES = ['kwin-wayland', 'plasma-workspace', 'plasma-desktop', 'libqt6core6t64', 'sheng-tablet-controls', 'sheng-msime-integration', 'sheng-futo-keyboard', 'fcitx5', 'fonts-noto-core', 'fonts-noto-cjk', 'fonts-materialdesignicons-legacy', 'fonts-roboto']
 PRIVATE = re.compile(r'/(?:home|root|run/user|tmp|var/tmp)/|file://|\b[A-Za-z]:[\\/]|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', re.I)
 STYLE_KEY = re.compile(r'password|secret|token|path|filename|image|url|uri|uuid|latitude|longitude|location|cache', re.I)
 

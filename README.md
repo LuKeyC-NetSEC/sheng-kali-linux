@@ -18,6 +18,7 @@
 | 原桌面上滑抽屉、Linexin Dock 与防框选 | [抽屉与 Dock 部署](docs/DESKTOP_DRAWER.md) |
 | 两段上滑 Dock、锁屏手势、缺字与新图标 | [触控和字体增量](docs/TOUCH_LOCKSCREEN_FONTS.md) |
 | 当前桌面配置快照、导出与源码核对 | [桌面配置同步](docs/DESKTOP_PROFILE.md) |
+| 实验 FUTO 原生键盘移植、范围与构建 | [FUTO Linux 适配](device/futo-keyboard/README.md) |
 | 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
 | 已验证功能、未完成项、验收方法 | [验证状态](docs/VALIDATION.md) |
 | 第三方来源与许可 | [THIRD_PARTY.md](THIRD_PARTY.md) |

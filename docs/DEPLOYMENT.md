@@ -134,6 +134,8 @@ kpackagetool6 --type Plasma/Applet --install out/packages/sheng-control-center.p
 
 Burp 官方安装及 6 GiB/170%/OpenGL 参数见 [burp-tablet.md](burp-tablet.md)。水杉/Fcitx5 OSK 的固定来源与未完成验收见 [input-method](../device/input-method/README.md)，不能作为默认稳定安装步骤。安装新输入法前保留可用的 Plasma Keyboard 回退入口。
 
+实验 [FUTO Linux 移植](../device/futo-keyboard/README.md)需要用 `--futo-ui` 构建并安装 `sheng-msime-integration 0.2.1-7`，再编译原生英文词典/候选模块、准备原版图标/字体/布局并执行用户级 setup。核心 UI/UX 通过 Rust 原生渲染；FUTO 的非商业 Source First 许可、实际范围与回退单独记录。未移植完整 Android 应用、滑行或语音，不替换水杉中文引擎。不要将仅打包 `.deb` 等同于已完成 C++ 构建。
+
 ## 回退与故障定位
 
 | 层 | 诊断/回退 |

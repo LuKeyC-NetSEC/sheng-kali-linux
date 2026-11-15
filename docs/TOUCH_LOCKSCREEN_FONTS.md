@@ -44,7 +44,7 @@ fc-list ':family=Material Design Icons version 6:charset=0061' family
 
 显示采用明确的 24 小时 `HH:mm` 与 `M月d日 星期`，Noto Sans CJK SC、Qt text 渲染，每秒读取系统时间，显示恢复时立即刷新。时钟位于上方独立区域，不随用户名布局挤压。
 
-触屏轻点空白处保持时钟画面；**向上滑动 56 逻辑像素以上**且纵向占优才显示密码页。鼠标与实体键盘沿用原生入口。显示密码页后仍是 KDE 原来的 MainBlock / PAM authenticator，没有修改验证结果、自动提交密码或绕过锁屏。
+触屏轻点空白处保持时钟画面；**向上滑动 56 逻辑像素以上**且纵向占优才显示密码页。密码页出现时隐藏时间与日期，返回锁屏封面时重新显示并刷新时间。鼠标与实体键盘沿用原生入口。显示密码页后仍是 KDE 原来的 MainBlock / PAM authenticator，没有修改验证结果、自动提交密码或绕过锁屏。
 
 ```bash
 sudo python3 scripts/install-lockscreen-touch.py

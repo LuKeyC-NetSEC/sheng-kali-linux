@@ -11,7 +11,7 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-3` 包含卸载回退、字体依赖与模式切换器；原实机版本为 `0.2.1-1` 加后续 guard 修复。安装新版后仍按验证矩阵逐项验收。
+`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-7` 保留 `-3` 的卸载回退、字体依赖与模式切换器，并支持 FUTO 英文入口。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
@@ -44,11 +44,11 @@ Plasma 会话只设置 `XMODIFIERS=@im=fcitx`，不全局强制 `QT_IM_MODULE`/`
 ```bash
 python3 scripts/prepare-osk-ui.py
 cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib/aarch64-linux-gnu
-cmake --build out/osk-cmake --parallel 2
+CARGO_BUILD_JOBS=2 cmake --build out/osk-cmake --parallel 2
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
-python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-3_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-3_arm64.deb
+python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
+sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
 # 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
 sheng-osk-mode float --font-defaults --sheng-ui
 # 切回底部停靠
@@ -58,3 +58,5 @@ sheng-osk-mode dock
 先安装固定版本 msime-linux，并按前文设置 Fcitx profile 与 KWin InputMethod；集成包不复制用户词库或账户。构建器不会自动编译实验 KWin 插件。此处路径从仓库根开始；干净源码构建可能需要较长时间和大量缓存空间。
 
 已完成：实体中文组合/上屏、触屏中文、PIN接入不弹软键盘、拔下后连续弹出，以及新界面的拖动和模式切换。剩余锁屏解锁及挂起恢复需要独立记录。保留 `/usr/share/applications/org.kde.plasma.keyboard.desktop` 回退入口，卸载集成包后确认 KWin InputMethod 与用户服务回到基础实现。不要为验收绕过锁屏或关闭已有应用。
+
+可选 [FUTO 原生移植](../futo-keyboard/README.md)在本输入面板上接入 FUTO/LatinIME 的英文 C++ 候选核心、QWERTY 布局和默认调色板；中文引擎仍为水杉。两者来源和许可证分开记录，不把 Linux 适配器称为完整 Android FUTO 应用。

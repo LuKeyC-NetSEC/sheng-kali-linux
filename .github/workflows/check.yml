@@ -39,8 +39,14 @@ jobs:
           python3 scripts/build-task-cards.py
           python3 scripts/build-desktop-drawer.py
           python3 scripts/prepare-osk-ui.py
+          python3 scripts/prepare-futo-keyboard.py
+          python3 scripts/prepare-osk-ui.py --futo-ui --output-dir out/osk-futo-ui-source
           python3 - <<'PY'
-          import pathlib, tomllib
+          import pathlib, tomllib, xml.etree.ElementTree as ET
           for path in pathlib.Path('device/input-method').rglob('*.toml'):
               tomllib.loads(path.read_text(encoding='utf-8'))
+          for path in pathlib.Path('out/futo-source/linux-data').glob('*.toml'):
+              tomllib.loads(path.read_text(encoding='utf-8'))
+          for path in pathlib.Path('out/futo-source/linux-data/icons').glob('*.svg'):
+              ET.parse(path)
           PY

@@ -35,16 +35,20 @@ for original,relative,mode in [
     destination=stage/relative;destination.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(original,destination);destination.chmod(mode)
 control=stage/'DEBIAN';control.mkdir(exist_ok=True)
+for name in ['FUTO-LICENSE.md', 'futo-ui.patch', 'provenance.json']:
+    original = source.parents[1]/'device/futo-keyboard'/name
+    destination = stage/'usr/share/doc/sheng-msime-integration'/('FUTO-'+name if name == 'provenance.json' else name)
+    shutil.copyfile(original, destination)
 for asset in (source/'ui').glob('*.toml'):
     category = 'key_sets' if asset.name.endswith('-keys.toml') else 'layouts' if asset.name.endswith(('-landscape.toml', '-portrait.toml')) else 'themes'
     destination = stage/'usr/share/fcitx5-osk'/category/asset.name
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(asset, destination)
 (control/'control').write_text('''Package: sheng-msime-integration
-Version: 0.2.1-3
+Version: 0.2.1-7
 Architecture: arm64
 Maintainer: Sheng tablet local setup
-Depends: msime-linux (>= 0.16.1), fcitx5, libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy
+Depends: msime-linux (>= 0.16.1), fcitx5, libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
 Description: Metasequoia input and touch keyboard integration for sheng
  Pinned Fcitx5 OSK with physical-keyboard suppression and KWin launcher.
 ''')
