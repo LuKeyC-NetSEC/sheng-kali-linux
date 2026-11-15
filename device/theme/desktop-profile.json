@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAtUTC": "2026-11-15T12:33:06+00:00",
+  "capturedAtUTC": "2026-11-15T14:48:56+00:00",
   "platform": {
     "device": "sheng",
     "architecture": "arm64",
@@ -10,11 +10,13 @@
       "fonts-materialdesignicons-legacy": "5.9.55+6.9.96+dfsg-3",
       "fonts-noto-cjk": "1:20240730+repack1-1",
       "fonts-noto-core": "20201225-6",
+      "fonts-roboto": "2:3.016-1",
       "kwin-wayland": "4:6.7.4-2+b1",
       "libqt6core6t64:arm64": "6.11.2+dfsg-5",
       "plasma-desktop": "4:6.7.4-1+b1",
       "plasma-workspace": "4:6.7.4-2",
-      "sheng-msime-integration": "0.2.1-3",
+      "sheng-futo-keyboard": "0.3.0-3",
+      "sheng-msime-integration": "0.2.1-8",
       "sheng-tablet-controls": "1.0-5"
     }
   },
@@ -763,15 +765,15 @@
   ],
   "screenKeyboard": {
     "placement": "Float",
-    "landscape_width": 640.0,
-    "portrait_width": 480.0,
-    "default_font": "Noto Sans CJK SC",
+    "landscape_width": 400.0,
+    "portrait_width": 300.0,
+    "default_font": "Roboto",
     "default_nerd_font": "Material Design Icons version 6",
-    "default_landscape_layout": "sheng-hyperos-landscape",
-    "default_portrait_layout": "sheng-hyperos-portrait",
+    "default_landscape_layout": "sheng-futo-landscape",
+    "default_portrait_layout": "sheng-futo-portrait",
     "theme": "Auto",
-    "light_theme": "Sheng Light",
-    "dark_theme": "Sheng Dark",
+    "light_theme": "FUTO Light",
+    "dark_theme": "FUTO Dark",
     "ignore_fcitx_show": false
   },
   "wallpapers": {
