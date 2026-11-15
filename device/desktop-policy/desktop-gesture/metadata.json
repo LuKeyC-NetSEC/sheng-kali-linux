@@ -1,0 +1,15 @@
+{
+  "KPackageStructure": "Plasma/Applet",
+  "KPlugin": {
+    "Id": "org.sheng.desktop-gesture",
+    "Name": "Desktop control-center gesture",
+    "Name[zh_CN]": "桌面下滑控制中心",
+    "Description": "Touch pull-down on the right half of the desktop",
+    "Version": "1.0.0",
+    "License": "MIT",
+    "Category": "System Information",
+    "Icon": "input-touchscreen"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-API": "declarativeappletscript"
+}

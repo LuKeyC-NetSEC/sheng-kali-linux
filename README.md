@@ -1,195 +1,84 @@
-# Warning
-We're not responsible for bricked devices, missing recovery partitions, dead xiaomi factoryline workers cowboys, dead microSD cards, dead pmics, dead ram, dead display ics, dead cpus, any xiaomi shenanigans, dead cats or dogs, nuclear wars or you getting fired because you forgot to boot back in to android for the alarm.
+# Sheng Kali Linux · 小米平板 6S Pro
 
-All the files here have been contributed by other users, here you will find a guide with the working files we managed to get. This is a delicate process, do it under your own risk and follow all the steps carefully.
+**在 Xiaomi Pad 6S Pro 12.4（`sheng` / `24018RPACC`）运行原生 Kali ARM64 + KDE Plasma Wayland。** 本仓库提供镜像构建、刷写校验、硬件修复和面向平板的桌面交互源码，便于开发者与 AI 协作部署。
 
-**IF YOU AREN'T COMFORTABLE MODDING YOUR TABLET OR ITS PARTITION TABLE OR YOU ARE PARANOID OF BRICKING YOUR DEVICE CLICK AWAY NOW!!! YOU HAVE BEEN WARNED, YOU ARE ON YOUR OWN IF YOU BRICK YOUR DEVICE!!! AGAIN! YOU HAVE BEEN WARNED!!!**
+基于 [alghiffaryfa19/sheng-pmos-builds](https://github.com/alghiffaryfa19/sheng-pmos-builds) 扩展，保留上游提交历史和 GPL 许可证。这是社区适配，非小米或 Kali 官方支持项目。
 
-# Status
+> 安装会覆盖 `userdata`，删除全部 Android 用户数据。仅适用于已解锁 Bootloader 的 **sheng**，不要用于其他小米平板。当前发布为源码与复现说明，未发布包含全部后续改动的完整预制镜像。
 
-You can check [Here](https://wiki.postmarketos.org/wiki/Xiaomi_Pad_6S_Pro_12.4_(xiaomi-sheng))
+## 从哪里开始
 
-# Installation Guide
-Please follow the guide carefully
+| 目的 | 文档 |
+| --- | --- |
+| 让 AI 帮你部署 | [AI 部署指南与可复制提示词](docs/AI_DEPLOY.md)、[AGENTS.md](AGENTS.md) |
+| 构建、刷写、分层安装与恢复 | [部署手册](docs/DEPLOYMENT.md) |
+| 桌面布局、控制中心、手势、电源行为 | [桌面与交互](docs/DESKTOP_AND_INTERACTIONS.md) |
+| 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
+| 已验证功能、未完成项、验收方法 | [验证状态](docs/VALIDATION.md) |
+| 第三方来源与许可 | [THIRD_PARTY.md](THIRD_PARTY.md) |
+| 修改与提交 | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
-1. Make sure you have unlocked the bootloader on your device and make sure only Android OS is installed.
-2. Look for the latest workflow run (marked with 🟢)
-3. Download the desired image:
- - xiaomi-sheng-none_*.zip (minimal system)
- - xiaomi-sheng-plasma_*.zip (KDE Plasma)
- - xiaomi-sheng-gnome_*.zip (GNOME Shell)
- - xiaomi-sheng-gnome_mobile_*.zip (GNOME Shell Mobile)
- - xiaomi-sheng-plasma_mobile_*.zip (KDE Plasma Mobile)
- - xiaomi-sheng-lomiri_*.zip (KDE Plasma Mobile)
- - xiaomi-sheng-kernel_*.zip (kernel packages)
-4. Extract ZIP
+English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start with the linked deployment guide; machine identifiers and commands are included. Flashing erases Android userdata. This is a source release, not a fully integrated ready-to-flash release image.
 
+## 当前功能
 
-# Single Boot
-1. Boot to bootloader
-    ```bash
-	adb reboot bootloader
-	```
-2. Erase dtbo
-    ```bash
-	fastboot erase dtbo_a
-    fastboot erase dtbo_b
-	```
+- 原生 ARM64 Kali rolling、Plasma Wayland；触屏、USB RNDIS/SSH、CDC ACM 串口。
+- Adreno 740：Mesa freedreno OpenGL 与 Turnip Vulkan 共存；[GPU 监控](device/gpu-monitor/README.md) 和[实机对比](docs/gpu-efficiency-measurement.md)。
+- PIN 键盘/触摸板认证和唤醒修复；扬声器、音量键；Wi-Fi 上网与并发热点。
+- 6 GiB Zstd ZRAM + 8 GiB swapfile；不额外划分 swap 分区。
+- 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。
+- 摄像头/麦克风/定位的统一隐私开关，含设备访问、门户请求与既有采集进程处理；范围和限制见[隐私说明](device/privacy/README.md)。
+- 电源短按锁屏；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。
+- 水杉 + Fcitx5 触屏/实体输入集成源码为**实验项**，锁屏后尚未完成中文上屏验收。默认基础镜像仍使用 Plasma Keyboard。
 
-3. Flash boot image
-    ```bash
-	fastboot flash boot_ab boot-xiaomi-sheng.img
-	```
+这些是当前实机的累计适配状态。**基础构建脚本未自动安装全部增量组件。** PIN 模块编译、热点面板编译、主题第三方资产与个别用户配置仍需按部署手册处理，不能仅刷入基础镜像就宣称完整复现。
 
-4. Flash rootfs image
-    ```bash
-	fastboot flash userdata rootfs-xiaomi-sheng-*.img
-	```
+## 快速构建基础镜像
 
-5. Reboot
-    ```bash
-	fastboot reboot
-	```
+在 Linux root 环境构建，需要 ARM64 binfmt/QEMU 及至少约 30 GiB 可用磁盘；完整构建建议预留更多空间。Windows 使用 Linux 虚拟机。
 
-# Dual Boot
-1. Boot to TWRP
-    ```bash
-	adb reboot recovery
-	```
+```bash
+git clone https://github.com/LuKeyC-NetSEC/sheng-kali-linux.git
+cd sheng-kali-linux
+sudo apt-get update
+sudo apt-get install -y debootstrap qemu-user-static binfmt-support \
+  android-sdk-libsparse-utils e2fsprogs curl ca-certificates gnupg python3
+sudo update-binfmts --enable qemu-aarch64
+sudo bash scripts/build-kali.sh
+python3 scripts/validate-images.py out
+```
 
-2. Download parted file in this repo
-4. Push parted file to android storage 
-	```bash
-	adb push <path/to/parted> /sdcard
-	```
-5. Enter adb shell
-	```bash
-	adb shell
-	```
-6. Create linux partition
-	```bash
-	chmod +x /sdcard/parted
-	/sdcard/parted /dev/block/sda
-	```
-7. delete userdata partition, note the number (far left), in my case, userdata is at number 29
-	```bash
-	print
-	rm 29
-	```
-8. Create userdata and linux partition (userdata 128GB and linux 128GB)
-	```bash
-	mkpart userdata ext4 12.7GB 140.7GB
-	mkpart linux ext4 140.7GB -0MB
-	```
+也可手动运行 GitHub Actions 的 **Xiaomi Pad 6S Pro Kali ARM64 KDE**。内核、固件及下载哈希在 [configs/sources.json](configs/sources.json)。Kali rolling 的软件包会更新，固定硬件来源不等于完整可重复构建；每次保留 `packages.tsv` 和 manifest。
 
-9. Check the partition that has been created
-	```bash
-	print
-	```
+基础产物：`out/boot-kali-sheng.img`、`out/rootfs-kali-arm64-kde-sheng.img`、`out/manifest.json`、校验与软件包列表。`out/` 和 `.work/` 不入库；其他人的本地文件无需存在，也不应作为下载来源。
 
-10. You will see 29 for userdata and 30 for linux
-11. Exit from parted
-	```bash
-	quit
-	```
-12. Exit from shell
-	```bash
-	exit
-	```
-13. Boot to bootloader
-    ```bash
-	adb reboot bootloader
-	```
+默认账户 `kali` / `kali`，开启自动登录与 USB SSH，root 密码登录锁定。首次启动请修改密码；可通过构建环境变量或 Actions secret `KALI_PASSWORD` 设置自定义密码，不要将真实密码写入仓库。
 
-14. Erase dtbo
-    ```bash
-    fastboot erase dtbo_b
-	```
+## 刷入与回退
 
-15. Flash boot image
-    ```bash
-	fastboot flash boot_b boot-xiaomi-sheng.img
-	```
+确认机型、备份、解锁状态及清数据授权后，在 Windows 执行：
 
-16. Flash rootfs image
-    ```bash
-	fastboot flash linux rootfs-xiaomi-sheng-*.img
-	```
+```powershell
+adb reboot bootloader
+python scripts/validate-images.py out
+.\scripts\flash-kali.ps1 -ImageDirectory .\out -EraseUserdata
+```
 
-17. Slot B activation
-    ```bash
-	fastboot set_active b
-	```
+Linux 使用 `OUT_DIR=out bash scripts/flash-kali.sh --erase-userdata`。脚本将 rootfs 写入 `userdata`，内核写入 `boot_b`，清除 `dtbo_b`，切至 B 槽并重启。脚本通过不等于硬件启动验收；分区影响、串口/SSH检查和恢复方法见[部署手册](docs/DEPLOYMENT.md)。保留 A 槽 boot/dtbo 不会保留 Android 用户数据。
 
-18. Reboot
-    ```bash
-	fastboot reboot
-	```
+## 源码导航
 
-# Fix Sensor
-1. Download all apk files from [Here](https://github.com/alghiffaryfa19/sheng-pmos-builds/releases/tag/sensor)
-2. Run this command
-	```bash
-	sudo apk add *apk
-	```
-3. Enable and start services
-	```bash
-	sudo systemctl enable iio-sensor-proxy
-	sudo systemctl start iio-sensor-proxy
-	sudo systemctl enable adsprpcd-sensorspd
-	sudo systemctl start adsprpcd-sensorspd
-	```
-4. Reboot
+| 路径 | 用途 |
+| --- | --- |
+| `scripts/build-kali.sh`、`fetch-assets.py`、`validate-images.py` | 基础镜像与校验 |
+| `device/keyboard-driver/`、`keyboard-auth/` | PIN 驱动及认证补丁 |
+| `scripts/sheng-hotspot.py`、`device/hotspot-panel/` | 并发 AP 与原生网络面板 |
+| `device/control-center/` | 澎湃风格控制中心 QML/SVG、固定上游补丁 |
+| `device/recents/`、`desktop-policy/` | 三指原生切窗、任务卡片、Dock、桌面下滑 |
+| `device/privacy/` | 进程/设备访问隐私后端 |
+| `device/theme/`、`input-method/` | 桌面配置、天气修复、实验输入法 |
+| `device/gpu-bench/`、`docs/` | GPU 测试代码、部署与验证说明 |
 
-# Switch OS
-1. From Android to Linux
-	- GUI (Requires rooting)
-		- Download app [Here](https://github.com/capntrips/BootControl/releases)
-		- Install app
-		- Open app
-		- Activate Slot B and reboot
+仓库保留的 `gnome_shell_mobile.jpg`、`hyperos.jpg`、`neofetch.jpg` 是上游历史资料，**不是当前 Kali 桌面截图**。当前布局和手势见交互文档中的结构图。Miku 壁纸仅记录来源，不重新分发图片；Burp 只提供公开性能配置，不提供软件本体或许可证。
 
-	- Bootloader (no root, requires PC)
-		- Boot to bootloader
-		- Slot B activation
-		```bash
-		fastboot set_active b
-		fastboot reboot
-		```
-
-2. From Linux to Android
-	- qbootctl
-		- Open terminal
-		- Slot A activation
-		```bash
-		sudo qbootctl -s a
-		sudo reboot
-		```
-
-	- Bootloader (Requires PC)
-		- Boot to bootloader
-		- Slot A activation
-		```bash
-		fastboot set_active a
-		fastboot reboot
-		```
-# 🔐 Login Credentials
-Default System Credentials
-
-Username: user
-Password: 147147 (for initial setup)
-
-# Tips if you use Gnome Shell Mobile
-1. Use gnome extensions to force phone mode, you can follow the guide [Here](https://github.com/vixalien/force-phone-mode)
-
-# Screenshot
-<div align="center">
-  <img src="hyperos.jpg" alt="Xiaomi Pad 6s Pro HyperOS"/>
-  <p><em>Xiaomi Pad 6s Pro HyperOS</em></p>
-  <br>
-	<img src="gnome_shell_mobile.jpg" alt="Xiaomi Pad 6s Pro PMOS"/>
-  <p><em>Xiaomi Pad 6s Pro PostmarketOS</em></p>
-    <br>
-	<img src="neofetch.jpg" alt="Xiaomi Pad 6s Pro neofetch"/>
-  <p><em>Xiaomi Pad 6s Pro with 6.17 kernel</em></p>
-</div>
+本地检查：`python3 scripts/check-project.py`。旧 postmarketOS 工作流仅手动触发，历史说明见 [postmarketos-original.md](docs/postmarketos-original.md)。
