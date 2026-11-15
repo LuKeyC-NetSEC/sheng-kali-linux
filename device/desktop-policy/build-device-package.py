@@ -14,6 +14,7 @@ output.parent.mkdir(parents=True,exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='sheng-tablet-controls-package-') as directory:
     stage = pathlib.Path(directory)
     files = [
+        (here.parents[1]/'scripts/install-desktop-drawer.py','usr/bin/sheng-desktop-drawer-setup',0o755),
         (here/'desktop-policy.py','usr/libexec/sheng-desktop-policy',0o755),
         (here/'sheng-desktop-policy.service','usr/lib/systemd/user/sheng-desktop-policy.service',0o644),
         (here/'org.sheng.DesktopPolicy.service','usr/share/dbus-1/services/org.sheng.DesktopPolicy.service',0o644),
@@ -41,12 +42,12 @@ with tempfile.TemporaryDirectory(prefix='sheng-tablet-controls-package-') as dir
         target.parent.mkdir(parents=True,exist_ok=True);target.write_text('<busconfig>\n</busconfig>\n')
     control = stage/'DEBIAN';control.mkdir()
     (control/'control').write_text('''Package: sheng-tablet-controls
-Version: 1.0-2
+Version: 1.0-4
 Architecture: arm64
 Maintainer: Sheng tablet local setup
-Depends: libc6 (>= 2.38), python3, python3-dbus, python3-gi, systemd, udev, polkitd, dbus, qdbus-qt6, alsa-utils, pulseaudio-utils, pipewire-bin
+Depends: libc6 (>= 2.38), python3, python3-dbus, python3-gi, systemd, udev, polkitd, dbus, qdbus-qt6, alsa-utils, pulseaudio-utils, pipewire-bin, plasma-workspace, plasma-desktop, qml6-module-org-kde-plasma-workspace, kpackagetool6
 Description: Dock, desktop gesture and process-level sensor privacy for sheng
- Retains the native Plasma Dock and uses a cgroup BPF device guard.
+ Includes the Linexin setup helper and uses a cgroup BPF device guard.
 ''')
     (control/'conffiles').write_text('\n'.join('/'+relative for _,relative,_ in files if relative.startswith('etc/'))+'\n/etc/dbus-1/system.d/51-sheng-privacy.conf\n/etc/dbus-1/session.d/51-sheng-privacy.conf\n')
     scripts = {

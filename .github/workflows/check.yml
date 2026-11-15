@@ -37,6 +37,7 @@ jobs:
         run: |
           python3 scripts/build-control-center.py
           python3 scripts/build-task-cards.py
+          python3 scripts/build-desktop-drawer.py
           python3 scripts/prepare-osk-ui.py
           python3 - <<'PY'
           import pathlib, tomllib

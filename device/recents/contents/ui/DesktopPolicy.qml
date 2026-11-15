@@ -12,7 +12,7 @@ Item {
     property int lastMode: -1
     function update() {
         var win = watched
-        var hidden = !!(win && !win.deleted && !win.minimized && !win.desktopWindow
+        var hidden = !!(win && win.caption !== "Sheng Application Drawer" && !win.deleted && !win.minimized && !win.desktopWindow
             && (win.normalWindow || win.dialog) && (win.fullScreen || Number(win.maximizeMode) === 3))
         if (lastMode === Number(hidden)) return
         lastMode = Number(hidden)

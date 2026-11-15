@@ -15,6 +15,7 @@
 | 让 AI 帮你部署 | [AI 部署指南与可复制提示词](docs/AI_DEPLOY.md)、[AGENTS.md](AGENTS.md) |
 | 构建、刷写、分层安装与恢复 | [部署手册](docs/DEPLOYMENT.md) |
 | 桌面布局、控制中心、手势、电源行为 | [桌面与交互](docs/DESKTOP_AND_INTERACTIONS.md) |
+| 原桌面上滑抽屉、Linexin Dock 与防框选 | [抽屉与 Dock 部署](docs/DESKTOP_DRAWER.md) |
 | 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
 | 已验证功能、未完成项、验收方法 | [验证状态](docs/VALIDATION.md) |
 | 第三方来源与许可 | [THIRD_PARTY.md](THIRD_PARTY.md) |
@@ -29,6 +30,7 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 - PIN 键盘/触摸板认证和唤醒修复；扬声器、音量键；Wi-Fi 上网与并发热点。
 - 6 GiB Zstd ZRAM + 8 GiB swapfile；不额外划分 swap 分区。
 - 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。
+- 原 Plasma 桌面全区域触屏上滑打开 Linexin 全屏抽屉；防触屏框选、长按编辑、左右分页。抽屉与桌面显示同一个 Linexin Dock，开关时保持静止。
 - 摄像头/麦克风/定位的统一隐私开关，含设备访问、门户请求与既有采集进程处理；范围和限制见[隐私说明](device/privacy/README.md)。
 - 电源短按锁屏；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。
 - 水杉 + Fcitx5 输入集成：PIN 中文、接入时禁止软键盘、无键盘时连续弹出，以及新界面的触屏中文、悬浮拖动和停靠切换均已用户确认。新输入法的锁屏/挂起恢复仍待独立验收；基础镜像默认使用 Plasma Keyboard。
@@ -77,6 +79,7 @@ Linux 使用 `OUT_DIR=out bash scripts/flash-kali.sh --erase-userdata`。脚本�
 | `scripts/sheng-hotspot.py`、`device/hotspot-panel/` | 并发 AP 与原生网络面板 |
 | `device/control-center/` | 澎湃风格控制中心 QML/SVG、固定上游补丁 |
 | `device/recents/`、`desktop-policy/` | 三指原生切窗、任务卡片、Dock、桌面下滑 |
+| `device/linexin-dock/`、`desktop-touch-guard/` | Linexin Dock/抽屉补丁、KWin 防框选与全屏 Dock 叠层 |
 | `device/privacy/` | 进程/设备访问隐私后端 |
 | `device/theme/`、`input-method/` | 桌面配置、天气修复、实验输入法 |
 | `device/gpu-bench/`、`docs/` | GPU 测试代码、部署与验证说明 |

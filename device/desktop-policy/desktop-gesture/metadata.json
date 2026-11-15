@@ -2,10 +2,10 @@
   "KPackageStructure": "Plasma/Applet",
   "KPlugin": {
     "Id": "org.sheng.desktop-gesture",
-    "Name": "Desktop control-center gesture",
-    "Name[zh_CN]": "桌面下滑控制中心",
-    "Description": "Touch pull-down on the right half of the desktop",
-    "Version": "1.1.0",
+    "Name": "Desktop touch gestures",
+    "Name[zh_CN]": "桌面触屏手势",
+    "Description": "Swipe up anywhere on the Plasma desktop for the application drawer",
+    "Version": "1.2.0",
     "License": "MIT",
     "Category": "System Information",
     "Icon": "input-touchscreen"

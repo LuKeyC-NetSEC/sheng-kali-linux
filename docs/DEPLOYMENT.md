@@ -95,11 +95,13 @@ python3 device/recents/install-native-tabbox.py
 ```bash
 gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
 sudo out/bin/sheng-privacy-bpf probe
-python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-2_arm64.deb
-sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-2_arm64.deb
+python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-4_arm64.deb
+sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-4_arm64.deb
 ```
 
 包安装用户会话服务、隐私过滤器及桌面手势部件；还需将 `org.sheng.desktop-gesture` 添加到桌面，并加载上一步 KWin 效果（其 `DesktopPolicy.qml` 通知最大化/全屏）。Dock 按 `ShengThemeRole=dock` 或底部任务面板识别，不依赖作者面板 ID。
+
+使用当前 Linexin Dock/抽屉时，先完成下面的主题面板，再按[抽屉专用说明](DESKTOP_DRAWER.md)构建启动器、运行迁移助手和编译原生桌面触控插件；助手自动添加手势部件、备份和迁移固定项。原生插件必须与当前 KWin/Qt ABI 匹配，它同时负责防框选和真正全屏抽屉上的 Dock 叠层；仅安装 QML 不够。
 
 隐私开关默认为允许访问；先读 [拦截范围](../device/privacy/README.md)。root 运行 `/usr/libexec/sheng-privacyctl off` 可恢复；本地活跃用户通过 `sheng-privacy on/off` 请求有限权限。冻结既有采集进程可能暂停整个相关应用，验收使用测试进程。
 

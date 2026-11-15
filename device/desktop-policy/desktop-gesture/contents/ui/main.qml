@@ -21,6 +21,13 @@ PlasmoidItem {
         var duration = hints ? Number(hints["mousePressAndHoldInterval"]) : 800
         return Number.isFinite(duration) && duration > 0 ? Math.ceil(duration) : 800
     }
+    readonly property int touchDragThreshold: {
+        var hints = Qt.styleHints
+        var distance = hints ? Number(hints["startDragDistance"]) : 10
+        if (!Number.isFinite(distance) || distance <= 0) distance = 10
+        // Claim touch motion before Folder View's mouse-style drag selection.
+        return Math.max(1, Math.min(3, Math.floor(distance / 2)))
+    }
 
     function findDesktopLayout(item, depth) {
         if (!item || depth > 28) return null
@@ -74,10 +81,10 @@ PlasmoidItem {
     Item {
         id: region
         parent: root.Window.window ? root.Window.window.contentItem : null
-        visible: !Plasmoid.configuration.pointerPresent && !Plasmoid.containment.corona.editMode
-        x: parent ? parent.width / 2 : 0
+        visible: !Plasmoid.containment.corona.editMode
+        x: 0
         y: 0
-        width: parent ? parent.width / 2 : 0
+        width: parent ? parent.width : 0
         height: parent ? parent.height : 0
         z: 100000
         PointHandler {
@@ -89,23 +96,29 @@ PlasmoidItem {
         }
         DragHandler {
             id: pullDown
-            property bool qualified: false
+            property string qualified: ""
             target: null
             acceptedDevices: PointerDevice.TouchScreen
             minimumPointCount: 1
             maximumPointCount: 1
-            dragThreshold: 12
-            xAxis.enabled: false
+            dragThreshold: root.touchDragThreshold
             onActiveChanged: {
                 root.updateTouchGuard()
-                if (active) qualified = false
-                else if (qualified) {
-                    qualified = false
-                    execute.connectSource("qdbus6 org.sheng.DesktopPolicy /org/sheng/DesktopPolicy org.sheng.DesktopPolicy.OpenControlCenter")
+                if (active) qualified = ""
+                else if (qualified !== "") {
+                    var action = qualified
+                    qualified = ""
+                    execute.connectSource("qdbus6 org.sheng.DesktopPolicy /org/sheng/DesktopPolicy org.sheng.DesktopPolicy." + action)
                 }
             }
-            onCanceled: qualified = false
-            onActiveTranslationChanged: if (active && activeTranslation.y > 48) qualified = true
+            onCanceled: qualified = ""
+            onActiveTranslationChanged: if (active) {
+                var dx = activeTranslation.x
+                var dy = activeTranslation.y
+                if (dy < -56 && -dy > Math.abs(dx) * 1.25) qualified = "OpenAppDrawer"
+                else if (!Plasmoid.configuration.pointerPresent && centroid.scenePressPosition.x > region.width / 2 && dy > 56 && dy > Math.abs(dx) * 1.25) qualified = "OpenControlCenter"
+                else qualified = ""
+            }
         }
     }
 }

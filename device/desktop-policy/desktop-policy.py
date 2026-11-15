@@ -85,6 +85,7 @@ class Policy(dbus.service.Object):
     def sync(self):
         present = bool(self.pointers)
         if self.published != present:
+            self.PointerPresenceChanged(present)
             value = 'true' if present else 'false'
             result = self.script('var n=0; panels().concat(desktops()).forEach(function(p){p.widgets().forEach(function(w){if(w.type==="org.kontrol.center" || w.type.indexOf("org.sheng.desktop-gesture")===0){w.currentConfigGroup=["Appearance"];w.writeConfig("pointerPresent",'+value+');w.reloadConfig();n++;}})}); print(n);')
             if result.strip() not in ('', '0'):
@@ -92,21 +93,29 @@ class Policy(dbus.service.Object):
             elif not self.sync_pending:
                 self.sync_pending = GLib.timeout_add(1500,self.retry_sync)
         self.apply_dock()
-        (STATE/'state.json').write_text(json.dumps({'pointer_present':present, 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden},ensure_ascii=False)+'\n')
+        self.save_state()
         return False
+
+    def save_state(self):
+        (STATE/'state.json').write_text(json.dumps({'pointer_present':bool(self.pointers), 'pointer_devices':self.pointers, 'dock_hidden':self.dock_hidden},ensure_ascii=False)+'\n')
 
     def retry_sync(self):
         self.sync_pending = 0
         return self.sync()
 
+    @dbus.service.signal('org.sheng.DesktopPolicy', signature='b')
+    def PointerPresenceChanged(self, present):
+        pass
+
     def apply_dock(self):
-        hiding = 'autohide' if self.dock_hidden else 'none'
-        self.script('var all=panels();var docks=all.filter(function(p){p.currentConfigGroup=["General"];return p.readConfig("ShengThemeRole","")==="dock";});if(!docks.length)docks=all.filter(function(p){return p.location==="bottom" && p.widgets().some(function(w){return w.type==="org.kde.plasma.icontasks";});});docks.forEach(function(p){if(p.hiding!=="'+hiding+'")p.hiding="'+hiding+'";});')
+        hiding = 'autohide' if self.dock_hidden else 'windowsgobelow'
+        self.script('panels().forEach(function(p){p.currentConfigGroup=["General"];if(p.readConfig("ShengThemeRole","")==="dock" && p.hiding!=="'+hiding+'")p.hiding="'+hiding+'";});')
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='b', out_signature='')
     def SetDockHidden(self, hidden):
         self.dock_hidden = bool(hidden)
-        self.sync()
+        self.apply_dock()
+        self.save_state()
 
     @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='s')
     def GetState(self):
@@ -116,6 +125,14 @@ class Policy(dbus.service.Object):
     def OpenControlCenter(self):
         identifier = self.script('var id=0;panels().forEach(p=>p.widgets().forEach(w=>{if(w.type==="org.kontrol.center")id=w.id}));print(id);').strip()
         if not identifier.isdigit() or identifier == '0': return
+        obj = BUS.get_object('org.kde.kglobalaccel','/component/plasmashell')
+        dbus.Interface(obj,'org.kde.kglobalaccel.Component').invokeShortcut('activate widget '+identifier)
+
+    @dbus.service.method('org.sheng.DesktopPolicy', in_signature='', out_signature='')
+    def OpenAppDrawer(self):
+        identifier = self.script('var id=0;panels().concat(desktops()).forEach(p=>p.widgets().forEach(w=>{if(w.type.indexOf("org.sheng.linexin.launcher")===0)id=w.id}));print(id);').strip()
+        if not identifier.isdigit() or identifier == '0':
+            return
         obj = BUS.get_object('org.kde.kglobalaccel','/component/plasmashell')
         dbus.Interface(obj,'org.kde.kglobalaccel.Component').invokeShortcut('activate widget '+identifier)
 

@@ -11,6 +11,8 @@
 | Plasma NM | [KDE/plasma-nm](https://github.com/KDE/plasma-nm)，`b6c03fe24b30d2a963a41dd83784e36086d7257e` | applet与库按原文件 SPDX；打包保留 GPL/LGPL 文本 |
 | 控制中心 | [Kontrol Center](https://github.com/ItsNotMeBro87/plasma6-kontrol-center)，`137ba6c3b441c69dd3e59052ac9e8124367f40b4` | GPL-3.0-or-later；构建器保留 LICENSE、图标说明和新增 NOTICE |
 | 自定义任务效果/手势 | [device/recents/LICENSE](device/recents/LICENSE) | MIT，保留文件头与许可证 |
+| Linexin 抽屉与 Dock | [Petexy/Linexin-Launcher](https://github.com/Petexy/Linexin-Launcher)，`43da5eab6e367f96f8e1aca9a90867a4289a9557` | GPL-3.0-or-later；固定归档哈希见 drawer-provenance，构建保留 LICENSE/NOTICE，Dock 提取文件保留 Petexy 版权 |
+| 原生桌面触控集成 | [device/desktop-touch-guard](device/desktop-touch-guard/README.md) | GPL-3.0-or-later，链接匹配的 KWin 开发库 |
 | 原生 Alt+Tab 布局 | 系统安装的 KWin thumbnail_grid | 复制时保留作者/许可，仅改导航边界 |
 | Panel Colorizer | [luisbocanegra/plasma-panel-colorizer](https://github.com/luisbocanegra/plasma-panel-colorizer)，`a8f8b1cee7bbc670cf2a5f5d194c24c314073b82` | 外部安装；插件需匹配 Qt/Plasma |
 | Colloid | [vinceliuice/Colloid-icon-theme](https://github.com/vinceliuice/Colloid-icon-theme)，`ceac6608ecd0e40025cbc2ebbd32bf0e0f4ebc6a` | 外部主题，保留其许可 |
