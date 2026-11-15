@@ -6,13 +6,15 @@
 
 - BreezeLight 默认配色、Breeze Plasma/应用/窗口样式；不使用壁纸强调色或 Moe 的旧粉色配色。
 - Colloid-Light 图标；**Breeze_Light 24px** 光标，白色主体、深色描边。
-- 上面板 40、底部居中 Dock 64 逻辑像素；200% 屏幕缩放；一个虚拟桌面。
-- 顶栏时钟 24 小时、常显秒（`showSeconds=2`）、日期 `MM-dd`（时间大、日期小）。由控制中心 `PanelIntegration.qml` 放到独立居中层；白色前景与电池遮罩。
-- Panel Colorizer 顶栏 ChromeOS 预设关闭背景，Dock 使用 Translucent；原生面板几何不由预设覆盖。Redmi Clock 前景白色。Lagtrain 为可选欢迎屏幕，不影响功能。
+- 上面板 40、底部居中 Linexin Dock 84 逻辑像素；200% 屏幕缩放；一个虚拟桌面。
+- 顶栏时钟 24 小时、常显秒（`showSeconds=2`）、日期 `MM-dd`（时间大、日期小）。由控制中心 `PanelIntegration.qml` 放到独立居中层；前景白色，电池由独立部件绘制。
+- Panel Colorizer 顶栏关闭背景；Dock 关闭宿主背景，由 Linexin 绘制圆角底板；原生面板几何不由预设覆盖。Redmi Clock 前景白色。Lagtrain 为可选欢迎屏幕，不影响功能。
 
 `layout.js` 是一次性布局种子：迁移现有任务面板、创建顶栏、建立角色标记；已经存在 Sheng 顶栏时停止。保留现有收藏，不绑定作者的 Burp desktop 文件。需要先安装依赖、准备壁纸或修改图片路径，且部署前备份。它不含完整 Panel Colorizer 用户预设，电池白色遮罩等仍需按新 widget ID 设置。步骤见 [部署手册](../../docs/DEPLOYMENT.md)。
 
 后续增量已改用单一 Linexin Dock（84px）和独立的白色电池绘制。电池图形向右移 4 逻辑像素，保留原生百分比/插电/弹窗后端；Burp 使用圆角矢量图标。锁屏采用明确字体与上滑显示密码页，修复 MDI 误参与 ASCII 回退造成的 Firefox/锁屏缺字。最新部署、版本核验和回退见[触控与字体说明](../../docs/TOUCH_LOCKSCREEN_FONTS.md)。
+
+当前会话的允许项快照见 [desktop-profile.json](desktop-profile.json)，150 个源文件的对应核对见 [source-audit.json](source-audit.json)。[配置同步说明](../../docs/DESKTOP_PROFILE.md)描述导出、角色映射、复现和未导出范围；它不包含用户完整配置。
 
 ## 来源
 

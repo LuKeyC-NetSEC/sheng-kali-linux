@@ -122,6 +122,8 @@ kpackagetool6 --type Plasma/Applet --install out/packages/sheng-control-center.p
 
 [theme/README.md](../device/theme/README.md) 记录组件版本、壁纸来源及天气补丁。安装相应 Panel Colorizer（含匹配 Qt/Plasma 的 C++ 插件）、Colloid-Light、Redmi Clock 后，在用户会话通过 Plasma 脚本接口执行 `device/theme/layout.js` 作为布局种子，或手动建立等价面板。
 
+当前配置、插件角色、显示模式和有效全局样式见[桌面配置同步](DESKTOP_PROFILE.md)及其 JSON 快照；按本机部件重新映射，不复制作者的实例 ID。导出脚本只读，校验器无需连接设备。
+
 该脚本会迁移现有任务面板并创建顶栏，**不是可重复执行的配置管理器**；先备份并读取脚本，已存在 Sheng 顶栏时它会停止。默认壁纸路径需先放置你有权使用的图片，或改成自己的路径。不要从作者设备导出整份配置。
 
 在系统设置选择 BreezeLight、Breeze 样式、Colloid-Light、Breeze_Light 24px；关闭壁纸强调色，设置内屏 200% 缩放。Panel Colorizer：顶栏 ChromeOS 预设关闭背景，普通部件和托盘前景白色；Dock 使用 Translucent；按新 widget ID 将电池图标设为白色符号遮罩。配置未全部自动化，须人工/AI检查。`WeatherData.qml` 替换 Redmi Clock 对应组件，再在其根目录应用 `weather-ui.patch`。

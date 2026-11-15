@@ -1,0 +1,66 @@
+{
+  "checkedAtUTC": "2026-11-15T12:30:59+00:00",
+  "sourceCommit": "6b681b72b880760fbce037c6e1c7e1b3acebd257",
+  "components": {
+    "linexin": {
+      "checked": 20,
+      "matched": 20
+    },
+    "control-center": {
+      "checked": 112,
+      "matched": 112
+    },
+    "task-cards": {
+      "checked": 4,
+      "matched": 4
+    },
+    "device": {
+      "checked": 11,
+      "matched": 11
+    },
+    "scripts": {
+      "checked": 2,
+      "matched": 2
+    },
+    "lockscreen": {
+      "checked": 1,
+      "matched": 1
+    }
+  },
+  "nativeGuardArtifactMatchesLocalBuild": true,
+  "differences": [],
+  "activeShengEffects": [
+    "sheng-task-cards-35ed679b1408",
+    "sheng_desktop_touch_guard_89e01576ba00"
+  ],
+  "nativeGuardArtifactSha256": "4a3e58261854d4ab05d560a27ca851ed43430577ac676bdc57c59ea938132c10",
+  "activePlasmaPlugins": [
+    "org.kontrol.center",
+    "org.sheng.desktop-gesture.drawer-b16bf14a74",
+    "org.sheng.linexin.launcher.c268de5fecf4",
+    "org.sheng.panel-style.dcc5a4976502"
+  ],
+  "buildManifests": [
+    {
+      "upstream": "https://github.com/Petexy/Linexin-Launcher",
+      "commit": "43da5eab6e367f96f8e1aca9a90867a4289a9557",
+      "plugin": "org.sheng.linexin.launcher.c268de5fecf4",
+      "revision": "c268de5fecf4",
+      "artifact": "sheng-desktop-drawer.plasmoid",
+      "sha256": "3d43f74a9f2cda9e6fa845d013235f2e0ad5857db972066f4c9d5e9b0a60db53"
+    },
+    {
+      "upstream": "https://github.com/ItsNotMeBro87/plasma6-kontrol-center",
+      "commit": "137ba6c3b441c69dd3e59052ac9e8124367f40b4",
+      "upstream_archive_sha256": "c5d085c4cec2cc54cde54ee6d7619f5b75d65961d76bf5f848a86cb75d3e88d2",
+      "patch_sha256": "fed3560bf8fd6812144f603533b63640a23aeeb9d0b658f46b3c10d618287059",
+      "artifact": "sheng-control-center.plasmoid",
+      "sha256": "4cd2ac1a740744728d6c07d5f00caea4c532c3332c7c54397108d034bd46493d"
+    },
+    {
+      "id": "sheng-task-cards-35ed679b1408",
+      "artifact": "sheng-task-cards-35ed679b1408.zip",
+      "sha256": "fcab15c08292cbe7b081b6b85349b16f335d987fafd5fe780cd38e90ff89053e"
+    }
+  ]
+}

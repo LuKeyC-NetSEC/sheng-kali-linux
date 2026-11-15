@@ -50,11 +50,11 @@ topColorizer.writeConfig("isEnabled", true);
 topColorizer.reloadConfig();
 
 dock.location = "bottom";
-dock.height = 64;
-dock.hiding = "none";
+dock.height = 84;
+dock.hiding = "windowsgobelow";
 dock.alignment = "center";
-dock.minimumLength = 420;
-dock.maximumLength = 1040;
+dock.minimumLength = 1;
+dock.maximumLength = 1100;
 dock.lengthMode = "fit";
 dock.currentConfigGroup = ["General"];
 dock.writeConfig("ShengThemeRole", "dock");
@@ -80,7 +80,7 @@ dockColorizer.writeConfig("isEnabled", true);
 dockColorizer.reloadConfig();
 
 var desktop = desktops()[0];
-var redmi = desktop.addWidget("Redmi.Clock", 28, 68, 300, 300);
+var redmi = desktop.addWidget("Redmi.Clock", 32, 104, 304, 304);
 redmi.currentConfigGroup = ["General"];
 redmi.writeConfig("colorHex", "#ffffff");
 redmi.writeConfig("boldfonts", false);
