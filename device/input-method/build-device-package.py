@@ -24,6 +24,7 @@ for original,relative,mode in [
     (source.parents[1]/'LICENSE','usr/share/doc/sheng-msime-integration/COPYING',0o644),
     (source/'README.md','usr/share/doc/sheng-msime-integration/README.md',0o644),
     (source/'hyperos-ui.patch','usr/share/doc/sheng-msime-integration/hyperos-ui.patch',0o644),
+    (source/'fcitx5-1.23.patch','usr/share/doc/sheng-msime-integration/fcitx5-1.23.patch',0o644),
     (source/'provenance.json','usr/share/doc/sheng-msime-integration/provenance.json',0o644),
     (source/'ui/LICENSE','usr/share/doc/sheng-msime-integration/UI-LICENSE',0o644),
     (source/'sheng-msime-launcher','usr/libexec/sheng-msime-launcher',0o755),
@@ -45,10 +46,10 @@ for asset in (source/'ui').glob('*.toml'):
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(asset, destination)
 (control/'control').write_text('''Package: sheng-msime-integration
-Version: 0.2.1-7
+Version: 0.2.1-8
 Architecture: arm64
 Maintainer: Sheng tablet local setup
-Depends: msime-linux (>= 0.16.1), fcitx5, libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
+Depends: msime-linux (>= 0.16.1), fcitx5 (>= 5.1.23), libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
 Description: Metasequoia input and touch keyboard integration for sheng
  Pinned Fcitx5 OSK with physical-keyboard suppression and KWin launcher.
 ''')

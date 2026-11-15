@@ -12,7 +12,9 @@
     "fcitx5-osk/src/layout.rs": "dc6c00a32e8ab37e0c670831b3c4121b6a59fd1504624920bd30d7b8cc0b0804",
     "fcitx5-osk/src/state/keyboard.rs": "3a90697ecc9cfe4144c915a2883757196721f61b011580b9f191f3d68dfb9afe",
     "fcitx5-osk/src/state/layout.rs": "0311fe7a2ab418325a129b5b161f8f1cdf1b186bbfb59a66e77f252c86f0bf4f",
-    "fcitx5-osk/src/app.rs": "a30d2dc18c5fd9aebff6239cb191d6bc10b754ceb24da6c15f52e5fea20cb683"
+    "fcitx5-osk/src/app.rs": "a30d2dc18c5fd9aebff6239cb191d6bc10b754ceb24da6c15f52e5fea20cb683",
+    "fcitx5-osk/src/dbus/client.rs": "b9b916fc0550d84096eff3c849b18ff93e72b065b9ac244b7ee4f7663116fb07"
   },
-  "license": "MIT (upstream OSK and UI adaptation); integration helpers retain their SPDX licenses"
+  "license": "MIT (upstream OSK and UI adaptation); integration helpers retain their SPDX licenses",
+  "fcitx_protocol_patch_sha256": "4ef71558f636202d292976c5225f1d658a706c820e22cec6c59cdedd69fefc56"
 }

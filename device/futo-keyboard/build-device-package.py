@@ -68,12 +68,12 @@ def main():
         control = stage / 'DEBIAN'
         control.mkdir()
         (control / 'control').write_text(f'''Package: sheng-futo-keyboard
-Version: 0.3.0-2
+Version: 0.3.0-3
 Architecture: arm64
 Maintainer: Sheng tablet local setup
 Section: non-free/text
 Priority: optional
-Depends: fcitx5 (= {fcitx_version}), fcitx5-modules, sheng-msime-integration (>= 0.2.1-7), libfcitx5core7, libfcitx5utils2, libfcitx5config6, libqt6core6t64 (>= 6.11.2), libc6 (>= 2.38), libstdc++6, libgcc-s1, python3 (>= 3.11), python3-dbus, fonts-noto-color-emoji, fonts-roboto
+Depends: fcitx5 (= {fcitx_version}), fcitx5-modules, sheng-msime-integration (>= 0.2.1-8), libfcitx5core7, libfcitx5utils2, libfcitx5config6, libqt6core6t64 (>= 6.11.2), libc6 (>= 2.38), libstdc++6, libgcc-s1, python3 (>= 3.11), python3-dbus, fonts-noto-color-emoji, fonts-roboto
 Description: Experimental native FUTO typing/layout adapter for Sheng
  FUTO native dictionary and QWERTY layout adapted to Fcitx5/Wayland.
  Non-commercial FUTO Source First terms apply to upstream components.

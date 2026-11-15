@@ -56,6 +56,11 @@ def main():
             raise SystemExit('Unexpected base source: ' + name)
     subprocess.run(['git', 'apply', '--check', '-'], input=patch, cwd=args.output_dir, check=True)
     subprocess.run(['git', 'apply', '-'], input=patch, cwd=args.output_dir, check=True)
+    protocol = (LOCAL / 'fcitx5-1.23.patch').read_bytes().replace(b'\r\n', b'\n')
+    if sha(protocol) != pin['fcitx_protocol_patch_sha256']:
+        raise SystemExit('Fcitx protocol patch SHA-256 mismatch')
+    subprocess.run(['git', 'apply', '--check', '-'], input=protocol, cwd=args.output_dir, check=True)
+    subprocess.run(['git', 'apply', '-'], input=protocol, cwd=args.output_dir, check=True)
     for source in (LOCAL / 'ui').glob('*.toml'):
         category = 'key_sets' if source.name.endswith('-keys.toml') else 'layouts' if source.name.endswith(('-landscape.toml', '-portrait.toml')) else 'themes'
         target = args.output_dir / 'pkg/share/fcitx5-osk' / category / source.name

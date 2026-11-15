@@ -11,11 +11,13 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-7` 保留 `-3` 的卸载回退、字体依赖与模式切换器，并支持 FUTO 英文入口。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
+`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-8` 保留 `-3` 的卸载回退、字体依赖与模式切换器，并支持 FUTO 英文入口。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
 Fcitx 默认引擎为 msime，保留 keyboard-us；全拼 `quanpin`。本机关闭云候选与翻译，停用语音/在线 socket 和剪贴板服务。每个开发者从官方设置初始化自己的资源和账户，**不能复制作者 preferences、匿名凭据、学习库或运行缓存**。
+
+[fcitx5-1.23.patch](fcitx5-1.23.patch) 修复固定 OSK 上游与本机 Fcitx 5.1.23 的翻页接口不兼容：实际 `NextPage()` / `PrevPage()` 不接收页码，旧代理发送整型参数会被 D-Bus 拒绝。准备器校验补丁哈希并应用；内部候选游标仍由 OSK 管理，传输层只发送无参数调用。不同 Fcitx 版本须核对实际接口，不能只凭候选显示出来就登记翻页通过。
 
 Plasma 会话只设置 `XMODIFIERS=@im=fcitx`，不全局强制 `QT_IM_MODULE`/`GTK_IM_MODULE`，避免干扰 Wayland text-input。禁用重复的 Fcitx autostart，由 KWin launcher 管理。
 
@@ -47,8 +49,8 @@ cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INS
 CARGO_BUILD_JOBS=2 cmake --build out/osk-cmake --parallel 2
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
-python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
+python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
+sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
 # 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
 sheng-osk-mode float --font-defaults --sheng-ui
 # 切回底部停靠

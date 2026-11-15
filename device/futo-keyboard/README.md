@@ -45,7 +45,7 @@
 
 ## 从公开源码构建
 
-在 ARM64 Kali Linux 上操作；Windows 只负责源码准备与传输。先按水杉集成说明安装可用的 `sheng-msime-integration 0.2.1-7`；构建该版本时使用下面的 `--futo-ui` 入口，否则只有原界面中的英文引擎入口。不要用 PowerShell 编译 Linux ELF。
+在 ARM64 Kali Linux 上操作；Windows 只负责源码准备与传输。先按水杉集成说明安装可用的 `sheng-msime-integration 0.2.1-8`；构建该版本时使用下面的 `--futo-ui` 入口，否则只有原界面中的英文引擎入口。不要用 PowerShell 编译 Linux ELF。
 
 ```bash
 # Rust/Cargo 和 OSK 开发依赖见 input-method/README.md
@@ -56,8 +56,8 @@ CARGO_BUILD_JOBS=2 cmake --build out/futo-osk-build --parallel 2
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5Osk
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5OskKwinLauncher
 python3 device/input-method/build-device-package.py out/futo-osk-stage \
-  scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-7_arm64.deb
+  scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
+sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
 ```
 
 ```bash
@@ -76,8 +76,8 @@ cmake -S device/futo-keyboard -B out/futo-build \
 ctest --test-dir out/futo-build --output-on-failure
 python3 device/futo-keyboard/build-device-package.py \
   out/futo-build out/futo-source out/futo-en_US \
-  out/packages/sheng-futo-keyboard_0.3.0-2_arm64.deb
-sudo apt-get install ./out/packages/sheng-futo-keyboard_0.3.0-2_arm64.deb
+  out/packages/sheng-futo-keyboard_0.3.0-3_arm64.deb
+sudo apt-get install ./out/packages/sheng-futo-keyboard_0.3.0-3_arm64.deb
 # 解锁状态，以桌面用户执行；只重载输入面板
 sheng-futo-keyboard-setup
 # 已启用过旧版时，保留原回退备份并重新加载升级后的界面
