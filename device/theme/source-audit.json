@@ -1,6 +1,6 @@
 {
-  "checkedAtUTC": "2026-11-21T03:43:46+00:00",
-  "sourceCommit": "8fe7cb1a8280df8547a5303ee4fb4ba0bb3d0cb2",
+  "checkedAtUTC": "2026-11-21T05:45:03+00:00",
+  "sourceCommit": "887c838d0210bf64e82694faad2d786bbe0c5d51",
   "components": {
     "linexin": {
       "checked": 20,
@@ -64,8 +64,8 @@
     "runningOskMatchesLocalBuild": true,
     "runningOskUsesDeletedFile": false,
     "wholeOskProcessMemory": {
-      "RssKiB": 41744,
-      "PssKiB": 37885
+      "RssKiB": 41612,
+      "PssKiB": 37694
     },
     "pagingWireSignature": "NextPage()/PrevPage(), no arguments; Fcitx 5.1.23"
   },
