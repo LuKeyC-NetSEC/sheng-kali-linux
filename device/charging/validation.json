@@ -1,0 +1,63 @@
+{
+  "checked_at_utc": "2026-11-21T02:55:59+00:00",
+  "device": "sheng / Xiaomi Pad 6S Pro 12.4",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "package": "xiaomi-mipps-auth",
+  "package_version": "0.21+sheng1",
+  "upstream_commit": "9176efbdf276b874fc0a97912a914449a88155fb",
+  "source_patch_sha256": "4779f866ded03378548475ad1ba754d6545a7195f9ea5f3d34a0719d8b40c246",
+  "transport": "Wi-Fi SSH, verified against previously trusted USB host key",
+  "before_deployment": {
+    "service_load_state": "not-found",
+    "charger": "Original Xiaomi 120W adapter and cable, connected directly; user confirmed",
+    "battery_percent": 46,
+    "battery_temperature_celsius": 22.9,
+    "real_type": "PD",
+    "usb_voltage_volts": 8.79,
+    "reported_usb_current_amperes_range": [1.309, 1.397],
+    "reported_usb_vi_watts_range": [11.51, 12.28],
+    "authentic": 0,
+    "slave_authentic": 0,
+    "pd_verifed": 0,
+    "fastchg_mode": 0,
+    "firmware_power_max_watts": 33
+  },
+  "after_user_replug": {
+    "battery_percent": 57,
+    "battery_temperature_celsius": 28.0,
+    "real_type": "PD_PPS",
+    "authentic": 1,
+    "slave_authentic": 1,
+    "pd_verifed": 1,
+    "fastchg_mode": 1,
+    "reverse_authentication_passed": true,
+    "firmware_apdo_max_watts": 120,
+    "firmware_power_max_watts": 120,
+    "usb_voltage_volts": 18.095,
+    "charge_pump_bus_voltage_raw": 18093,
+    "charge_pump_master_current_raw": 1650,
+    "charge_pump_slave_current_raw": 1615,
+    "qcom_usb_current_now_is_total_input_current": false,
+    "automatic_attach_trigger_verified": true
+  },
+  "checks": {
+    "offline_tests_on_target_passed": 14,
+    "installed_daemon_service_rules_match_reviewed_source": true,
+    "systemd_unit_verification_passed": true,
+    "successful_authentication_sequences": 2,
+    "observed_connection_change_cancellations": 1,
+    "automatic_retry_recovered_after_connection_change": true,
+    "temporary_first_run_retry_override_removed": true,
+    "firmware_thermal_voltage_current_policy_overridden": false,
+    "kernel_or_modules_replaced": false,
+    "kernel_auth_payload_debug_print_enabled": false,
+    "authentication_material_in_this_report": false
+  },
+  "limitations": [
+    "120W is a firmware-reported negotiated capability, not measured sustained input power",
+    "qcom USB current and UCSI current are not reliable total input telemetry in dual-pump fast-charge mode",
+    "No external power meter or calibrated charge-pump current measurement was used",
+    "Cold boot with charger attached, suspend/resume, other adapters/cables and long-term thermal behavior remain unverified"
+  ]
+}

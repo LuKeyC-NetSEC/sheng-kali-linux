@@ -19,7 +19,7 @@
 | 两段上滑 Dock、锁屏手势、缺字与新图标 | [触控和字体增量](docs/TOUCH_LOCKSCREEN_FONTS.md) |
 | 当前桌面配置快照、导出与源码核对 | [桌面配置同步](docs/DESKTOP_PROFILE.md) |
 | 实验 FUTO 原生键盘移植、范围与构建 | [FUTO Linux 适配](device/futo-keyboard/README.md) |
-| MiPPS/120W 静态审查与离线适配 | [充电源码分析](device/charging/README.md) |
+| MiPPS/120W 源码适配、部署与测量边界 | [充电说明](device/charging/README.md) |
 | 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
 | 已验证功能、未完成项、验收方法 | [验证状态](docs/VALIDATION.md) |
 | 第三方来源与许可 | [THIRD_PARTY.md](THIRD_PARTY.md) |
@@ -32,6 +32,7 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 - 原生 ARM64 Kali rolling、Plasma Wayland；触屏、USB RNDIS/SSH、CDC ACM 串口。
 - Adreno 740：Mesa freedreno OpenGL 与 Turnip Vulkan 共存；[GPU 监控](device/gpu-monitor/README.md) 和[实机对比](docs/gpu-efficiency-measurement.md)。
 - PIN 键盘/触摸板认证和唤醒修复；扬声器、音量键；Wi-Fi 上网与并发热点。
+- MiPPS 用户态认证已增量部署：原装充电器及拔插自动认证通过，固件报告120W上限；实际持续功率未测，基础镜像尚未自动集成。
 - 6 GiB Zstd ZRAM + 8 GiB swapfile；不额外划分 swap 分区。
 - 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。
 - 临时 Dock 点击外部立即向下收起；底边连续上滑依次显示白条、Dock、返回原桌面，应用保留在后台。

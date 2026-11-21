@@ -15,7 +15,7 @@
     "path": "drivers/power/supply/qti_battery_charger.c",
     "sha256": "8198c9fa5959361dec714877c90058008a7f9c23034e08219bcc2e6e762963cf"
   },
-  "status": "Offline review and simulated sysfs tests only; no device deployment or charging-power validation",
+  "status": "Deployed 2026-11-21 on sheng: MiPPS authentication and user replug auto-trigger passed; 120W firmware capability only, actual input power unmeasured. See validation.json.",
   "optional_kernel_log_patch_sha256": "1f83429c54cc5e00237d0d2939d04caef6d5798c5384c237534aa22ef2bad1d2",
   "kernel_battmgr_base_sha256": "51ac68823a08c6b850d50d98f645694d45eef8060cfc5a0d46436b6ed1d07d06"
 }

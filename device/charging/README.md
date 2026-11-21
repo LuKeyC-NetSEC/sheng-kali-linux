@@ -1,10 +1,12 @@
-# MiPPS 120W 充电：静态审查与离线适配
+# MiPPS 120W 充电：源码适配与部署
 
-2026-11-21，目标为 sheng / Kali ARM64 / 内核 `7.3.4-sm8550-00104-g87ac0f2347eb`。本次**未连接平板、未写 sysfs、未安装服务、未更换内核、未测充电功率**。当前设备没电充电中，所有修改限于电脑上的源代码与模拟测试。
+2026-11-21，目标为 sheng / Kali ARM64 / 内核 `7.3.4-sm8550-00104-g87ac0f2347eb`。先完成静态审查和离线适配，随后经用户明确授权，在设备电量恢复后通过 Wi-Fi 部署 `xiaomi-mipps-auth 0.21+sheng1`。原装充电器下初次认证与用户重新拔插后的自动认证均通过，固件报告 MiPPS/120W 上限；**没有测得或宣称持续输入120W**。未更换内核或模块，未覆盖固件温控/电压/电流策略。
+
+去敏实测记录见 [validation.json](validation.json)。Wi-Fi 地址、SSH 资料、认证材料和完整日志不入库。
 
 ## 无法进入官方快充的首要嫌疑
 
-仓库 [build-kali.sh](../../scripts/build-kali.sh) 没有安装 `xiaomi-mipps-auth`、对应 systemd 单元或 udev 触发规则；历史镜像的本地 `packages.tsv` 中也没有它。以上只能确认构建/历史镜像缺项，不能证明设备此刻的服务状态。
+仓库 [build-kali.sh](../../scripts/build-kali.sh) 没有安装 `xiaomi-mipps-auth`、对应 systemd 单元或 udev 触发规则；历史镜像的本地 `packages.tsv` 中也没有它。本轮连接设备后确认服务为 `not-found`，程序及规则也不存在。换接原装充电器后只有约9V普通PD，两侧电量计及适配器认证结果均为0；部署认证服务后进入 MiPPS，因此本机缺少用户态认证服务的原因已由前后对照验证。
 
 固定内核的配置已启用 `CONFIG_BATTERY_QCOM_BATTMGR=m`、`CONFIG_QCOM_PMIC_GLINK=y`、`CONFIG_UCSI_PMIC_GLINK=y`。sheng DTS 使用 `xiaomi,sm8550-pmic-glink`，`qcom_battmgr.c` 提供 `xiaomi/` 属性组，包括双电量计认证、适配器 UVDM 命令和认证状态。内核的 enable worker 请求通知，未主动执行整个 MiPPS 用户态认证流程。因而优先补查认证服务，而非直接替换整套充电驱动。
 
@@ -51,10 +53,38 @@ python3 -m unittest discover -s tests -p test_mipps_auth.py -v
 
 输出 `out/mipps-source`，下载固定 archive 并验证补丁和基础文件 SHA；重复准备请用新的 `--output-dir`。允许用 `--archive /path/to/cache.tar.gz` 提供缓存，仍强制校验；其他开发者不需要作者 `.work/`。源码使用 GPL-2.0-only，保留上游 SPDX 和作者信息；[mipps-hardening.patch](mipps-hardening.patch) 是本项目改动，没有向上游提交 PR。
 
-**不要现在在充电设备上执行下载脚本或安装此实验版本。** 设备电量恢复后先只读检查 `xiaomi/` 节点、服务存在性、PD 类型、电压/电流、温度和认证布尔结果，再决定安装。禁止将认证状态手工改成1冒充通过，也不记录 `verify_digest`、VDM 认证响应、挑战或设备认证材料。
+设备电量恢复后先只读检查 `xiaomi/` 节点、服务存在性、PD 类型、电压/电流、温度和认证布尔结果。实际发起认证前应有部署授权和备份，并验证 Wi-Fi/独立恢复通道。禁止将认证状态手工改成1冒充通过，也不记录 `verify_digest`、VDM 认证响应、挑战或设备认证材料。
 
-如后续授权部署，在匹配内核的 ARM64 Linux 中使用准备后的 `build-deb.sh` 打包，审阅并备份现有 service/udev 文件后安装；当前不自动接入基础镜像。USB 数据角色切换可能影响 USB 网络，部署前应安排恢复通道。回退恢复原服务/规则，或卸载增量包，保留固件自己的基础充电路径；不通过反复重绑 PMIC/ADSP 解决问题。
+在匹配内核的 ARM64 Linux 中打包，审阅并备份现有 service/udev 文件后安装；当前不自动接入基础镜像。先完成前述源码准备和测试，再执行：
+
+```bash
+mkdir -p out/packages
+mipps_tmp=$(mktemp -d)
+TMPDIR="$mipps_tmp" bash out/mipps-source/build-deb.sh \
+  "$PWD/out/packages/xiaomi-mipps-auth_0.21+sheng1_arm64.deb"
+sudo apt-get install ./out/packages/xiaomi-mipps-auth_0.21+sheng1_arm64.deb
+sudo systemctl start --no-block xiaomi-mipps-auth.service
+systemctl show xiaomi-mipps-auth.service -p LoadState -p ActiveState -p Result
+```
+
+服务为 udev 触发的 `oneshot`，成功执行后 `inactive/dead` 加 `Result=success` 是正常状态，不要求常驻或 `enable`。部署时先用临时 `Restart=no` 限制首次观察，确认成功后已移除该临时项，恢复包内有限重试策略。用户重新拔插后，观察到一次连接变化取消及随后自动重试成功，未再次手工启动服务。
+
+本机安装文件及原状态记录保存在 `/var/lib/sheng-mipps/`，只供本机回退，不上传。初装前没有旧版本；停止服务并卸载即可撤销后续自动认证触发：
+
+```bash
+sudo systemctl stop xiaomi-mipps-auth.service
+sudo apt-get remove xiaomi-mipps-auth
+```
+
+卸载不会立即撤销固件已经完成的本次充电协商，也不应强写认证结果或断开 PMIC。恢复原来文件时使用自己的部署前备份；需要重新协商时正常拔插充电器，不反复重绑 PMIC/ADSP。
+
+## 本机结果
+
+- 原装充电器下，部署前为普通PD，约8.79V；电量计、适配器认证和快充状态均为0。
+- 部署后及用户重新拔插后：`authentic=1`、`slave_authentic=1`、`pd_verifed=1`、`fastchg_mode=1`，反向认证通过，`real_type=PD_PPS`，固件 `apdo_max/power_max=120`，总线约18V。
+- `qcom-battmgr-usb/current_now` 在双充电泵模式仅报约0.07A，与两侧充电泵的电流状态不一致；UCSI 也存在0V/固定电流等能力或无效读数。**不使用这些值计算总输入功率**，也不把通知里的120W当作功率计读数。充电泵原始值未做独立标定。
+- ARM64 设备侧14项离线测试通过；安装程序/服务/规则SHA与已审查源码一致，systemd单元校验通过。动态调试的认证摘要输出处于关闭状态；可选内核去日志补丁未安装。
 
 ## 未验证
 
-设备现时安装状态、原装适配器/线材识别、实际 MiPPS 握手、低电量阶段、两侧电量计响应时间、持续功率、温控、离线关机充电及休眠恢复均未验证。模拟测试不能证明达到120W，也不证明当前固件的私有属性编号正确。
+外接功率计测量、低电量峰值和持续功率、长时间温控、关机插电、冷启动已插电、休眠恢复及其他适配器/线材组合仍未验证。本轮握手通过支持当前固件下所用认证接口可用，不等于验证全部私有属性编号。

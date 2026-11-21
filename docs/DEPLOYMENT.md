@@ -136,6 +136,12 @@ Burp 官方安装及 6 GiB/170%/OpenGL 参数见 [burp-tablet.md](burp-tablet.md
 
 实验 [FUTO Linux 移植](../device/futo-keyboard/README.md)需要用 `--futo-ui` 构建并安装 `sheng-msime-integration 0.2.1-8`，再编译原生英文词典/候选模块、准备原版图标/字体/布局并执行用户级 setup。核心 UI/UX 通过 Rust 原生渲染；FUTO 的非商业 Source First 许可、实际范围与回退单独记录。未移植完整 Android 应用、滑行或语音，不替换水杉中文引擎。不要将仅打包 `.deb` 等同于已完成 C++ 构建。
 
+### 7. 小米 MiPPS 充电认证
+
+基础镜像没有自动安装该服务，按 [MiPPS 部署说明](../device/charging/README.md)准备固定源码、测试、打包并增量安装 `xiaomi-mipps-auth 0.21+sheng1`。先核对匹配的内核私有接口、备份旧服务/规则，并验证 Wi-Fi SSH；认证过程可能切换 USB 数据角色。实际启用应已取得部署授权，不直接写认证成功标志或放宽温控/限流。
+
+本机原装适配器初次认证及重新拔插后的自动认证均通过；固件120W上限不等于实测持续功率。服务由udev触发、执行后退出，`inactive/dead` 配合 `Result=success` 属正常；回退停止并卸载增量包，不重绑PMIC。原始认证材料与完整用户日志不导出。
+
 ## 回退与故障定位
 
 | 层 | 诊断/回退 |
