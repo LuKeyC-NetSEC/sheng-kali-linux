@@ -8,8 +8,8 @@ kwriteconfig6 --file powerdevilrc --group BatteryManagement --key BatteryCritica
 # This tablet exposes suspend-to-RAM, not a configured hibernation image.
 kwriteconfig6 --file powerdevilrc --group BatteryManagement --key BatteryCriticalAction 1
 for profile in AC Battery LowBattery; do
-    # Short press locks the session on every power source.
-    kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerButtonAction 32
+    # Native DPMS turns off directly; LockBeforeTurnOffDisplay below also locks.
+    kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerButtonAction 64
     # KWin emits PowerDown for a long hold; use Plasma's native power menu.
     kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerDownAction 16
     kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key SleepMode 1

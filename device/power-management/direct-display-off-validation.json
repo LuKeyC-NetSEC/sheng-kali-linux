@@ -1,0 +1,96 @@
+{
+  "checkedAtUTC": "2026-11-21T11:18:27+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "plasma": "6.7.4",
+  "qt": "6.11.2+dfsg-5",
+  "nativePackages": {
+    "powerdevil": "4:6.7.4-2+sheng4",
+    "powerdevil-data": "4:6.7.4-2+sheng4",
+    "libpowerdevilcore2": "4:6.7.4-2+sheng4"
+  },
+  "nativePolicyVersion": 2,
+  "displayOffPolicyVersion": 2,
+  "dpmsAnimationDurationMs": 1,
+  "dpmsFadeConfiguredEnabled": false,
+  "dpmsFadeEffectLoaded": false,
+  "nativeCtestGroupsPassed": 6,
+  "nativeQtTestTotalsPassed": 8,
+  "runningCoreMatchesInstalledFile": true,
+  "coreLibrarySha256": "211a254d9a714b0c9184b5ebbbacc8fc2c94bd8d87a977611fed2d5cbc78392d",
+  "packageSha256": {
+    "powerdevil-data": "e87c5ae2532e19110943fd8a2c89bd41f9422613c2f98b267405b78c4c9aac5f",
+    "libpowerdevilcore2": "f6600d0cfb8170b5456283353966b7e5eae493054c7e379a66156fcfaa7e09dd",
+    "powerdevil": "2962d170817b08c49b383d6f1ea7bb6b48c6ae7e3fd50780d01f494da1ff7582"
+  },
+  "sourceSha256": {
+    "shengpolicy.cpp": "175fa53a16d34b6afa73fbf9a23fc7e689aff69af56ec3bbf554ffbf14163c5f",
+    "shengpolicy.h": "8b304104cecadb7639be06494c677ae115955f47bcafd6b8693cdb29ac3dbbde",
+    "shengpolicytest.cpp": "5b8ee46d017d41431ebb7ffa71827c0575fc963e07a66e5f428121eb53b2b81b",
+    "powerdevil.patch": "4b9c329826bbd088f594866e769099a34ad91db075d9f19b0c5940764d1a79ab"
+  },
+  "kwinAndPlasmaProcessesPreserved": true,
+  "batteryProviderRetained": true,
+  "exportedSymbolsAdded": 0,
+  "exportedSymbolsRemoved": 0,
+  "profiles": {
+    "AC": {
+      "TurnOffDisplayIdleTimeoutSec": "60",
+      "LockBeforeTurnOffDisplay": "true",
+      "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
+      "PowerButtonAction": "64",
+      "PowerDownAction": "16",
+      "AutoSuspendAction": "0",
+      "AutoSuspendIdleTimeoutSec": "60"
+    },
+    "Battery": {
+      "TurnOffDisplayIdleTimeoutSec": "60",
+      "LockBeforeTurnOffDisplay": "true",
+      "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
+      "PowerButtonAction": "64",
+      "PowerDownAction": "16",
+      "AutoSuspendAction": "0",
+      "AutoSuspendIdleTimeoutSec": "60"
+    },
+    "LowBattery": {
+      "TurnOffDisplayIdleTimeoutSec": "60",
+      "LockBeforeTurnOffDisplay": "true",
+      "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
+      "PowerButtonAction": "64",
+      "PowerDownAction": "16",
+      "AutoSuspendAction": "1",
+      "AutoSuspendIdleTimeoutSec": "300"
+    }
+  },
+  "lockGraceSeconds": "0",
+  "dpms": "Off",
+  "locked": true,
+  "sessionForcedRestart": false,
+  "kernelChanged": false,
+  "suspendTriggeredByAgent": false,
+  "dpkgAuditClean": true,
+  "userVerifiedPowerButton": true,
+  "userVerifiedIdleTimeout": true,
+  "idleVisualConfirmationVersion": "4:6.7.4-2+sheng3",
+  "initialAttempt": {
+    "version": "4:6.7.4-2+sheng3",
+    "idleVisualPassed": true,
+    "powerButtonVisualPassed": false
+  },
+  "buildCacheGuardRollbackObserved": true,
+  "buildUsesCleanGeneratedState": true,
+  "notVerified": [
+    "idle visual recheck on final package",
+    "actual hardware off latency",
+    "suspend/resume",
+    "long-term repeated transitions"
+  ],
+  "rollback": "Installer --restore restores the three previous packages plus power/locker/kwinrc configuration from the private backup",
+  "sourceMatchesRepository": true,
+  "userVerifiedSecureWake": true,
+  "powerButtonVisualConfirmationVersion": "4:6.7.4-2+sheng4",
+  "isolatedKconfigMigrationTestsPassed": 3,
+  "desktopProfileTestsPassed": 7,
+  "publicDesktopProfileUpdated": true
+}

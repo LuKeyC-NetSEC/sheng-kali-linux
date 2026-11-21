@@ -52,7 +52,8 @@ class PowerPolicyMigrationTests(unittest.TestCase):
         for profile in ('AC','Battery','LowBattery'):
             self.assertEqual(config.getint(profile+'][Display','TurnOffDisplayIdleTimeoutSec'),60)
             self.assertEqual(config.getint(profile+'][Display','TurnOffDisplayIdleTimeoutWhenLockedSec'),0)
-            self.assertEqual(config.getint(profile+'][SuspendAndShutdown','PowerButtonAction'),32)
+            self.assertEqual(config.getint(profile+'][SuspendAndShutdown','PowerButtonAction'),64)
+            self.assertTrue(config.getboolean(profile+'][Display','LockBeforeTurnOffDisplay'))
             self.assertEqual(config.getint(profile+'][SuspendAndShutdown','PowerDownAction'),16)
         locker=configparser.ConfigParser(interpolation=None)
         locker.read(self.directory/'kscreenlockerrc')

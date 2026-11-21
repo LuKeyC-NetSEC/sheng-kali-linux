@@ -73,3 +73,14 @@
      qCDebug(POWERDEVIL) << "DPMS: triggered on idle timeout, turning off display and keyboard backlight";
  
      const int keyboardBrightness = core()->keyboardBrightnessController()->brightness();
+@@ -201,6 +209,9 @@
+     }
+     // Allow (almost) immediate turn-off upon entering the lockscreen, but not when already locked
+-    m_idleTimeoutWhenActivatingLock = std::max(m_idleTimeoutWhenLocked, s_minIdleTimeoutWhenActivatingLock);
++    // Keep the native idle/resume lifecycle, but do not leave a lit lockscreen
++    // between a tablet power-button lock and the physical DPMS request.
++    const auto activatingMinimum = ShengPolicy::isDevice() ? 1ms : s_minIdleTimeoutWhenActivatingLock;
++    m_idleTimeoutWhenActivatingLock = std::max(m_idleTimeoutWhenLocked, activatingMinimum);
+     m_idleTimeoutWhenLocked = std::max(m_idleTimeoutWhenLocked, s_minIdleTimeoutWhenLocked);
+ 
+     registerStandardIdleTimeout();

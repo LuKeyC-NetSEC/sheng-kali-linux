@@ -12,7 +12,7 @@
 | 图形 | Adreno 740、Mesa `26.3.1-1+sheng1`、主线 drm/msm | 用户态增量已部署；用户重新登录后KWin实读Mesa26.3.1/FD740/EGL；freedreno GL、Turnip Vulkan；无 Android KGSL |
 | 触屏 | `xiaomi-sheng-thp 0.3.9`、libssc | 固定资产与哈希见 sources.json |
 | PIN | `sheng-dock-fix 1.3-2`、模块 `1.3.1-shengfix` | 必须配合安全存储认证服务 |
-| 电源 | PowerDevil `4:6.7.4-2+sheng1` 原生C++适配 | 与Qt 6.11.2及匹配核心库/data一起部署 |
+| 电源 | PowerDevil `4:6.7.4-2+sheng4` 原生C++适配 | 与Qt 6.11.2及匹配核心库/data一起部署；原生DPMS直接息屏并锁定 |
 | 控制中心 | `0.7.7-sheng-privacy4` | 固定 Kontrol Center 上游 + 本地 patch |
 | 输入法集成 | msime-linux 0.16.1、Fcitx5 5.1.23、OSK 0.2.1 + 集成包 0.2.1-9 | 中文/软键盘及锁屏两页已确认；挂起恢复按当前版本另验 |
 

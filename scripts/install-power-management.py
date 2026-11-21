@@ -17,8 +17,9 @@ PROJECT=Path(__file__).resolve().parents[1]
 LOCAL=PROJECT/'device/power-management'
 STATE=Path('/var/lib/sheng-power-management')
 NAMES=('libpowerdevilcore2','powerdevil-data','powerdevil')
-VERSION='4:6.7.4-2+sheng2'
+VERSION='4:6.7.4-2+sheng4'
 POLICY_VERSION=2
+DISPLAY_OFF_POLICY_VERSION=2
 BASE_VERSION='4:6.7.4-2'
 
 
@@ -32,7 +33,7 @@ def user(owner,*arguments):
 
 
 def files(owner):
-    return [Path(owner.pw_dir)/'.config'/name for name in ('powerdevilrc','kscreenlockerrc')]+[
+    return [Path(owner.pw_dir)/'.config'/name for name in ('powerdevilrc','kscreenlockerrc','kwinrc')]+[
         Path('/etc/systemd/sleep.conf.d/50-sheng.conf'),Path('/usr/lib/systemd/system-sleep/60-sheng-desktop'),
         Path('/usr/share/sheng-power-management/native-policy.json'),Path('/usr/bin/sheng-power-status'),
         Path('/usr/libexec/sheng-configure-power-buttons')]
@@ -62,6 +63,9 @@ def restore(backup,owner):
     else:
         (STATE/'installed.json').unlink(missing_ok=True)
     subprocess.run(user(owner,'systemctl','--user','start','plasma-powerdevil.service'),check=True)
+    # Restore the DPMS effect configuration in the existing compositor too.
+    # With no running KWin it will instead be read at the next normal login.
+    subprocess.run(user(owner,'qdbus6','org.kde.KWin','/KWin','org.kde.KWin.reconfigure'),check=False)
 
 
 def main():
@@ -109,7 +113,7 @@ def main():
     for name,version in previous.items():
         if version==BASE_VERSION:
             subprocess.run(['apt-get','download',name+'='+version],cwd=packages,check=True)
-        elif version in ('4:6.7.4-2+sheng1',VERSION):
+        elif version in ('4:6.7.4-2+sheng1','4:6.7.4-2+sheng2','4:6.7.4-2+sheng3',VERSION):
             cached=[path for path in (STATE/'installed-packages').glob('*.deb')
                     if run(['dpkg-deb','-f',str(path),'Package'])==name
                     and run(['dpkg-deb','-f',str(path),'Version'])==version]
@@ -149,6 +153,9 @@ def main():
         while run(user(owner,'kreadconfig6','--file','powerdevilrc','--group','ShengPower','--key','PolicyVersion'))!=str(POLICY_VERSION):
             if time.monotonic()>deadline:raise RuntimeError('Native policy did not initialize')
             time.sleep(0.25)
+        while run(user(owner,'kreadconfig6','--file','powerdevilrc','--group','ShengPower','--key','DisplayOffPolicyVersion'))!=str(DISPLAY_OFF_POLICY_VERSION):
+            if time.monotonic()>deadline:raise RuntimeError('Native direct-display-off policy did not initialize')
+            time.sleep(0.25)
         pid=int(run(user(owner,'systemctl','--user','show','plasma-powerdevil.service','-p','MainPID','--value')))
         library=Path('/usr/lib/aarch64-linux-gnu/libpowerdevilcore.so.6.7.4')
         mapped=[line.split() for line in Path(f'/proc/{pid}/maps').read_text().splitlines() if 'libpowerdevilcore.so' in line]
@@ -161,6 +168,7 @@ def main():
     cache=STATE/'installed-packages';cache.mkdir(exist_ok=True)
     for package in candidates.values():shutil.copy2(package,cache/package.name)
     report={'nativePackageVersion':VERSION,'sleepMode':args.sleep_mode,'nativePolicyVersion':POLICY_VERSION,
+            'displayOffPolicyVersion':DISPLAY_OFF_POLICY_VERSION,
             'legacyDesktopSleepHookRemoved':not hook.exists(),'batteryProviderRetained':True,
             'coreLibrarySha256':hashlib.sha256(library.read_bytes()).hexdigest(),
             'packages':{name:hashlib.sha256(path.read_bytes()).hexdigest() for name,path in candidates.items()},

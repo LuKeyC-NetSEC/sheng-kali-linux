@@ -2,6 +2,7 @@
 // Native PowerDevil integration for Xiaomi sheng. No process-spawned policies.
 #include "shengpolicy.h"
 #include "powerdevilcore.h"
+#include "powerdevilenums.h"
 #include "controllers/suspendcontroller.h"
 
 #include <KConfigGroup>
@@ -60,7 +61,7 @@ bool migrateDefaults(const KSharedConfig::Ptr &config, bool canSuspend)
         suspend.writeEntry("AutoSuspendAction", profile == QStringLiteral("LowBattery") && canSuspend ? 1 : 0);
         suspend.writeEntry("AutoSuspendIdleTimeoutSec", profile == QStringLiteral("LowBattery") ? 300 : 60);
         suspend.writeEntry("SleepMode", 1);
-        suspend.writeEntry("PowerButtonAction", 32);
+        suspend.writeEntry("PowerButtonAction", static_cast<int>(PowerButtonAction::TurnOffScreen));
         suspend.writeEntry("PowerDownAction", 16);
         auto display = group.group(QStringLiteral("Display"));
         display.writeEntry("TurnOffDisplayWhenIdle", true);
@@ -87,6 +88,38 @@ bool migrateDefaults(const KSharedConfig::Ptr &config, bool canSuspend)
 int lockMinutes(int seconds)
 {
     return seconds >= 30 ? std::min(1440, std::max(1, seconds / 60)) : -1;
+}
+
+bool migrateDisplayOffDefaults(const KSharedConfig::Ptr &config, const KSharedConfig::Ptr &kwin)
+{
+    KConfigGroup managed(config, QStringLiteral("ShengPower"));
+    const int version = managed.readEntry("DisplayOffPolicyVersion", 0);
+    if (version >= 2) {
+        return false;
+    }
+    // Workspace's native DPMS timer and PowerDevil both use this group.
+    // KWin's effect TimeLine requires a positive duration, including after a
+    // later manual effect re-enable. Disable only DPMS fading, never animations
+    // globally, and keep a 1ms event-loop minimum instead of an invalid zero.
+    if (version < 1) {
+        KConfigGroup(kwin, QStringLiteral("Effect-Kscreen")).writeEntry("Duration", 1);
+        KConfigGroup(kwin, QStringLiteral("Plugins")).writeEntry("kscreenEnabled", false);
+        kwin->sync();
+    }
+    for (const auto &profile : {QStringLiteral("AC"), QStringLiteral("Battery"), QStringLiteral("LowBattery")}) {
+        const auto group = KConfigGroup(config, profile);
+        const auto display = group.group(QStringLiteral("Display"));
+        auto suspend = group.group(QStringLiteral("SuspendAndShutdown"));
+        // Use HandleButtonEvents -> DPMSControl, not LockScreen -> greeter ready
+        // -> idle timer. Only migrate a lock action when DPMS will also lock.
+        if (suspend.readEntry("PowerButtonAction", -1) == static_cast<int>(PowerButtonAction::LockScreen)
+            && display.readEntry("LockBeforeTurnOffDisplay", false)) {
+            suspend.writeEntry("PowerButtonAction", static_cast<int>(PowerButtonAction::TurnOffScreen));
+        }
+    }
+    managed.writeEntry("DisplayOffPolicyVersion", 2);
+    config->sync();
+    return true;
 }
 
 namespace {
@@ -143,6 +176,19 @@ class Integration final : public QObject {
 public:
     explicit Integration(Core *core) : QObject(core)
     {
+        if (migrateDisplayOffDefaults(KSharedConfig::openConfig(QStringLiteral("powerdevilrc")),
+                                      KSharedConfig::openConfig(QStringLiteral("kwinrc")))) {
+            if (!KConfigGroup(KSharedConfig::openConfig(QStringLiteral("kwinrc")), QStringLiteral("Plugins")).readEntry("kscreenEnabled", true)) {
+                auto unload = QDBusMessage::createMethodCall(QStringLiteral("org.kde.KWin"),
+                    QStringLiteral("/Effects"), QStringLiteral("org.kde.kwin.Effects"), QStringLiteral("unloadEffect"));
+                unload.setArguments({QStringLiteral("kscreen")});
+                QDBusConnection::sessionBus().asyncCall(unload);
+            }
+            const auto reconfigure = QDBusMessage::createMethodCall(QStringLiteral("org.kde.KWin"),
+                QStringLiteral("/KWin"), QStringLiteral("org.kde.KWin"), QStringLiteral("reconfigure"));
+            QDBusConnection::sessionBus().asyncCall(reconfigure);
+            QTimer::singleShot(0, core, &Core::refreshStatus);
+        }
         connect(core, &Core::profileChanged, this, [this](const QString &profile) { syncLock(profile); });
         connect(core->suspendController(), &SuspendController::aboutToSuspend, this, [this] {
             const auto session = activeSession();

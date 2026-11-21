@@ -23,6 +23,8 @@ KCONFIG = {
         'org.kde.kdecoration2': ['library', 'theme', 'BorderSize', 'BorderSizeAuto'],
         'TabBox': ['LayoutName', 'LayoutNameAlternative'],
         'Wayland': ['InputMethod', 'VirtualKeyboardMode'],
+        'Effect-Kscreen': ['Duration'],
+        'Plugins': ['kscreenEnabled'],
     },
     'kscreenlockerrc': {'Daemon': ['Autolock', 'LockGrace', 'Timeout'], 'Greeter': ['WallpaperPlugin']},
     'powerdevilrc': {

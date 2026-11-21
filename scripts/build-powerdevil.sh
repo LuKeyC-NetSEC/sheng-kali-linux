@@ -12,13 +12,15 @@ from pathlib import Path
 import sys
 source=Path(sys.argv[1]); path=source/'debian/changelog'
 text=path.read_text()
-if not text.startswith('powerdevil (4:6.7.4-2+sheng2)'):
-    header='''powerdevil (4:6.7.4-2+sheng2) unstable; urgency=medium
+if not text.startswith('powerdevil (4:6.7.4-2+sheng4)'):
+    header='''powerdevil (4:6.7.4-2+sheng4) unstable; urgency=medium
 
   * Integrate sheng power policy, lock synchronization and resume handling
     natively into PowerDevil; retain all Debian patches.
   * Blank and lock after one idle minute while preserving the separate
     five-minute low-battery suspend policy and user customizations.
+  * Remove the DPMS fade stage and minimize tablet lock-to-display-off delay.
+  * Route the protected short power-button action directly through native DPMS.
 
  -- Sheng Kali builders <noreply@localhost>  Sat, 21 Nov 2026 12:00:00 +0800
 
@@ -26,7 +28,9 @@ if not text.startswith('powerdevil (4:6.7.4-2+sheng2)'):
     path.write_text(header+text)
 PY
 cd "$source_dir"
-dpkg-buildpackage --build=binary --no-sign --no-pre-clean -j2
+# A prior debhelper build stamp can skip compilation after patch changes.
+# Clean the generated build/staging state so package contents match the source.
+dpkg-buildpackage --build=binary --no-sign -j2
 # Run upstream migration tests and the native policy test in an isolated config.
 build=$(find "$source_dir" -maxdepth 1 -type d -name 'obj-*' -print -quit)
 [[ -n $build ]]

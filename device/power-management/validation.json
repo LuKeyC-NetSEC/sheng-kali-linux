@@ -135,5 +135,7 @@
     "PIN/touch/OSK and display scale after suspend (user unavailable to unlock)",
     "long-duration unplugged standby power"
   ],
-  "rollback": "Original Debian packages and related configuration in private /var/lib/sheng-power-management backups; installer --restore"
+  "rollback": "Original Debian packages and related configuration in private /var/lib/sheng-power-management backups; installer --restore",
+  "historicalSnapshot": true,
+  "currentDisplayOffValidation": "direct-display-off-validation.json"
 }

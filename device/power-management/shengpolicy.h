@@ -13,6 +13,7 @@ inline bool isDevice()
         && QString::fromUtf8(model.readAll()).remove(QChar(u'\0')).trimmed() == QStringLiteral("Xiaomi Pad 6S Pro 12.4");
 }
 bool migrateDefaults(const KSharedConfig::Ptr &config, bool canSuspend);
+bool migrateDisplayOffDefaults(const KSharedConfig::Ptr &config, const KSharedConfig::Ptr &kwin);
 int lockMinutes(int displayIdleSeconds);
 void initialize(Core *core);
 }

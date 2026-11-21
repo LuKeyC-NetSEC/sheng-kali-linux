@@ -4,9 +4,11 @@
 
 ## 本轮改动
 
+电源条目已更新为直接息屏适配；其余条目保留原生迁移时的阶段快照，后续用户验收以[公开验证矩阵](VALIDATION.md)为准。
+
 | 功能 | 源码归属与结果 | 构建/测试 | 设备状态 |
 | --- | --- | --- | --- |
-| 电源/恢复 | [PowerDevil C++](../device/power-management/README.md)：各档位1分钟锁屏息屏；普通供电继续后台，仅离电10%低电量档闲置5分钟挂起，5%临界保护 | 6组CTest、3项隔离KConfig测试通过 | +sheng2已部署；默认仍s2idle |
+| 电源/恢复 | [PowerDevil C++](../device/power-management/README.md)：各档位1分钟锁屏息屏；短按原生DPMS直接关屏并锁定；普通供电继续后台，仅离电10%低电量档闲置5分钟挂起，5%临界保护 | 6组CTest/8项原生QtTest、3项隔离KConfig测试通过 | +sheng4已部署，短按复验通过；默认仍s2idle |
 | 键盘自动显示 | [Rust启动器](../device/input-method/native-policy.rs)监听真实输入/窗口/锁状态及ManualMode确认，保留Fcitx中文上下文 | 13项测试与release通过；FUTO UI ELF未变 | 新版已正常登录加载，实体输入待用户复验 |
 | 输入面板重载 | [KWin InputMethod](../device/kwin-integration/README.md)原生异步重载，不临时清空持久输入法配置 | 私有D-Bus和配置环境7项通过 | +sheng1已正常登录加载，API v1活动 |
 | 三指Alt+Tab | KWin原生TabBox过滤器消费已有触摸板事件，直接选窗/确认，不模拟Alt | 匹配ARM64/Qt构建通过 | 实体PIN的新路径未验证 |
