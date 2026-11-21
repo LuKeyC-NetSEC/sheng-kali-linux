@@ -30,10 +30,12 @@ jobs:
       - name: Compile native helpers
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential pkg-config libinput-dev libudev-dev
+          sudo apt-get install -y build-essential pkg-config qt6-base-dev
           mkdir -p out/bin
           gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
-          g++ -std=c++17 -O2 -Wall -Wextra -Werror device/recents/gesture-bridge.cpp -o out/bin/sheng-task-gestures $(pkg-config --cflags --libs libinput libudev)
+          cmake -S device/plasma-integration/tests -B out/plasma-policy-tests
+          cmake --build out/plasma-policy-tests
+          ctest --test-dir out/plasma-policy-tests --output-on-failure
       - name: Build pinned desktop packages
         run: |
           python3 scripts/build-control-center.py

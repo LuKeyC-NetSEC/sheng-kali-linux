@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAtUTC": "2026-11-21T05:40:19+00:00",
+  "capturedAtUTC": "2026-11-21T07:15:58+00:00",
   "platform": {
     "device": "sheng",
     "architecture": "arm64",
@@ -12,12 +12,12 @@
       "fonts-noto-core": "20201225-6",
       "fonts-roboto": "2:3.016-1",
       "kwin-wayland": "4:6.7.4-2+b1",
-      "libpowerdevilcore2:arm64": "4:6.7.4-2+sheng1",
+      "libpowerdevilcore2:arm64": "4:6.7.4-2+sheng2",
       "libqt6core6t64:arm64": "6.11.2+dfsg-5",
       "plasma-desktop": "4:6.7.4-1+b1",
       "plasma-workspace": "4:6.7.4-2",
-      "powerdevil": "4:6.7.4-2+sheng1",
-      "powerdevil-data": "4:6.7.4-2+sheng1",
+      "powerdevil": "4:6.7.4-2+sheng2",
+      "powerdevil-data": "4:6.7.4-2+sheng2",
       "sheng-dock-fix": "1.3-2",
       "sheng-futo-keyboard": "0.3.0-3",
       "sheng-msime-integration": "0.2.1-9",
@@ -70,7 +70,7 @@
       "Daemon": {
         "Autolock": "true",
         "LockGrace": "0",
-        "Timeout": "60"
+        "Timeout": "1"
       },
       "Greeter": {
         "WallpaperPlugin": "org.kde.image"
@@ -90,14 +90,14 @@
         "PowerDownAction": "16",
         "SleepMode": "1",
         "AutoSuspendAction": "0",
-        "AutoSuspendIdleTimeoutSec": "3600"
+        "AutoSuspendIdleTimeoutSec": "60"
       },
       "Battery][SuspendAndShutdown": {
         "PowerButtonAction": "32",
         "PowerDownAction": "16",
         "SleepMode": "1",
         "AutoSuspendAction": "0",
-        "AutoSuspendIdleTimeoutSec": "1800"
+        "AutoSuspendIdleTimeoutSec": "60"
       },
       "LowBattery][SuspendAndShutdown": {
         "PowerButtonAction": "32",
@@ -108,19 +108,19 @@
       },
       "AC][Display": {
         "TurnOffDisplayWhenIdle": "true",
-        "TurnOffDisplayIdleTimeoutSec": "3600",
+        "TurnOffDisplayIdleTimeoutSec": "60",
         "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
         "LockBeforeTurnOffDisplay": "true"
       },
       "Battery][Display": {
         "TurnOffDisplayWhenIdle": "true",
-        "TurnOffDisplayIdleTimeoutSec": "1800",
+        "TurnOffDisplayIdleTimeoutSec": "60",
         "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
         "LockBeforeTurnOffDisplay": "true"
       },
       "LowBattery][Display": {
         "TurnOffDisplayWhenIdle": "true",
-        "TurnOffDisplayIdleTimeoutSec": "300",
+        "TurnOffDisplayIdleTimeoutSec": "60",
         "TurnOffDisplayIdleTimeoutWhenLockedSec": "0",
         "LockBeforeTurnOffDisplay": "true"
       }

@@ -1,0 +1,60 @@
+--- a/src/tabbox/tabbox.h
++++ b/src/tabbox/tabbox.h
+@@ -17,6 +17,7 @@
+ #include <QKeySequence>
+ #include <QModelIndex>
+ #include <QTimer>
++#include <memory>
+ 
+ class KConfigGroup;
+ class KLazyLocalizedString;
+@@ -32,6 +33,7 @@
+ struct PointerButtonEvent;
+ struct PointerMotionEvent;
+ class Workspace;
++class InputEventFilter;
+ class Window;
+ 
+ namespace TabBox
+@@ -238,6 +240,7 @@
+     void tabBoxKeyEvent(QKeyEvent *);
+ 
+ private:
++    friend class ShengTabBoxGestures;
+     enum Direction {
+         Backward = -1,
+         Steady = 0,
+@@ -293,6 +296,7 @@
+     QList<ElectricBorder> m_borderActivate, m_borderAlternativeActivate;
+     QHash<ElectricBorder, QAction *> m_touchActivate;
+     QHash<ElectricBorder, QAction *> m_touchAlternativeActivate;
++    std::unique_ptr<InputEventFilter> m_shengGestures;
+ };
+ 
+ } // namespace TabBox
+--- a/src/tabbox/tabbox.cpp
++++ b/src/tabbox/tabbox.cpp
+@@ -12,6 +12,10 @@
+ // #define QT_CLEAN_NAMESPACE
+ //  own
+ #include "tabbox.h"
++#if KWIN_BUILD_WAYLAND
++#include "tabboxgesture.h"
++#include <QFile>
++#endif
+ // tabbox
+ #include "tabbox/tabbox_logging.h"
+ #include "tabbox/tabboxconfig.h"
+@@ -286,6 +290,12 @@
+     m_tabBoxMode = TabBoxWindowsMode; // init variables
+     connect(&m_delayedShowTimer, &QTimer::timeout, this, &TabBox::show);
+     connect(Workspace::self(), &Workspace::configChanged, this, &TabBox::reconfigure);
++#if KWIN_BUILD_WAYLAND
++    QFile compatible(QStringLiteral("/proc/device-tree/compatible"));
++    if (compatible.open(QIODevice::ReadOnly) && compatible.readAll().contains("xiaomi,sheng")) {
++        m_shengGestures = std::make_unique<ShengTabBoxGestures>(this);
++    }
++#endif
+ }
+ 
+ TabBox::~TabBox() = default;

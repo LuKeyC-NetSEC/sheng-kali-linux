@@ -1,0 +1,35 @@
+--- a/contents/ui/main.qml
++++ b/contents/ui/main.qml
+@@ -1,4 +1,5 @@
+ import QtQuick
++import org.kde.plasma.workspace.dbus as DBus
+ import QtQuick.Layouts
+ import QtQuick.Window
+ import org.kde.plasma.plasmoid
+@@ -315,7 +316,16 @@
+     readonly property bool classic: conf.classicPopup || dlgLoader.status === Loader.Error
+     property bool dialogOpen: dlgLoader.item ? dlgLoader.item.visible : false
+     readonly property bool popupOpen: classic ? expanded : dialogOpen
++    function publishGestureVisibility(value) {
++        DBus.SessionBus.asyncCall({
++            service: "org.sheng.DesktopTouch", path: "/org/sheng/DesktopTouch",
++            iface: "org.sheng.DesktopTouch", member: "ControlCenterVisible",
++            signature: "(b)", arguments: [Boolean(value)]
++        }, function() {}, function() {})
++    }
++    Component.onDestruction: publishGestureVisibility(false)
+     onPopupOpenChanged: {
++        publishGestureVisibility(popupOpen)
+         if (popupOpen) { copiedHex = ""; refresh(); refreshDisplays() }
+         else if (!picking) page = "main"      // reopen on the normal page (but not while the screen color picker is running)
+     }
+--- a/contents/ui/PopupDialog.qml
++++ b/contents/ui/PopupDialog.qml
+@@ -10,6 +10,7 @@
+ // - blur mode: Plasma's own frame is used, because that is what makes KWin blur the desktop behind it.
+ PlasmaCore.Dialog {
+     id: dlg
++    title: "Sheng Control Center"
+     property var ctl: null
+     property var panelComp: null
+     property double closedAt: 0

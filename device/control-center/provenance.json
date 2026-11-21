@@ -21,5 +21,6 @@
   "sha256": "bfb83cf61c5dbc548b50f8aa93c5e95317a3bcf4f1ed292753b22fbef3349ec9",
   "upstream_patch_sha256": "fed3560bf8fd6812144f603533b63640a23aeeb9d0b658f46b3c10d618287059",
   "upstream_archive_sha256": "c5d085c4cec2cc54cde54ee6d7619f5b75d65961d76bf5f848a86cb75d3e88d2",
-  "artifact_note": "Historical device artifact; new build hash is written to its own manifest."
+  "artifact_note": "Historical device artifact; new build hash is written to its own manifest.",
+  "gesture_ownership_patch_sha256": "3d04a381b364f5e0a6ec4e75dd63efa023c07927806ad4c726a584067825257d"
 }

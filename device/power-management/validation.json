@@ -1,25 +1,25 @@
 {
-  "checkedAtUTC": "2026-11-21T05:35:15+00:00",
+  "checkedAtUTC": "2026-11-21T07:17:44+00:00",
   "device": "sheng",
   "architecture": "arm64",
   "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
   "plasma": "6.7.4",
   "qt": "6.11.2",
   "nativePackages": {
-    "powerdevil": "4:6.7.4-2+sheng1",
-    "libpowerdevilcore2": "4:6.7.4-2+sheng1",
-    "powerdevil-data": "4:6.7.4-2+sheng1"
+    "powerdevil": "4:6.7.4-2+sheng2",
+    "powerdevil-data": "4:6.7.4-2+sheng2",
+    "libpowerdevilcore2": "4:6.7.4-2+sheng2"
   },
-  "coreLibrarySha256": "84c2718e303b27d7777bd219b8b3ee2625e812b71f8898d2429ce722c20cee89",
+  "coreLibrarySha256": "a560460abfc266a60c9e4803b2e6bb78804ac79579e1a18e2ad18ab4fdecd0b5",
   "packageSha256": {
-    "powerdevil": "6506a59a28ff3a7a4a4da950c071d91bd82c94e5f3571549b1bbb74bbd9f71db",
-    "libpowerdevilcore2": "c82fb776e294359eca2c7576b391ecea546fb23ea8b1b02f9bb5b8e02ed1ef2d",
-    "powerdevil-data": "56938c3a3db6a7df705aeab698ed13ad513eebbd635579276d76a503bc539d5d"
+    "powerdevil": "a799f7093801a87f2b6021691e0094884a7034c4d13dbb9639ad6765f4d16957",
+    "powerdevil-data": "b9d54051e4c6bd11f6d38b9bdaa45b341b0dfd9224e9253df15298d5d7e6c60e",
+    "libpowerdevilcore2": "0b08e261fe62da575fdce00c3079796cec53c94727dd52f1a5c3c47c545f90f0"
   },
   "runningCoreMappedToInstalledFile": true,
   "sourceFiles": {
     "shengpolicy.cpp": {
-      "sha256": "91da7ceaaeab4fb1048eb261da4b08bc2b11f1dcf1266f86b160cd6ee61f5c63",
+      "sha256": "f19f70d265291074fb647c581b18c328254af13f7e0f29282560d21f1c0f4e04",
       "matchesRepository": true
     },
     "shengpolicy.h": {
@@ -27,11 +27,11 @@
       "matchesRepository": true
     },
     "shengpolicytest.cpp": {
-      "sha256": "41dd2a0c44d40557fe45303fb6e5ee7d3c83869591f059618522ab728947c848",
+      "sha256": "f4f5ffbc94d588088ca2ddc2952405e7c414fde59ab556b233e8f5d343b9f91e",
       "matchesRepository": true
     }
   },
-  "nativePolicyVersion": 1,
+  "nativePolicyVersion": 2,
   "additionalRuntimePolicyDaemon": false,
   "debianSourceSignatureVerified": true,
   "debianPatchesRetained": [
@@ -48,11 +48,19 @@
     "nativeLockerSync": {
       "testMinutes": 59,
       "restoredMinutes": 60,
-      "lockStateRetained": true
+      "lockStateRetained": true,
+      "historicalPackage": "4:6.7.4-2+sheng1"
     },
     "sessionProcessesPreservedDuringInstall": true,
     "batteryProviderRetainedDuringInstall": true,
-    "legacyDesktopSleepHookRemoved": true
+    "legacyDesktopSleepHookRemoved": true,
+    "oneMinuteLockAndDisplayConfig": {
+      "AC": 60,
+      "Battery": 60,
+      "LowBattery": 60,
+      "lockerMinutes": 1,
+      "lowBatterySuspendSeconds": 300
+    }
   },
   "observedPowerState": {
     "profile": "AC",
@@ -60,23 +68,23 @@
     "onBattery": false,
     "batteryWarningLevel": 1,
     "autoSuspendAction": 0,
-    "autoSuspendIdleSeconds": 3600,
+    "autoSuspendIdleSeconds": 60,
     "lowBatteryPercent": 10,
     "criticalBatteryPercent": 5,
     "battery": {
-      "capacity": "88",
-      "current_now": "268000",
-      "voltage_now": "4243000",
-      "temp": "223",
+      "capacity": "87",
+      "current_now": "-859000",
+      "voltage_now": "4186000",
+      "temp": "288",
       "status": "Charging"
     },
-    "estimatedBatteryNetWatts": 1.137,
+    "estimatedBatteryNetWatts": -3.596,
     "netPowerMeaning": "negative means net battery discharge; fuel-gauge estimate, not USB input power",
     "dpms": "Off",
-    "reportedBacklightBrightness": "565",
+    "reportedBacklightBrightness": "1882",
     "kernelMemorySleep": "s2idle [deep]",
     "systemdMemorySleepMode": "s2idle",
-    "suspendSuccess": "0",
+    "suspendSuccess": "1",
     "suspendFailures": "0",
     "blockingSleepInhibitors": 0,
     "gpuRuntimeStatus": "suspended",
@@ -84,12 +92,47 @@
       "schedutil"
     ]
   },
-  "suspendTest": null,
+  "suspendTest": {
+    "before": {
+      "success": 0,
+      "fail": 0,
+      "locked": true,
+      "memorySleep": "s2idle [deep]",
+      "dpms": "Off"
+    },
+    "after": {
+      "success": 1,
+      "fail": 0,
+      "locked": true,
+      "memorySleep": "s2idle [deep]",
+      "dpms": "On"
+    },
+    "alarmCallbackReceived": true,
+    "observedSleepSeconds": 3.511,
+    "sessionProcessesPreserved": true,
+    "lockPreserved": true,
+    "requestedSleepMode": "deep",
+    "nativeWakeAlarmTimerfd": true,
+    "kernelPowerMessages": [
+      "PM: suspend entry (deep)",
+      "PM: suspend exit"
+    ],
+    "originalDisplayOffRestored": true,
+    "testOverrideRemoved": true,
+    "actualSuspendSuccess": true,
+    "deepEntryObserved": true,
+    "unpromptedEarlyWake": true,
+    "testedPackage": "4:6.7.4-2+sheng1",
+    "plannedSeconds": 20,
+    "wakeSource": "unidentified"
+  },
   "notVerified": [
-    "actual suspend/resume on the final native package",
-    "deep-mode stability",
+    "actual suspend/resume on +sheng2 (unchanged suspend implementation)",
+    "stable 20-second deep-mode sleep",
+    "cause of early wake",
     "real low-battery threshold crossing",
     "physical AC/battery profile switching",
+    "PIN/touch/OSK and display scale after suspend (user unavailable to unlock)",
     "long-duration unplugged standby power"
   ],
   "rollback": "Original Debian packages and related configuration in private /var/lib/sheng-power-management backups; installer --restore"

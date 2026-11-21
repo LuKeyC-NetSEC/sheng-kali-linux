@@ -140,24 +140,16 @@ printf '[Autologin]\nUser=kali\nSession=%s\nRelogin=false\n' "$SESSION" > "$ROOT
 cat > "$ROOTFS/home/kali/.config/kwinrc" <<'EOF'
 [Wayland]
 InputMethod=/usr/share/applications/org.kde.plasma.keyboard.desktop
-VirtualKeyboardEnabled=true
+VirtualKeyboardMode=1
 [Xwayland]
 Scale=2
 EOF
 chroot "$ROOTFS" chown -R kali:kali /home/kali
-install -Dm 0755 "$PROJECT/scripts/set-screen-lock-timeout.sh" "$ROOTFS/usr/libexec/sheng-set-screen-lock-timeout"
 install -m 0755 "$PROJECT/scripts/configure-power-buttons.sh" "$ROOTFS/tmp/configure-power-buttons.sh"
 chroot "$ROOTFS" runuser -u kali -- /bin/bash /tmp/configure-power-buttons.sh --config-only
 install -Dm 0644 "$PROJECT/device/50-sheng-logind.conf" "$ROOTFS/etc/systemd/logind.conf.d/50-sheng.conf"
 install -Dm 0644 "$PROJECT/device/50-sheng-sleep.conf" "$ROOTFS/etc/systemd/sleep.conf.d/50-sheng.conf"
 install -Dm 0644 "$PROJECT/device/20-sheng-sddm-display.conf" "$ROOTFS/etc/sddm.conf.d/20-sheng-display.conf"
-install -Dm 0755 "$PROJECT/scripts/resume-desktop.py" "$ROOTFS/usr/libexec/sheng-desktop-resume.py"
-install -Dm 0755 "$PROJECT/scripts/keyboard-policy.py" "$ROOTFS/usr/libexec/sheng-keyboard-policy.py"
-install -Dm 0644 "$PROJECT/device/sheng-keyboard-policy.service" "$ROOTFS/usr/lib/systemd/user/sheng-keyboard-policy.service"
-install -d "$ROOTFS/home/kali/.config/systemd/user/graphical-session.target.wants"
-ln -sf /usr/lib/systemd/user/sheng-keyboard-policy.service "$ROOTFS/home/kali/.config/systemd/user/graphical-session.target.wants/sheng-keyboard-policy.service"
-chroot "$ROOTFS" chown -R kali:kali /home/kali/.config/systemd
-install -Dm 0755 "$PROJECT/device/sheng-desktop-sleep" "$ROOTFS/usr/lib/systemd/system-sleep/60-sheng-desktop"
 install -Dm 0755 "$PROJECT/scripts/sheng-hotspot.py" "$ROOTFS/usr/libexec/sheng-hotspot/hotspot.py"
 install -Dm 0755 "$PROJECT/scripts/setup-hotspot.py" "$ROOTFS/usr/libexec/sheng-hotspot/setup.py"
 install -Dm 0755 "$PROJECT/scripts/hotspot-toggle.sh" "$ROOTFS/usr/local/bin/sheng-hotspot-toggle"

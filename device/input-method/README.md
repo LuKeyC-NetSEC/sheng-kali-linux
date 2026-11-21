@@ -11,7 +11,7 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-9` 保留此前卸载回退、字体依赖、模式切换器和FUTO入口，并直接包含基础策略服务及graphical-session启用链接；安装时显式启用当前用户服务，离线安装后也能随会话启动。2026-11-21 已安装并核对服务enabled/active，OSK ELF哈希保持不变。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
+`build-device-package.py STAGING OUTPUT.deb` 只打包已完成上游安装的ARM64 staging，并要求启动器的 `--sheng-native-version` 返回匹配接口版本。当前源码只生成 `0.2.1-10+native1` 原生版，依赖KWin输入API v1、上下文v2及匹配的原生桌面包。旧Python策略、服务和兼容分支已删除；安装不再启用它们。实机当前运行的0.2.1-9仍是此前已验证基线，新版尚待成组维护和实机验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
@@ -53,8 +53,8 @@ cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INS
 CARGO_BUILD_JOBS=2 cmake --build out/osk-cmake --parallel 2
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
-python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-9_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-9_arm64.deb
+python3 device/input-method/build-device-package.py out/osk-stage out/packages/sheng-msime-integration_0.2.1-10+native1_arm64.deb
+# 保存应用并准备正常重新登录后，成组安装匹配的原生组件；此处不立即安装。
 # 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
 sheng-osk-mode float --font-defaults --sheng-ui
 # 切回底部停靠
@@ -66,3 +66,16 @@ sheng-osk-mode dock
 已完成：实体中文组合/上屏、触屏中文、PIN接入不弹软键盘、拔下后连续弹出，以及新界面的拖动和模式切换。锁屏时钟页/密码页与正常解锁本轮已确认；锁屏内热插拔、挂起恢复仍需独立记录。保留 `/usr/share/applications/org.kde.plasma.keyboard.desktop` 回退入口，卸载集成包后确认 KWin InputMethod 与用户服务回到基础实现。不要为验收绕过锁屏或关闭已有应用。
 
 可选 [FUTO 原生移植](../futo-keyboard/README.md)在本输入面板上接入 FUTO/LatinIME 的英文 C++ 候选核心、QWERTY 布局和默认调色板；中文引擎仍为水杉。两者来源和许可证分开记录，不把 Linux 适配器称为完整 Android FUTO 应用。
+
+## 原生策略迁移（待统一加载）
+
+[native-policy.rs](native-policy.rs)把独立Python显示策略移入OSK的Rust启动器。监听KWin文本上下文、窗口角色、原生输入设备事实、OSK模式/ManualMode确认及服务owner变化；没有每秒轮询。实体键盘连接时隐藏面板但保留Fcitx中文组合上下文，无键盘时通过Fcitx正式接口进入屏幕键盘模式。桌面禁止残留输入焦点误弹；锁屏仅由greeter控制安全面板，不强制显示。
+
+[native-launcher.patch](native-launcher.patch)调用KWin原生重载API，移除临时删除再写回 `Wayland/InputMethod` 的做法；重载不改持久启动项，退出等待限制为1秒。新策略要求[KWin输入API v1](../kwin-integration/README.md)与[原生上下文v2](../desktop-touch-guard/README.md)。缺少接口时不会清空配置或通过模拟输入兜底；新旧策略不能同时启用。
+
+```bash
+python3 scripts/prepare-osk-ui.py --futo-ui --output-dir out/osk-native-source
+bash scripts/build-native-launcher.sh out/osk-native-source
+```
+
+这两条只准备源码、运行13项策略测试并编译启动器，不安装或重启。也可把 `prepare-native-launcher.py SOURCE` 应用到已核验的、尚未修改启动器的FUTO源码树，保留其UI和中文引擎。2026-11-21在sheng ARM64上13项测试与release编译通过，包含ScreenSaver提前锁定信号，防止合成器锁状态尚未更新时误弹普通面板；已安装原生启动器，须正常重新登录完成交接，实际中文、密码页、PIN热插拔仍待在用户方便时正常重新登录后验收。旧版仅保留在Git历史和设备私有回退包中。

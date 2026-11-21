@@ -16,5 +16,14 @@
     "fcitx5-osk/src/dbus/client.rs": "b9b916fc0550d84096eff3c849b18ff93e72b065b9ac244b7ee4f7663116fb07"
   },
   "license": "MIT (upstream OSK and UI adaptation); integration helpers retain their SPDX licenses",
-  "fcitx_protocol_patch_sha256": "4ef71558f636202d292976c5225f1d658a706c820e22cec6c59cdedd69fefc56"
+  "fcitx_protocol_patch_sha256": "4ef71558f636202d292976c5225f1d658a706c820e22cec6c59cdedd69fefc56",
+  "native_launcher_patch_sha256": "18e8009a31437c9ddd157de1c520ffe6424766bf385833911056e956d4c3bfe3",
+  "native_launcher_files": {
+    "native-policy.rs": "c983fcfe06aa9da47fe68d1e802cd79b57d295963c3f2828e83741c6414c5dcc"
+  },
+  "native_launcher_base_files": {
+    "dbus.rs": "3020881ce6c7afc32b9ad9203cd709407e02adcb3c3d6bc7a53f6aead9a7c813",
+    "kwin.rs": "4bee2bc2a3e8f3e398ed296bfae491290f881dbad80dc9c00ddc510cf724138f",
+    "main.rs": "1195f69f4e3012be641420b30c7e2d79c7b6da54acea9912a55884fe0dda334a"
+  }
 }

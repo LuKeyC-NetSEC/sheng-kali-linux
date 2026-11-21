@@ -45,7 +45,7 @@
 
 ## 从公开源码构建
 
-在 ARM64 Kali Linux 上操作；Windows 只负责源码准备与传输。先按水杉集成说明安装可用的 `sheng-msime-integration 0.2.1-8`；构建该版本时使用下面的 `--futo-ui` 入口，否则只有原界面中的英文引擎入口。不要用 PowerShell 编译 Linux ELF。
+在 ARM64 Kali Linux 上操作；Windows 只负责源码准备与传输。先按水杉集成说明准备匹配的原生KWin/Plasma组件；构建时使用下面的 `--futo-ui` 入口，否则只有原界面中的英文引擎入口。不要用 PowerShell 编译 Linux ELF。
 
 ```bash
 # Rust/Cargo 和 OSK 开发依赖见 input-method/README.md
@@ -56,8 +56,8 @@ CARGO_BUILD_JOBS=2 cmake --build out/futo-osk-build --parallel 2
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5Osk
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5OskKwinLauncher
 python3 device/input-method/build-device-package.py out/futo-osk-stage \
-  scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
+  out/packages/sheng-msime-integration_0.2.1-10+native1_arm64.deb
+# 仅构建；待正常重新登录的维护窗口成组安装匹配原生组件。
 ```
 
 ```bash

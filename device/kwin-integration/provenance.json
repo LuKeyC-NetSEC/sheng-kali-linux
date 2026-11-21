@@ -1,0 +1,14 @@
+{
+  "base_source": "kwin 4:6.7.4-2",
+  "binary_base": "4:6.7.4-2+b1",
+  "native_version": "4:6.7.4-2+sheng1",
+  "qt_version": "6.11.2+dfsg-5",
+  "native_api_version": 1,
+  "local_files": {
+    "input-method-reload.patch": "57bb205f9404321f1883a0676eeabaebce486450e5b31af64ea294fc610ae934",
+    "tabbox-gestures.patch": "47e8997d6de0d065822f8edd8e69020f20e6fb626690a66b2e91cd3254b27aeb",
+    "input-method-tests.patch": "43f45f69fbc1cb58f1a2860d96e991a53ed3d4a493cad4369d2eb5ccce45c520",
+    "tabboxgesture.h": "20b91dbdb48139d78c6a92c2e7bbdd8b524bf4eb5ba90d1be6f91097a275265b"
+  },
+  "license": "KWin source notices retained; native additions GPL-2.0-or-later"
+}

@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.sheng.DesktopPolicy
+Exec=/usr/bin/plasmashell --no-respawn
+SystemdService=plasma-plasmashell.service

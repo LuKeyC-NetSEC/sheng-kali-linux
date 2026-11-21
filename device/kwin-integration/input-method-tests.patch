@@ -1,0 +1,75 @@
+--- a/autotests/integration/test_virtualkeyboard_dbus.cpp
++++ b/autotests/integration/test_virtualkeyboard_dbus.cpp
+@@ -18,6 +18,11 @@
+ #include <QDBusPendingReply>
+ #include <QSignalSpy>
+ #include <QTest>
++#include <QElapsedTimer>
++#include <QFile>
++#include <QProcess>
++#include <QTemporaryDir>
++#include <KConfigGroup>
+ 
+ #include <virtualkeyboardinterface.h>
+ 
+@@ -33,6 +38,7 @@
+     void testEnabled();
+     void testRequestMode_data();
+     void testRequestMode();
++    void testNativeRestartDoesNotClearConfigurationOrBlockKWin();
+     void init();
+     void cleanup();
+ };
+@@ -119,5 +125,52 @@
+     QTRY_COMPARE(iface.mode(), expectedResult);
+ }
+ 
++void VirtualKeyboardDBusTest::testNativeRestartDoesNotClearConfigurationOrBlockKWin()
++{
++    QTemporaryDir directory;
++    QVERIFY(directory.isValid());
++    const auto marker = directory.filePath(QStringLiteral("ready"));
++    const auto program = directory.filePath(QStringLiteral("input-method"));
++    QFile script(program);
++    QVERIFY(script.open(QIODevice::WriteOnly));
++    script.write("#!/bin/sh\ntrap '' TERM\nprintf ready > '" + marker.toUtf8() + "'\nread ignored\n");
++    script.close();
++    QVERIFY(script.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner));
++    KConfigGroup config(kwinApp()->config(), QStringLiteral("Wayland"));
++    const auto previous = config.readEntry("InputMethod", QString());
++    const auto chosen = QStringLiteral("/usr/share/applications/sheng-native-test.desktop");
++    config.writeEntry("InputMethod", chosen);
++    config.sync();
++    auto *method = kwinApp()->inputMethod();
++    method->setInputMethodCommand(program);
++    const auto running = [method]() -> qint64 {
++        for (auto *process : method->findChildren<QProcess *>(QString(), Qt::FindDirectChildrenOnly)) {
++            if (process->state() == QProcess::Running) return process->processId();
++        }
++        return 0;
++    };
++    QTRY_VERIFY(QFile::exists(marker));
++    QTRY_VERIFY(running() > 0);
++    const auto initial = running();
++    VirtualKeyboardDBus adapter(method);
++    QCOMPARE(adapter.property("configuredInputMethod").toString(), chosen);
++    QVERIFY(!adapter.restartInputMethod(QStringLiteral("/wrong/desktop-file")));
++    QCOMPARE(running(), initial);
++    QElapsedTimer timer;
++    timer.start();
++    QVERIFY(adapter.restartInputMethod(chosen));
++    QVERIFY2(timer.elapsed() < 250, "Restart must not synchronously wait for a TERM-resistant input method");
++    QCOMPARE(config.readEntry("InputMethod", QString()), chosen);
++    // A second request coalesces with the first rather than creating a second
++    // private input-method process or persisting a transient empty setting.
++    QVERIFY(adapter.restartInputMethod(chosen));
++    QTRY_VERIFY_WITH_TIMEOUT(running() > 0 && running() != initial, 5000);
++    QCOMPARE(config.readEntry("InputMethod", QString()), chosen);
++    method->setInputMethodCommand(QString());
++    QTRY_COMPARE_WITH_TIMEOUT(running(), 0, 5000);
++    config.writeEntry("InputMethod", previous);
++    config.sync();
++}
++
+ WAYLANDTEST_MAIN(VirtualKeyboardDBusTest)
+ #include "test_virtualkeyboard_dbus.moc"

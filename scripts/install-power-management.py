@@ -17,7 +17,8 @@ PROJECT=Path(__file__).resolve().parents[1]
 LOCAL=PROJECT/'device/power-management'
 STATE=Path('/var/lib/sheng-power-management')
 NAMES=('libpowerdevilcore2','powerdevil-data','powerdevil')
-VERSION='4:6.7.4-2+sheng1'
+VERSION='4:6.7.4-2+sheng2'
+POLICY_VERSION=2
 BASE_VERSION='4:6.7.4-2'
 
 
@@ -55,6 +56,11 @@ def restore(backup,owner):
             shutil.copy2(backup/str(index),target);os.chown(target,item['uid'],item['gid'])
         else:
             target.unlink(missing_ok=True)
+    previous_install=backup/'previous-install.json'
+    if previous_install.exists():
+        shutil.copy2(previous_install,STATE/'installed.json')
+    else:
+        (STATE/'installed.json').unlink(missing_ok=True)
     subprocess.run(user(owner,'systemctl','--user','start','plasma-powerdevil.service'),check=True)
 
 
@@ -92,19 +98,26 @@ def main():
             candidates[name]=candidate
     if set(candidates)!=set(names):raise SystemExit('Expected matched native PowerDevil packages, including dev if installed')
     hook=Path('/usr/lib/systemd/system-sleep/60-sheng-desktop')
-    if hook.exists() and hook.read_bytes().replace(b'\r\n',b'\n')!=(PROJECT/'device/sheng-desktop-sleep').read_bytes().replace(b'\r\n',b'\n'):
+    if hook.exists() and hashlib.sha256(hook.read_bytes().replace(b'\r\n',b'\n')).hexdigest()!=json.loads((LOCAL/'provenance.json').read_text())['legacy_sleep_hook_sha256']:
         raise SystemExit('Desktop sleep hook has local changes; review before replacing it')
     STATE.mkdir(mode=0o700,exist_ok=True);STATE.chmod(0o700)
     backup=STATE/('backup-'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S'));backup.mkdir(mode=0o700)
+    if (STATE/'installed.json').is_file():
+        shutil.copy2(STATE/'installed.json',backup/'previous-install.json')
     packages=backup/'packages';packages.mkdir()
     previous={name:run(['dpkg-query','-W','-f=${Version}',name]) for name in names}
     for name,version in previous.items():
         if version==BASE_VERSION:
             subprocess.run(['apt-get','download',name+'='+version],cwd=packages,check=True)
-        elif version==VERSION:
-            cached=STATE/'installed-packages'/candidates[name].name
-            if not cached.exists():raise SystemExit('Missing cached package for rollback: '+name)
-            shutil.copy2(cached,packages/cached.name)
+        elif version in ('4:6.7.4-2+sheng1',VERSION):
+            cached=[path for path in (STATE/'installed-packages').glob('*.deb')
+                    if run(['dpkg-deb','-f',str(path),'Package'])==name
+                    and run(['dpkg-deb','-f',str(path),'Version'])==version]
+            if len(cached)!=1:raise SystemExit('Missing or ambiguous cached rollback package: '+name)
+            saved=json.loads((STATE/'installed.json').read_text())
+            if hashlib.sha256(cached[0].read_bytes()).hexdigest()!=saved['packages'][name]:
+                raise SystemExit('Cached rollback package hash mismatch: '+name)
+            shutil.copy2(cached[0],packages/cached[0].name)
         else:raise SystemExit('Installed package version is outside the reviewed ABI: '+name)
     manifest=[]
     for index,target in enumerate(files(owner)):
@@ -127,13 +140,13 @@ def main():
         target.write_text('\n'.join('MemorySleepMode='+args.sleep_mode if line.startswith('MemorySleepMode=') else line
                                     for line in text.splitlines())+'\n');target.chmod(0o644)
         marker=Path('/usr/share/sheng-power-management/native-policy.json');marker.parent.mkdir(parents=True,exist_ok=True)
-        marker.write_text(json.dumps({'packageVersion':VERSION,'policyVersion':1})+'\n');marker.chmod(0o644)
+        marker.write_text(json.dumps({'packageVersion':VERSION,'policyVersion':POLICY_VERSION})+'\n');marker.chmod(0o644)
         shutil.copyfile(LOCAL/'power-status.py','/usr/bin/sheng-power-status');Path('/usr/bin/sheng-power-status').chmod(0o755)
         shutil.copyfile(PROJECT/'scripts/configure-power-buttons.sh','/usr/libexec/sheng-configure-power-buttons')
         Path('/usr/libexec/sheng-configure-power-buttons').chmod(0o755)
         subprocess.run(user(owner,'systemctl','--user','start','plasma-powerdevil.service'),check=True)
         deadline=time.monotonic()+30
-        while run(user(owner,'kreadconfig6','--file','powerdevilrc','--group','ShengPower','--key','PolicyVersion'))!='1':
+        while run(user(owner,'kreadconfig6','--file','powerdevilrc','--group','ShengPower','--key','PolicyVersion'))!=str(POLICY_VERSION):
             if time.monotonic()>deadline:raise RuntimeError('Native policy did not initialize')
             time.sleep(0.25)
         pid=int(run(user(owner,'systemctl','--user','show','plasma-powerdevil.service','-p','MainPID','--value')))
@@ -147,7 +160,7 @@ def main():
         restore(backup,owner);raise
     cache=STATE/'installed-packages';cache.mkdir(exist_ok=True)
     for package in candidates.values():shutil.copy2(package,cache/package.name)
-    report={'nativePackageVersion':VERSION,'sleepMode':args.sleep_mode,'nativePolicyVersion':1,
+    report={'nativePackageVersion':VERSION,'sleepMode':args.sleep_mode,'nativePolicyVersion':POLICY_VERSION,
             'legacyDesktopSleepHookRemoved':not hook.exists(),'batteryProviderRetained':True,
             'coreLibrarySha256':hashlib.sha256(library.read_bytes()).hexdigest(),
             'packages':{name:hashlib.sha256(path.read_bytes()).hexdigest() for name,path in candidates.items()},

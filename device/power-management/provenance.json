@@ -3,8 +3,8 @@
   "upstream_version": "6.7.4",
   "upstream_commit": "7c97bbcd0e90ccb43eca1debd36191fc97f9f987",
   "debian_version": "4:6.7.4-2",
-  "native_package_version": "4:6.7.4-2+sheng1",
-  "policy_version": 1,
+  "native_package_version": "4:6.7.4-2+sheng2",
+  "policy_version": 2,
   "archive_base": "https://kali.download/kali/pool/main/p/powerdevil/",
   "dsc_name": "powerdevil_6.7.4-2.dsc",
   "debian_keyring": "/usr/share/keyrings/debian-keyring.pgp",
@@ -16,9 +16,10 @@
   },
   "local_files": {
     "powerdevil.patch": "5b305e0d17672283e627bba19ebfbe142ada7b8a606b64c820e6249853388ce0",
-    "shengpolicy.cpp": "91da7ceaaeab4fb1048eb261da4b08bc2b11f1dcf1266f86b160cd6ee61f5c63",
+    "shengpolicy.cpp": "f19f70d265291074fb647c581b18c328254af13f7e0f29282560d21f1c0f4e04",
     "shengpolicy.h": "e28e91e042f4a5b50d0a240e5cbdcc0345214cf3fb8a79eb938a1ae443c6165f",
-    "shengpolicytest.cpp": "41dd2a0c44d40557fe45303fb6e5ee7d3c83869591f059618522ab728947c848"
+    "shengpolicytest.cpp": "f4f5ffbc94d588088ca2ddc2952405e7c414fde59ab556b233e8f5d343b9f91e"
   },
-  "licenses": "Upstream and Debian notices retained; native integration GPL-2.0-or-later"
+  "licenses": "Upstream and Debian notices retained; native integration GPL-2.0-or-later",
+  "legacy_sleep_hook_sha256": "55ea4a7d6118db9ac0fc218f5c44ec5f566d6dbafc1529a34787eeccdee13acf"
 }

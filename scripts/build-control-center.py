@@ -61,6 +61,11 @@ def main():
                 raise SystemExit('Incomplete upstream package: ' + extra)
         subprocess.run(['git', 'apply', '--check', '-'], input=patch, cwd=stage, check=True)
         subprocess.run(['git', 'apply', '-'], input=patch, cwd=stage, check=True)
+        ownership = (SOURCE / 'gesture-ownership.patch').read_bytes().replace(b'\r\n', b'\n')
+        if digest(ownership) != pin['gesture_ownership_patch_sha256']:
+            raise SystemExit('Gesture ownership patch changed; review provenance')
+        subprocess.run(['git', 'apply', '--check', '-'], input=ownership, cwd=stage, check=True)
+        subprocess.run(['git', 'apply', '-'], input=ownership, cwd=stage, check=True)
         for name in pin['local_files']:
             if pathlib.PurePath(name).name != name:
                 raise SystemExit('Invalid local file name')
@@ -72,7 +77,7 @@ def main():
                 raise SystemExit('Unsupported local asset')
             shutil.copyfile(SOURCE / name, target)
         metadata = json.loads((stage / 'metadata.json').read_text(encoding='utf-8'))
-        metadata['KPlugin']['Version'] = '0.7.7-sheng-privacy4'
+        metadata['KPlugin']['Version'] = '0.7.8-sheng-native1'
         (stage / 'metadata.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         (stage / 'NOTICE.sheng').write_text(
             'Kontrol Center by ItsNotMeBro87 (Agon A.), GPL-3.0-or-later.\n'
@@ -93,6 +98,7 @@ def main():
                 output.writestr(entry, file.read_bytes().replace(b'\r\n', b'\n'))
     manifest = {'upstream': pin['upstream'], 'commit': pin['commit'],
                 'upstream_archive_sha256': digest(data), 'patch_sha256': digest(patch),
+                'gesture_ownership_patch_sha256': digest(ownership),
                 'artifact': args.output.name, 'sha256': digest(args.output.read_bytes())}
     args.output.with_suffix('.manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(manifest, indent=2))

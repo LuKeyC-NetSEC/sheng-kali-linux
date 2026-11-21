@@ -80,30 +80,37 @@ bash scripts/build-hotspot-panel-package.sh /path/to/org.kde.plasma.networkmanag
 ### 2. 任务效果、原生三指切窗
 
 ```bash
-sudo apt-get install -y build-essential pkg-config libinput-dev libudev-dev
-mkdir -p out/bin out/packages
-g++ -std=c++17 -O2 -Wall -Wextra -Werror device/recents/gesture-bridge.cpp \
-  -o out/bin/sheng-task-gestures $(pkg-config --cflags --libs libinput libudev)
-python3 device/recents/build-device-package.py out/bin/sheng-task-gestures out/packages/sheng-task-gestures_1.0-1_arm64.deb
-sudo apt-get install ./out/packages/sheng-task-gestures_1.0-1_arm64.deb
+# 在匹配ARM64环境构建原生KWin，保留当前会话。
+python3 scripts/prepare-kwin-native.py
+sudo apt-get build-dep --no-install-recommends ./out/kwin-native-source
+bash scripts/build-kwin-native.sh
+bash scripts/test-kwin-native.sh
 python3 scripts/build-task-cards.py --install
 python3 device/recents/install-native-tabbox.py
 ```
 
-任务效果构建器打印带源码散列的新插件 ID 和启用命令，按其输出以当前用户启用；升级先停用旧 ID，不能同时加载多个副本。停用原生 Overview，避免手势/Meta+W 冲突；系统设置中保留一个虚拟桌面，将其他桌面的窗口先归并后删除桌面。切窗桥接服务、udev、D-Bus 降权路径针对 `kali`/UID 1000，其他用户需要一起修改。独立三指上下没有动作；进入 Alt+Tab 后才允许四向选择。
+任务效果构建器打印带源码散列的新插件 ID 和启用命令，按其输出以当前用户启用；升级先停用旧 ID，不能同时加载多个副本。停用原生 Overview，避免手势/Meta+W 冲突；系统设置中保留一个虚拟桌面，将其他桌面的窗口先归并后删除桌面。旧三指桥接器已删除；手势直接进入合成器现有TabBox。独立三指上下没有动作；进入 Alt+Tab 后才允许四向选择。
 
 ### 3. 桌面策略与隐私
 
 ```bash
+python3 scripts/prepare-plasma-native.py
+sudo apt-get build-dep --no-install-recommends ./out/plasma-native-source
+bash scripts/build-plasma-native.sh
+# 使用刚构建的KWin SDK，不替换当前运行中的合成器。
+mkdir -p out/kwin-sdk out/bin out/packages
+dpkg-deb -x out/kwin-dev_6.7.4-2+sheng1_arm64.deb out/kwin-sdk
+dpkg-deb -x out/libkwin6_6.7.4-2+sheng1_arm64.deb out/kwin-sdk
+CMAKE_PREFIX_PATH="$PWD/out/kwin-sdk/usr" bash scripts/build-desktop-touch-guard.sh
 gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
 sudo out/bin/sheng-privacy-bpf probe
-python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-6_arm64.deb
-sudo apt-get install ./out/packages/sheng-tablet-controls_1.0-6_arm64.deb
+python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-7+native1_arm64.deb --touch-guard-build out/build-desktop-touch-guard
+# 新包依赖原生KWin/Plasma；先准备全部匹配包及回退，再安排正常重新登录。
 ```
 
-包安装用户会话服务、隐私过滤器及桌面手势部件；还需将 `org.sheng.desktop-gesture` 添加到桌面，并加载上一步 KWin 效果（其 `DesktopPolicy.qml` 通知最大化/全屏）。Dock 按 `ShengThemeRole=dock` 或底部任务面板识别，不依赖作者面板 ID。
+包安装隐私过滤器、一次性布局工具及指向原生plasmashell的激活入口。Dock显隐直接运行在 [Plasma Shell C++](../device/plasma-integration/README.md)，桌面上滑由原生guard负责；旧Python服务、QML手势部件及任务效果中的Dock发布器已移除。Dock按 `ShengThemeRole=dock` 识别，不依赖作者面板ID。
 
-使用当前 Linexin Dock/抽屉时，先完成下面的主题面板，再按[抽屉专用说明](DESKTOP_DRAWER.md)构建启动器、运行迁移助手和编译原生桌面触控插件；助手自动添加手势部件、备份和迁移固定项。原生插件必须与当前 KWin/Qt ABI 匹配，它同时负责防框选和真正全屏抽屉上的 Dock 叠层；仅安装 QML 不够。
+使用当前 Linexin Dock/抽屉时，先完成下面的主题面板，再按[抽屉专用说明](DESKTOP_DRAWER.md)构建启动器、运行迁移助手和编译原生桌面触控插件；助手删除旧手势部件实例、备份和迁移固定项。原生插件必须与当前 KWin/Qt ABI 匹配，它同时负责防框选和真正全屏抽屉上的 Dock 叠层；仅安装 QML 不够。
 
 隐私开关默认为允许访问；先读 [拦截范围](../device/privacy/README.md)。root 运行 `/usr/libexec/sheng-privacyctl off` 可恢复；本地活跃用户通过 `sheng-privacy on/off` 请求有限权限。冻结既有采集进程可能暂停整个相关应用，验收使用测试进程。
 
@@ -146,7 +153,7 @@ Burp 官方安装及 6 GiB/170%/OpenGL 参数见 [burp-tablet.md](burp-tablet.md
 
 ### 8. 原生PowerDevil电源适配
 
-按[原生电源说明](../device/power-management/README.md)从固定Debian/KDE 6.7.4-2源码构建 `4:6.7.4-2+sheng1`，保留发行版补丁并运行6项C++迁移测试。用 `scripts/install-power-management.py` 安装匹配的核心库、PowerDevil和data包；只重启PowerDevil，不退出会话。安装器备份原deb/配置、停用已知旧桌面恢复钩子，并检查电池提供者未被卸载。
+按[原生电源说明](../device/power-management/README.md)从固定Debian/KDE 6.7.4-2源码构建 `4:6.7.4-2+sheng2`，保留发行版补丁并运行6组CTest。用 `scripts/install-power-management.py` 安装匹配的核心库、PowerDevil和data包；只重启PowerDevil，不退出会话。安装器备份原deb/配置、停用已知旧桌面恢复钩子，并检查电池提供者未被卸载。
 
 运行时低电量策略、档位锁屏时间同步及显示恢复在PowerDevil C++进程内执行。普通插电/离电不自动挂起；只有10%低电量档闲置5分钟挂起，保留5%临界保护。挂起模式需实机恢复验收后选择，不把内核列出deep当作通过；基础镜像的配置兼容工具不能代替这个原生增量。
 
@@ -158,7 +165,7 @@ Burp 官方安装及 6 GiB/170%/OpenGL 参数见 [burp-tablet.md](burp-tablet.md
 | PIN | 查看 `modinfo`、`journalctl -u sheng-devauth`、只读握手计数；卸载修复包后重装匹配原内核包，不能只删除唯一模块 |
 | 热点 | `journalctl -u sheng-hotspot`、`iw dev`、专用 nft 表；停服务后重新测试原 wlan 上网，勿 flush 全局防火墙 |
 | 网络 applet | 卸载补丁并重装匹配 plasma-nm，下一次会话加载原版 |
-| 三指 | 停止 `sheng-task-gestures`，停用本 KWin 效果并恢复备份；bridge 退出会释放虚拟 Alt |
+| 三指 | 新版在原生KWin中处理；回退匹配deb和自己的配置，下次正常登录加载 |
 | 隐私 | `sudo /usr/libexec/sheng-privacyctl off`，核对冻结进程恢复后再卸载 |
 | 桌面 | 使用自己部署前的备份恢复；作者 `restore.py` 的备份路径不适用于新设备 |
 

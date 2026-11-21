@@ -84,6 +84,7 @@ def main():
             'ActionBar.kt, v2keyboard/Keyboard.kt, DefaultLightDark.kt and layout schemas.\n'
             'FUTO Source First terms and per-file notices remain applicable to upstream content.\n'
             'New Linux rendering/integration: MIT. Support the original: https://keyboard.futo.org/\n', encoding='utf-8')
+    subprocess.run([__import__('sys').executable, str(PROJECT / 'scripts/prepare-native-launcher.py'), str(args.output_dir)], check=True)
     (args.output_dir / 'NOTICE.sheng').write_text(
         'Fcitx5 OSK by fortime, MIT.\nSheng touch UI modifications, MIT.\n'
         'Upstream commit: ' + pin['osk_commit'] + '\n'

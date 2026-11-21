@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-"""Add Linexin Launcher and hot-load the desktop touch gesture widget."""
+"""Configure Linexin Launcher with the native KWin desktop gesture integration."""
 import argparse
 import datetime
-import hashlib
 import json
 import os
 import pathlib
 import shutil
 import subprocess
-import tempfile
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--gesture-source',type=pathlib.Path)
     parser.add_argument('--launcher-id',help='Plugin ID printed in the drawer build manifest')
     args=parser.parse_args()
     if os.geteuid()==0:
@@ -38,27 +35,12 @@ def main():
             if accel.isGlobalShortcutAvailable(dbus.Int32(code),''):
                 shortcut=label;break
         if not shortcut:raise SystemExit('No free drawer activation shortcut; configure the Dashboard shortcut first')
-    here=pathlib.Path(__file__).resolve().parents[1]
-    source=args.gesture_source or here/'device/desktop-policy/desktop-gesture'
-    if not source.is_dir():source=pathlib.Path('/usr/share/plasma/plasmoids/org.sheng.desktop-gesture')
-    if not (source/'contents/ui/main.qml').is_file():raise SystemExit('Install sheng-tablet-controls first')
-    metadata=json.loads((source/'metadata.json').read_text(encoding='utf-8'))
-    if metadata['KPlugin']['Id']!='org.sheng.desktop-gesture':raise SystemExit('Unexpected source widget')
-    revision=hashlib.sha256((source/'contents/ui/main.qml').read_bytes().replace(b'\r\n',b'\n')).hexdigest()[:10]
-    plugin='org.sheng.desktop-gesture.drawer-'+revision
     state=pathlib.Path.home()/'.local/state/sheng-desktop-drawer'
     backup=state/('backup-'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
     backup.mkdir(parents=True,exist_ok=True);backup.chmod(0o700)
     for name in ['plasma-org.kde.plasma.desktop-appletsrc','plasmashellrc']:
         path=pathlib.Path.home()/'.config'/name
         if path.exists():shutil.copy2(path,backup/name)
-    installed=pathlib.Path.home()/'.local/share/plasma/plasmoids'/plugin
-    if not installed.is_dir():
-        with tempfile.TemporaryDirectory(prefix='sheng-desktop-gesture-') as tmp:
-            stage=pathlib.Path(tmp)/plugin;shutil.copytree(source,stage)
-            metadata['KPlugin']['Id']=plugin
-            (stage/'metadata.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-            subprocess.run(['kpackagetool6','--type','Plasma/Applet','--install',str(stage)],check=True)
     script='''
 var all=panels();
 var preferences={};
@@ -115,19 +97,11 @@ dock.widgets().forEach(function(w){
         w.writeConfig("globalSettings",JSON.stringify(settings));w.reloadConfig();
     }catch(error){}
 });
-var gestures=[];
-desktops().forEach(function(d){
-    var old=d.widgets().filter(w=>w.type.indexOf("org.sheng.desktop-gesture")===0);
-    var current=old.find(w=>w.type===PLUGIN);
-    if(!current){current=d.addWidget(PLUGIN);if(!current||current.type!==PLUGIN)throw new Error("Gesture widget failed to load");}
-    old.forEach(w=>{if(w.id!==current.id)w.remove();});
-    gestures.push({desktop:d.id,widget:current.id,type:current.type});
-});
-print(JSON.stringify({dashboard:dashboard.id,dock:dock.id,gestures:gestures}));
-'''.replace('PLUGIN',json.dumps(plugin)).replace('ACTIVATION',json.dumps(shortcut)).replace('TARGET',json.dumps(launcher))
+desktops().forEach(d=>d.widgets().filter(w=>w.type.indexOf("org.sheng.desktop-gesture")===0).forEach(w=>w.remove()));
+print(JSON.stringify({dashboard:dashboard.id,dock:dock.id}));
+'''.replace('ACTIVATION',json.dumps(shortcut)).replace('TARGET',json.dumps(launcher))
     result=json.loads(str(plasma.evaluateScript(script,timeout=15)).strip())
-    (state/'installed.json').write_text(json.dumps({'plugin':plugin,'revision':revision,'backup':str(backup),'activationShortcut':shortcut,**result},indent=2)+'\n',encoding='utf-8')
-    subprocess.run(['systemctl','--user','restart','sheng-desktop-policy.service'],check=True)
+    (state/'installed.json').write_text(json.dumps({'backup':str(backup),'activationShortcut':shortcut,**result},indent=2)+'\n',encoding='utf-8')
     print(json.dumps(result,ensure_ascii=False,indent=2))
 
 

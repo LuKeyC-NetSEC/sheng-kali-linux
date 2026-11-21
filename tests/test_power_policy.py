@@ -49,11 +49,14 @@ class PowerPolicyMigrationTests(unittest.TestCase):
     def test_display_timeouts_and_power_button_behavior_survive_migration(self):
         self.apply()
         config=self.read()
-        for profile, seconds in [('AC',3600),('Battery',1800),('LowBattery',300)]:
-            self.assertEqual(config.getint(profile+'][Display','TurnOffDisplayIdleTimeoutSec'),seconds)
+        for profile in ('AC','Battery','LowBattery'):
+            self.assertEqual(config.getint(profile+'][Display','TurnOffDisplayIdleTimeoutSec'),60)
             self.assertEqual(config.getint(profile+'][Display','TurnOffDisplayIdleTimeoutWhenLockedSec'),0)
             self.assertEqual(config.getint(profile+'][SuspendAndShutdown','PowerButtonAction'),32)
             self.assertEqual(config.getint(profile+'][SuspendAndShutdown','PowerDownAction'),16)
+        locker=configparser.ConfigParser(interpolation=None)
+        locker.read(self.directory/'kscreenlockerrc')
+        self.assertEqual(locker.getint('Daemon','Timeout'),1)
         before=(self.directory/'powerdevilrc').read_bytes()
         self.apply()
         self.assertEqual((self.directory/'powerdevilrc').read_bytes(),before)

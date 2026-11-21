@@ -1,0 +1,166 @@
+--- a/src/inputmethod.h
++++ b/src/inputmethod.h
+@@ -73,6 +73,7 @@
+     InputPanelV1Window *panel() const;
+     void setPanel(InputPanelV1Window *panel);
+     void setInputMethodCommand(const QString &path);
++    bool restartInputMethod();
+ 
+     InputMethodGrabV1 *keyboardGrab();
+     bool shouldShowOnActive() const;
+@@ -166,6 +167,7 @@
+     bool m_hasPendingModifiers = false;
+     bool m_activeClientSupportsTextInput = false;
+     bool m_shouldShowPanel = false;
++    bool m_inputMethodRestartPending = false;
+ };
+ 
+ }
+--- a/src/inputmethod.cpp
++++ b/src/inputmethod.cpp
+@@ -831,26 +831,78 @@
+     Q_EMIT availableChanged();
+ }
+ 
++bool InputMethod::restartInputMethod()
++{
++    if (m_inputMethodCommand.isEmpty() || kwinApp()->isTerminating()) {
++        return false;
++    }
++    m_inputMethodCrashes = 0;
++    startInputMethod();
++    return true;
++}
++
+ void InputMethod::stopInputMethod()
+ {
+-    if (!m_inputMethodProcess) {
+-        return;
+-    }
+-    disconnect(m_inputMethodProcess, nullptr, this, nullptr);
+-
+-    m_inputMethodProcess->terminate();
+-    if (!m_inputMethodProcess->waitForFinished()) {
+-        m_inputMethodProcess->kill();
+-        m_inputMethodProcess->waitForFinished();
+-    }
+-    m_inputMethodProcess->deleteLater();
+-    m_inputMethodProcess = nullptr;
+-
++    m_inputMethodRestartPending = false;
++    QProcess *process = std::exchange(m_inputMethodProcess, nullptr);
++    if (!process) {
++        return;
++    }
++    disconnect(process, nullptr, this, nullptr);
++    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), process, &QObject::deleteLater);
++    connect(process, &QProcess::errorOccurred, process, [process](QProcess::ProcessError error) {
++        if (error == QProcess::FailedToStart) {
++            process->deleteLater();
++        }
++    });
++    if (process->state() == QProcess::NotRunning) {
++        process->deleteLater();
++    } else {
++        process->terminate();
++        QTimer::singleShot(1500, process, [process] {
++            if (process->state() != QProcess::NotRunning) {
++                process->kill();
++            }
++        });
++    }
+     waylandServer()->destroyInputMethodConnection();
+ }
+ 
+ void InputMethod::startInputMethod()
+ {
++    if (m_inputMethodProcess && m_inputMethodProcess->state() != QProcess::NotRunning) {
++        if (m_inputMethodRestartPending) {
++            return; // The latest configured command will be used on completion.
++        }
++        m_inputMethodRestartPending = true;
++        QProcess *process = m_inputMethodProcess;
++        disconnect(process, nullptr, this, nullptr);
++        const auto restart = [this, process] {
++            if (m_inputMethodProcess != process) {
++                return;
++            }
++            m_inputMethodProcess = nullptr;
++            m_inputMethodRestartPending = false;
++            process->deleteLater();
++            startInputMethod();
++        };
++        connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [restart] { restart(); });
++        connect(process, &QProcess::errorOccurred, this, [restart](QProcess::ProcessError error) {
++            if (error == QProcess::FailedToStart) {
++                restart();
++            }
++        });
++        // Revoke the old private Wayland connection immediately. In particular,
++        // a normal-session input method must not receive the greeter context.
++        waylandServer()->destroyInputMethodConnection();
++        process->terminate();
++        QTimer::singleShot(1500, process, [process] {
++            if (process->state() != QProcess::NotRunning) {
++                process->kill();
++            }
++        });
++        return; // Never block KWin waiting for an external input method.
++    }
+     stopInputMethod();
+     if (m_inputMethodCommand.isEmpty() || kwinApp()->isTerminating()) {
+         return;
+--- a/src/virtualkeyboard_dbus.h
++++ b/src/virtualkeyboard_dbus.h
+@@ -19,6 +19,8 @@
+     Q_OBJECT
+     Q_CLASSINFO("D-Bus Interface", "org.kde.kwin.VirtualKeyboard")
+     Q_PROPERTY(bool available READ isAvailable NOTIFY availableChanged)
++    Q_PROPERTY(QString configuredInputMethod READ configuredInputMethod)
++    Q_PROPERTY(int shengIntegrationVersion READ shengIntegrationVersion CONSTANT)
+     Q_PROPERTY(int mode READ mode WRITE setMode NOTIFY modeChanged)
+     Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+     Q_PROPERTY(bool visible READ isVisible NOTIFY visibleChanged)
+@@ -28,6 +30,9 @@
+     explicit VirtualKeyboardDBus(InputMethod *inputMethod);
+     ~VirtualKeyboardDBus() override;
+     bool isEnabled() const;
++    QString configuredInputMethod() const;
++    int shengIntegrationVersion() const { return 1; }
++    Q_SCRIPTABLE bool restartInputMethod(const QString &expectedDesktopFile);
+     int mode() const;
+ 
+     bool activeClientSupportsTextInput() const;
+--- a/src/virtualkeyboard_dbus.cpp
++++ b/src/virtualkeyboard_dbus.cpp
+@@ -7,6 +7,8 @@
+     SPDX-License-Identifier: GPL-2.0-or-later
+ */
+ #include "virtualkeyboard_dbus.h"
++#include "main.h"
++#include <KConfigGroup>
+ #include <QDBusConnection>
+ 
+ namespace KWin
+@@ -27,6 +29,21 @@
+ }
+ 
+ VirtualKeyboardDBus::~VirtualKeyboardDBus() = default;
++
++QString VirtualKeyboardDBus::configuredInputMethod() const
++{
++    return kwinApp()->config()->group(QStringLiteral("Wayland")).readEntry("InputMethod", QString());
++}
++
++bool VirtualKeyboardDBus::restartInputMethod(const QString &expectedDesktopFile)
++{
++    if (expectedDesktopFile.isEmpty() || expectedDesktopFile != configuredInputMethod()) {
++        return false;
++    }
++    // Recreate the socket/process in memory. Never persist an empty InputMethod
++    // merely to force a reload: interruption must not disable the next login.
++    return m_inputMethod->restartInputMethod();
++}
+ 
+ bool VirtualKeyboardDBus::isActive() const
+ {

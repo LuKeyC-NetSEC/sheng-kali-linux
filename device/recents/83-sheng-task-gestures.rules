@@ -1,1 +1,0 @@
-SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="Sheng Task Gesture Keys", OWNER="kali", MODE="0600"

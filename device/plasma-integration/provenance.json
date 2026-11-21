@@ -1,0 +1,14 @@
+{
+  "base_source": "plasma-workspace 4:6.7.4-2",
+  "native_version": "4:6.7.4-2+sheng1",
+  "qt_version": "6.11.2+dfsg-5",
+  "native_api_version": 1,
+  "local_files": {
+    "workspace.patch": "2ffc538e910b25db9a73491faf0cc720d2e7072d5c3d2c22b65d858396da1429",
+    "shengdesktoppolicy.cpp": "1538d068e27efc8d5e64c06254babbda25bd30db9265beea20043b5cfd315b6a",
+    "shengdesktoppolicy.h": "884fb04a0cc6fb25084617d4947aefb945c1a59012d687183f31950fb1538df4",
+    "org.sheng.DesktopPolicy.service": "3a7a0fd39eba7ce923eccbd6c31ef84e490791b69dd2b881daa8cd83ff4ebcd3",
+    "migrate-installed.py": "2e593d58d08a931b556dc5332f2e38c4b6fe18da5f2af1c4dd71e87685a9ed69"
+  },
+  "license": "Upstream Plasma/KDE notices retained; native integration GPL-2.0-or-later"
+}

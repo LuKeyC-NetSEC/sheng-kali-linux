@@ -14,7 +14,7 @@ Dock 随普通应用最大化/全屏向下隐藏后，从物理屏幕最底部�
 
 入口只在 Dock 隐藏时生效，位于 KWin 的原生 screen-edge 过滤器之前；从应用普通内容区开始的触摸不被拦截。不读取/独占 evdev，也不向应用注入按键。锁屏时取消白条和手势状态。全屏应用上的临时 Dock 使用堆叠约束，显示与输入命中一致。
 
-源码为 [touchguard.cpp](../device/desktop-touch-guard/touchguard.cpp)、[DockRevealHint.qml](../device/desktop-touch-guard/DockRevealHint.qml) 和 [desktop-policy.py](../device/desktop-policy/desktop-policy.py)。白条通过 KWin OffscreenQuickScene 合成，不创建可窃取焦点的普通窗口。宽度扣除本布局宿主左右各 12px 的留白；改动宿主留白时也要调整这一参数。
+源码为 [touchguard.cpp](../device/desktop-touch-guard/touchguard.cpp)、[DockRevealHint.qml](../device/desktop-touch-guard/DockRevealHint.qml) 和 [原生Plasma策略](../device/plasma-integration/shengdesktoppolicy.cpp)。白条通过 KWin OffscreenQuickScene 合成，不创建可窃取焦点的普通窗口。宽度扣除本布局宿主左右各 12px 的留白；改动宿主留白时也要调整这一参数。
 
 按[原生插件说明](../device/desktop-touch-guard/README.md)重建匹配 ABI 的新插件，先停用旧 ID；升级 `sheng-tablet-controls 1.0-5` 后，重新加载当前任务效果以同步活动窗口。源码 hash 同时覆盖 QML 资源，避免热加载继续使用旧资源。禁止同时启用两个原生 guard。
 
@@ -47,7 +47,7 @@ fc-list ':family=Material Design Icons version 6:charset=0061' family
 
 触屏轻点空白处保持时钟画面；**向上滑动 56 逻辑像素以上**且纵向占优才显示密码页。密码页出现时隐藏时间与日期，返回锁屏封面时重新显示并刷新时间。鼠标与实体键盘沿用原生入口。显示密码页后仍是 KDE 原来的 MainBlock / PAM authenticator，没有修改验证结果、自动提交密码或绕过锁屏。
 
-时钟页移除密码框焦点并隐藏输入面板，密码页才恢复焦点、自动唤起键盘。Plasma 6.7 的 `KWinVirtualKeyboard` 已使用 `mode`；该版本原生 Wayland QML 仍访问不存在的 `enabled`。锁屏专用 [ShengVirtualKeyboard.qml](../device/theme/lockscreen/ShengVirtualKeyboard.qml) 使用实际的 `mode` / `available`，保留原生加载动画与安全 Wayland 输入通道，不修改全局 SDDM 组件。实体键盘接入时 Never 模式继续抑制自动显示；锁屏期间拔下时输入策略恢复模式。安装此增量需同时更新 `scripts/keyboard-policy.py` 及原生 guard，详见[输入法说明](../device/input-method/README.md)。
+时钟页移除密码框焦点并隐藏输入面板，密码页才恢复焦点、自动唤起键盘。Plasma 6.7 的 `KWinVirtualKeyboard` 已使用 `mode`；该版本原生 Wayland QML 仍访问不存在的 `enabled`。锁屏专用 [ShengVirtualKeyboard.qml](../device/theme/lockscreen/ShengVirtualKeyboard.qml) 使用实际的 `mode` / `available`，保留原生加载动画与安全 Wayland 输入通道，不修改全局 SDDM 组件。实体键盘接入时 Never 模式继续抑制自动显示；锁屏期间拔下时输入策略恢复模式。安装此增量需同时更新原生Rust启动器及原生guard，详见[输入法说明](../device/input-method/README.md)。
 
 ```bash
 sudo python3 scripts/install-lockscreen-touch.py
@@ -61,7 +61,7 @@ sudo python3 scripts/install-lockscreen-touch.py --restore
 
 ## 电源键菜单
 
-三个电源配置的短按仍为锁屏（32），长按改为原生电源菜单（16），不再直接关机（8）；logind 的长按处理设为 ignore，让 Plasma 接管。执行 `bash scripts/configure-power-buttons.sh` 写入配置并调用 PowerDevil `refreshStatus()`，它同时强制重载当前方案；单独 `reparseConfiguration()` 不会更新已缓存的按钮动作。AC 60 分钟/电池 30 分钟闲置策略保留。系统级配置需将 `device/50-sheng-logind.conf` 安装到 `/etc/systemd/logind.conf.d/50-sheng.conf`，备份后使用支持 reload 的 logind 重读，不能为此终止用户会话。
+三个电源配置的短按仍为锁屏（32），长按改为原生电源菜单（16），不再直接关机（8）；logind 的长按处理设为 ignore，让 Plasma 接管。执行 `bash scripts/configure-power-buttons.sh` 写入配置并调用 PowerDevil `refreshStatus()`，它同时强制重载当前方案；单独 `reparseConfiguration()` 不会更新已缓存的按钮动作。各档位均闲置1分钟锁屏息屏，只有离电10%低电量档闲置5分钟挂起。系统级配置需将 `device/50-sheng-logind.conf` 安装到 `/etc/systemd/logind.conf.d/50-sheng.conf`，备份后使用支持 reload 的 logind 重读，不能为此终止用户会话。
 
 2026-11-21 用户确认长按约 1 秒显示菜单；测试只取消菜单，没有选择关机。固件的超长按强制断电不属于桌面菜单策略。
 

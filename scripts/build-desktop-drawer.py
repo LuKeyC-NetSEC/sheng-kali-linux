@@ -62,9 +62,17 @@ def main():
     files['contents/icons/sheng-burp-rounded.svg']=burp_icon
     files['contents/ui/main.qml']=files['contents/ui/main.qml'].replace(b'    id: kicker',b'    id: kicker\n    Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground',1)
     config=files['contents/config/main.xml'].decode()
-    config=config.replace('<group name="General">','<group name="General">\n    <entry name="launchers" type="StringList"><default></default></entry>',1)
+    config=config.replace('<group name="General">','<group name="General">\n    <entry name="launchers" type="StringList"><default></default></entry>\n    <entry name="physicalKeyboardPresent" type="Bool"><default>false</default></entry>',1)
     files['contents/config/main.xml']=config.encode()
     dashboard=files['contents/ui/DashboardRepresentation.qml'].decode()
+    old_focus='''        searchField.clear();
+        searchField.forceActiveFocus();'''
+    if dashboard.count(old_focus)!=1:raise SystemExit('Upstream initial search focus changed')
+    dashboard=dashboard.replace(old_focus,'''        searchField.clear();
+        // Touch opening starts on the application grid. Tapping the search
+        // field still activates text input; physical keyboards keep type-ahead.
+        if (visible && Plasmoid.configuration.physicalKeyboardPresent) searchField.forceActiveFocus();
+        else { searchField.focus = false; rootItem.forceActiveFocus(); }''',1)
     dashboard=dashboard.replace('import QtQuick 2.15','import QtQuick',1)
     dashboard=dashboard.replace('import QtQml 2.15','import QtQml\nimport QtQuick.Window',1)
     # KWin constrains the real panel above the tagged fullscreen launcher.

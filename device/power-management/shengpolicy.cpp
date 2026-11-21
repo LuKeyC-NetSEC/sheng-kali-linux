@@ -30,22 +30,41 @@ namespace PowerDevil::ShengPolicy {
 bool migrateDefaults(const KSharedConfig::Ptr &config, bool canSuspend)
 {
     KConfigGroup managed(config, QStringLiteral("ShengPower"));
-    if (managed.readEntry("PolicyVersion", 0) >= 1) {
+    const int version = managed.readEntry("PolicyVersion", 0);
+    if (version >= 2) {
         return false; // Subsequent System Settings edits remain authoritative.
     }
     const QStringList profiles{QStringLiteral("AC"), QStringLiteral("Battery"), QStringLiteral("LowBattery")};
+    if (version == 1) {
+        // Update only the previous managed defaults. Preserve later user edits,
+        // including suspension and battery protection settings.
+        for (const auto &profile : profiles) {
+            const int previousSeconds = profile == QStringLiteral("AC") ? 3600 : profile == QStringLiteral("Battery") ? 1800 : 300;
+            auto group = KConfigGroup(config, profile);
+            auto display = group.group(QStringLiteral("Display"));
+            if (display.readEntry("TurnOffDisplayIdleTimeoutSec", -1) == previousSeconds) {
+                display.writeEntry("TurnOffDisplayIdleTimeoutSec", 60);
+            }
+            auto suspend = group.group(QStringLiteral("SuspendAndShutdown"));
+            if (profile != QStringLiteral("LowBattery") && suspend.readEntry("AutoSuspendIdleTimeoutSec", -1) == previousSeconds) {
+                suspend.writeEntry("AutoSuspendIdleTimeoutSec", 60);
+            }
+        }
+        managed.writeEntry("PolicyVersion", 2);
+        config->sync();
+        return true;
+    }
     for (const auto &profile : profiles) {
-        const int minutes = profile == QStringLiteral("AC") ? 60 : profile == QStringLiteral("Battery") ? 30 : 5;
         KConfigGroup group(config, profile);
         auto suspend = group.group(QStringLiteral("SuspendAndShutdown"));
         suspend.writeEntry("AutoSuspendAction", profile == QStringLiteral("LowBattery") && canSuspend ? 1 : 0);
-        suspend.writeEntry("AutoSuspendIdleTimeoutSec", minutes * 60);
+        suspend.writeEntry("AutoSuspendIdleTimeoutSec", profile == QStringLiteral("LowBattery") ? 300 : 60);
         suspend.writeEntry("SleepMode", 1);
         suspend.writeEntry("PowerButtonAction", 32);
         suspend.writeEntry("PowerDownAction", 16);
         auto display = group.group(QStringLiteral("Display"));
         display.writeEntry("TurnOffDisplayWhenIdle", true);
-        display.writeEntry("TurnOffDisplayIdleTimeoutSec", minutes * 60);
+        display.writeEntry("TurnOffDisplayIdleTimeoutSec", 60);
         display.writeEntry("TurnOffDisplayIdleTimeoutWhenLockedSec", 0);
         display.writeEntry("LockBeforeTurnOffDisplay", true);
         auto script = group.group(QStringLiteral("RunScript"));
@@ -60,7 +79,7 @@ bool migrateDefaults(const KSharedConfig::Ptr &config, bool canSuspend)
         battery.writeEntry("BatteryCriticalAction", 1);
     }
     managed.writeEntry("SyncLockTimeout", true);
-    managed.writeEntry("PolicyVersion", 1);
+    managed.writeEntry("PolicyVersion", 2);
     config->sync();
     return true;
 }

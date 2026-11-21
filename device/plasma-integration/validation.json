@@ -1,0 +1,169 @@
+{
+  "checkedAtUTC": "2026-11-21T08:58:03+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "qt": "6.11.2+dfsg-5",
+  "installedPackages": {
+    "kwin-common": "4:6.7.4-2+sheng1",
+    "kwin-data": "4:6.7.4-2+sheng1",
+    "kwin-dev": "4:6.7.4-2+sheng1",
+    "kwin-wayland": "4:6.7.4-2+sheng1",
+    "libkwin6": "4:6.7.4-2+sheng1",
+    "libbatterycontrol6": "4:6.7.4-2+sheng1",
+    "libkfontinst6": "4:6.7.4-2+sheng1",
+    "libkfontinstui6": "4:6.7.4-2+sheng1",
+    "libklipper6": "4:6.7.4-2+sheng1",
+    "libklookandfeel6": "4:6.7.4-2+sheng1",
+    "libkmpris6": "4:6.7.4-2+sheng1",
+    "libkworkspace6-6": "4:6.7.4-2+sheng1",
+    "libnotificationmanager1": "4:6.7.4-2+sheng1",
+    "libtaskmanager6": "4:6.7.4-2+sheng1",
+    "plasma-workspace-data": "4:6.7.4-2+sheng1",
+    "plasma-workspace-dev": "4:6.7.4-2+sheng1",
+    "plasma-workspace": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-breeze-components": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-notificationmanager": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-plasma-clock": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-plasma-lookandfeel": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-plasma-workspace": "4:6.7.4-2+sheng1",
+    "qml6-module-org-kde-taskmanager": "4:6.7.4-2+sheng1",
+    "sheng-msime-integration": "0.2.1-10+native1",
+    "sheng-tablet-controls": "1.0-7+native1"
+  },
+  "packageArtifacts": {
+    "kwin-common": {
+      "file": "kwin-common_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "897060f949f422d6fa4a1eeb613cb4002dc4f85ab3db674fae7c542f641dd85e"
+    },
+    "kwin-data": {
+      "file": "kwin-data_6.7.4-2+sheng1_all.deb",
+      "sha256": "fe0bc4ac1cdf95e7e2a61fea8a0c6c8bd451464a74952abcd574650868a41167"
+    },
+    "kwin-dev": {
+      "file": "kwin-dev_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "02a710cef5d9a59393c46ab2f0f48d584093e28ab79850a95f159515c90dc457"
+    },
+    "kwin-wayland": {
+      "file": "kwin-wayland_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "af2d11e04b0a2a4247ca2654f2092733aef7c07af0863afac2df702ba6776c1f"
+    },
+    "libkwin6": {
+      "file": "libkwin6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "76051b6f970e30487cd65b3494c492bde924c8a9d9c160e9d530d92287719c79"
+    },
+    "libbatterycontrol6": {
+      "file": "libbatterycontrol6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "bc186fa109d35a2551ac9c5f72b79e94848a1ae401d7bcf77aceab8a869d2f0f"
+    },
+    "libkfontinst6": {
+      "file": "libkfontinst6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "ee298446c2e8b3488f3a6b796009881cf5a6a1db47679c6462f7cdc345027fd5"
+    },
+    "libkfontinstui6": {
+      "file": "libkfontinstui6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "6a8e75391d721c09de1e916fca3573f3450554fbdf34fc63c9b024a73e2f83b4"
+    },
+    "libklipper6": {
+      "file": "libklipper6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "610d53f698a4cb77d2c70d3350eb9c349d3d076466c15c69758b1a6abf554340"
+    },
+    "libklookandfeel6": {
+      "file": "libklookandfeel6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "1550ca558c5c75c33255092918c6cc396fdceaa9f239302e782058b6fa089eb6"
+    },
+    "libkmpris6": {
+      "file": "libkmpris6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "2adc242c77a73e87210b0ed8411d0612dc6e3b9155ebf36676bec187a9a21533"
+    },
+    "libkworkspace6-6": {
+      "file": "libkworkspace6-6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "3113f98ecb4660285dab27e776ae1a6d32a40372a80e42c2e047b0f22ce6cbe2"
+    },
+    "libnotificationmanager1": {
+      "file": "libnotificationmanager1_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "728dadd2191066424fee3c8b03bc0f63410be07d2fb397848fa0b81857b0c238"
+    },
+    "libtaskmanager6": {
+      "file": "libtaskmanager6_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "c4661545a4ead7a65114721c264682f6280e320ae63b2a90747ed4b20d20e9d6"
+    },
+    "plasma-workspace-data": {
+      "file": "plasma-workspace-data_6.7.4-2+sheng1_all.deb",
+      "sha256": "90b44542cc7a83735605f07db5d93ee86590db48315499aeb5de4951b22eaba5"
+    },
+    "plasma-workspace-dev": {
+      "file": "plasma-workspace-dev_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "0a1a5d3da3acb7ce7e961e2d103115fdd6504e2960e79b40ced671300edff776"
+    },
+    "plasma-workspace": {
+      "file": "plasma-workspace_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "5ebd7d55e617d2e299b7733af09e98ff2f232317f1ffc46d459ec32e999fc2cc"
+    },
+    "qml6-module-org-kde-breeze-components": {
+      "file": "qml6-module-org-kde-breeze-components_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "a5584dcaf464c83b4ac43d753be5f858f9b98dd6758ed7b94ffc9fc6267b9881"
+    },
+    "qml6-module-org-kde-notificationmanager": {
+      "file": "qml6-module-org-kde-notificationmanager_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "d700b8715785856b585d581d6513e5649667c1e5a48c4d3c11a73d50ff1c892e"
+    },
+    "qml6-module-org-kde-plasma-clock": {
+      "file": "qml6-module-org-kde-plasma-clock_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "c4aec7d6ad2ef3ecb3adebcad349a72b8745cbc63f56f5bda493934699f2319f"
+    },
+    "qml6-module-org-kde-plasma-lookandfeel": {
+      "file": "qml6-module-org-kde-plasma-lookandfeel_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "81e111f19c8f9720d3e3b2f783046acdf5d9f8562f446919b060b5d7b89d3c89"
+    },
+    "qml6-module-org-kde-plasma-workspace": {
+      "file": "qml6-module-org-kde-plasma-workspace_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "5b5fb8d166ee03dd1714d6a5ed9f0d5476aa6ceca2986a2d95855e2b22f4faec"
+    },
+    "qml6-module-org-kde-taskmanager": {
+      "file": "qml6-module-org-kde-taskmanager_6.7.4-2+sheng1_arm64.deb",
+      "sha256": "51610b5562f5d4eb0f2847b6d9f39018c805d89a2b2785c0ed7985723ef8f272"
+    },
+    "sheng-msime-integration": {
+      "file": "sheng-msime-integration_0.2.1-10+native1_arm64.deb",
+      "sha256": "abf9130c6a78e02a0c0115100e21ad509554a783cb652a979015f51a5fb4f970"
+    },
+    "sheng-tablet-controls": {
+      "file": "sheng-tablet-controls_1.0-7+native1_arm64.deb",
+      "sha256": "2ee15c946597dc6b464cd08a972e7a8cd11a89efe0e15096cf3411c9173e0503"
+    }
+  },
+  "sourceMatches": {
+    "shell/shengdesktoppolicy.cpp": "1538d068e27efc8d5e64c06254babbda25bd30db9265beea20043b5cfd315b6a",
+    "shell/shengdesktoppolicy.h": "884fb04a0cc6fb25084617d4947aefb945c1a59012d687183f31950fb1538df4",
+    "src/tabbox/tabboxgesture.h": "20b91dbdb48139d78c6a92c2e7bbdd8b524bf4eb5ba90d1be6f91097a275265b"
+  },
+  "tests": {
+    "powerdevilCtestGroups": 6,
+    "isolatedPowerConfigTests": 3,
+    "nativeKwinInputTestsPassed": 7,
+    "rustKeyboardPolicyTestsPassed": 13,
+    "dockAndGestureBusinessScenariosPassed": 8,
+    "dockQtTestTotalPassed": 10
+  },
+  "sessionForciblyRestarted": false,
+  "hardwareRebound": false,
+  "originalPackagesBackedUp": 25,
+  "legacySourceImplementationsRemoved": true,
+  "actualTouchAndInputVerified": false,
+  "notVerified": [
+    "new PIN keyboard/touchpad gesture path",
+    "soft keyboard on app and secure password page",
+    "control-center swipe conflict and protected lists/sliders",
+    "drawer search focus without keyboard",
+    "Dock transitions on the complete native stack",
+    "suspend/resume on the complete native stack"
+  ],
+  "futoUiElfUnchanged": true,
+  "guardId": "sheng_desktop_touch_guard_96793da01c9e",
+  "guardBuiltAgainstNativeSdk": true,
+  "rollback": "Private original packages/configuration in /var/lib/sheng-native-session; restore during a normal logged-out maintenance window",
+  "runningKwinNativeApi": 0,
+  "runningInputContextApi": 0,
+  "requiresNormalLogin": true
+}

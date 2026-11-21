@@ -8,7 +8,6 @@ KWin.SceneEffect {
     property bool expanded: false
     property int selectedIndex: 0
     property var pendingWindow: null
-    DesktopPolicy { }
 
     function eligible(win) {
         return win && !win.deleted && (win.normalWindow || win.dialog)

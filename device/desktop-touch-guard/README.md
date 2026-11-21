@@ -8,7 +8,7 @@
 
 首次桌面触摸移动达到 3 逻辑像素时，向桌面发送 Wayland touch cancel，避免 Folder View 的模拟鼠标路径启动框选。手势结束仍向下层 KWin 过滤器传递 touch up，清理屏幕边缘及多指跟踪状态；多指序列不触发抽屉/控制中心。点击与长按仍使用桌面原有规则。这里只拦截桌面表面的移动，因此桌面部件上的触屏拖动也会受限；编辑布局请使用鼠标/触摸板。
 
-它调用 `org.sheng.DesktopPolicy` 的 `OpenAppDrawer` / `OpenControlCenter`，缓存服务发布的指针状态；没有添加另一个主屏幕，也没有全局应用内导航入口。QML 桌面手势部件保留原有长按防误触保护。
+它调用 `org.sheng.DesktopPolicy` 的 `OpenAppDrawer` / `OpenControlCenter`，使用自身原生输入设备状态；没有添加另一个主屏幕，也没有全局应用内导航入口。旧QML桌面手势部件已移除，取消/长按生命周期在原生Plasma组件处理。
 
 全屏 Sheng 抽屉存在时，还为同一输出的底部 Plasma 面板添加 KWin stacking constraint，使真实 Dock 保持在抽屉上方；关闭抽屉后移除。Dock 不进入抽屉自身的缩放/淡入动画，不再显示两份。输入命中也使用同一窗口堆叠顺序。
 
@@ -20,7 +20,7 @@
 
 ```bash
 sudo apt-get install build-essential cmake ninja-build extra-cmake-modules \
-    kwin-dev qt6-base-dev qt6-declarative-dev
+    kwin-dev qt6-base-dev qt6-declarative-dev libudev-dev
 bash scripts/build-desktop-touch-guard.sh
 sudo cmake --install out/build-desktop-touch-guard
 # 以下以正在运行 Plasma 的用户执行
@@ -34,7 +34,11 @@ qdbus6 org.sheng.DesktopTouch /org/sheng/DesktopTouch org.sheng.DesktopTouch.Get
 
 ## 验收与回退
 
-`GetKeyboardContext()` / `KeyboardContextChanged()` 为输入策略提供锁屏状态、前台窗口角色和变化序号，不返回窗口标题或文本内容。桌面残留文本焦点不再触发自动软键盘；插件暂不可用时输入策略保留普通应用的自动输入能力。
+`GetInputContext()` / `KeyboardContextChanged()` 为输入策略提供锁屏状态、前台窗口角色和变化序号，不返回窗口标题或文本内容。桌面残留文本焦点不再触发自动软键盘；新启动器要求匹配的原生上下文接口，不能提前卸掉当前正在承担锁屏输入的组件。
+
+`GetInputContext()` 以 `a{sv}` 返回上下文v2，包含上述事实以及物理键盘、鼠标/触摸板状态。它由 [inputpresence.cpp](inputpresence.cpp) 监听KWin已有设备增删、启用状态和PIN属性的sysfs通知；USB/蓝牙按udev属性识别，排除触屏、笔和虚拟输入，PIN拔下时排除残留HID节点。设备事件合并350ms，恢复后重新检查，没有周期扫描或第二个libinput客户端。接口不返回设备名称、按键或输入内容。
+
+v2插件 `sheng_desktop_touch_guard_96793da01c9e` 已在匹配ARM64环境构建，已随原生包安装，当前会话仍加载登录时的v1插件。它是[原生输入法启动器](../input-method/README.md)的必需接口，须与KWin/Plasma迁移一起安排加载。现有用户确认属于下面的v1部署；不能套用为v2的热插拔/锁屏验收。USB键盘、蓝牙鼠标暂无实物，本轮仍未验证。
 
 已获用户确认：原桌面左/中/右上滑打开抽屉；触屏无框选；临时 Dock 点击外部立即向下收起、原点击生效、Dock 本身不误收起；第三次底边上滑返回桌面及重新打开应用后 Dock 自动隐藏均正常。当前构建为 sheng ARM64 / KWin 6.7.4 / Qt 6.11.2，2026-11-21 增补键盘上下文接口并原生编译，启用的源码散列 ID 为 `sheng_desktop_touch_guard_5e3a927fc736`；用户确认桌面等待不弹软键盘，应用输入框仍正常。原 Dock 手势未在此次改动后全面复验；鼠标/触摸板的新按下观察路径未独立实测；横竖屏、挂起恢复仍待回归。
 
@@ -47,3 +51,7 @@ qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.unloadEffect "$guard_id"
 ```
 
 源码为 GPL-3.0-or-later，许可证见仓库根 [LICENSE](../../LICENSE)。
+
+控制中心打开时，桌面上滑序列在初次按下即归控制中心所有，后续面板隐藏不会改变它；底边Dock入口也让位于控制中心。滑条与Wi-Fi/蓝牙列表由控制中心自己的保护区域处理，不会触发关闭。取消序列不会打开底层抽屉。对应跨组件回归场景见Plasma策略测试，实机触屏仍待复验。
+
+原生部署包已包含该插件，安装迁移工具会设置新ID并删除旧副本，不需另启用键盘/桌面策略服务。构建插件时使用新KWin包提取的SDK；部署包通过CMake安装阶段移除临时RPATH。

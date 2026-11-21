@@ -1,6 +1,6 @@
 # 当前桌面配置与源码对应关系
 
-本次同步的是已经在 sheng 运行的 Plasma 桌面与源码。配置见 [desktop-profile.json](../device/theme/desktop-profile.json)，代码核对结果见 [source-audit.json](../device/theme/source-audit.json)。配置从当前用户会话只读导出，不退出应用或重启桌面。
+本次同步的是已经在 sheng 运行的 Plasma 桌面与源码。配置见 [desktop-profile.json](../device/theme/desktop-profile.json)，此前运行基线的代码核对结果见 [source-audit.json](../device/theme/source-audit.json)。配置从当前用户会话只读导出，不退出应用或重启桌面。
 
 ## 配置内容
 
@@ -14,7 +14,7 @@
 | 配色/指针 | BreezeLight / Colloid-Light / Breeze_Light 24px，关闭壁纸强调色 |
 | 桌面时钟 | 白色 Redmi Clock，位置与尺寸使用导出的逻辑坐标；天气缓存不导出 |
 | 软键盘 | FUTO 原生 UI/英文核心 + 水杉中文 + Fcitx5 OSK；FUTO Light/Dark、Roboto、400/300px 悬浮布局；中文键帽大写/英文默认小写 |
-| 锁屏/电源 | 原生PowerDevil C++：AC60/普通离电30分钟锁屏息屏并保留后台；10%低电量档闲置5分钟挂起，保留5%临界保护；短按锁屏/长按菜单 |
+| 锁屏/电源 | 原生PowerDevil C++：AC/普通离电均1分钟锁屏息屏并保留后台；10%低电量档闲置5分钟挂起，保留5%临界保护；短按锁屏/长按菜单 |
 
 FUTO 增量已从固定源码构建并安装：原生英文候选核心、原版图标/配色和 Linux UI/UX 集成；中文继续使用水杉。构建、范围和回退见 [FUTO 说明](../device/futo-keyboard/README.md)。语音、滑行与完整 Android 设置未移植，不能将当前版本称为完整 Android 应用移植。
 
@@ -49,7 +49,7 @@ python3 scripts/export-desktop-profile.py --validate device/theme/desktop-profil
 
 仓库没有“把 JSON 覆盖成整份 Plasma 配置”的导入命令。上述源码安装器和允许列表给 AI/开发者提供具体设置目标，跨版本仍需判断迁移，不绕过本机 ABI 或配置备份。
 
-## 源码核对结果
+## 迁移前基线的源码核对结果
 
 2026-11-21 重新比较安装位置、匹配 ABI 的构建源码及固定上游生成资源；实际源提交见审计的 `sourceCommit`，文本统一换行为 LF，其他内容不改。沿用此前188项，新增锁屏键盘组件、logind配置、电源配置脚本与锁屏安装器，共192项；安装器按设备上的部署副本核对。结果如下：
 
@@ -71,4 +71,8 @@ python3 scripts/export-desktop-profile.py --validate device/theme/desktop-profil
 
 新增的原生PowerDevil核心库、源码、安装与运行映射检查单独记录在[电源验证](../device/power-management/validation.json)，不并入此前192项桌面资源统计。Profile另包含原生包版本、10%/5%电量阈值及锁屏同步开关；迁移版本只写入验证报告，不当作配置回放，以免新设备跳过首次原生迁移。不公开完整电源配置备份。
 
+2026-11-21再次从设备允许列表导出：PowerDevil为 `4:6.7.4-2+sheng2`，AC/普通离电/低电量档息屏时间均60秒、锁屏1分钟；只有低电量档自动挂起300秒，10%/5%阈值保留。KWin/Plasma原生迁移的新包尚未加载，因此此快照继续记录当前运行基线，不把已编译版本当作已部署版本。
+
 导出和核对只读执行，没有重放桌面布局、刷机或退出会话。保留此前 Dock、键盘尺寸/键帽、符号/表情/动作栏和候选翻页/上屏的用户确认。本轮另确认PIN键盘/触摸板恢复、长按电源菜单、真实锁屏两页的键盘行为与正常解锁，以及桌面不误弹/应用输入正常；未将逻辑测试视为锁屏热插拔或休眠恢复的实机通过。
+
+旧键盘/桌面脚本、三指桥接器和QML桌面手势已从当前源码移除。192项核对属于原始 `sourceCommit` 的历史基线，不能当作本次原生迁移后的全量一致性结果；新组件散列、构建与未验收项另见源码迁移记录。

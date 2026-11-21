@@ -1,0 +1,51 @@
+{
+  "kwin": {
+    "version": "4:6.7.4-2",
+    "baseUrl": "https://kali.download/kali/pool/main/k/kwin/",
+    "archives": {
+      "kwin_6.7.4-2.dsc": "579a9cd7743fc367d15573143cf1ef3ffd10f2ddb1a3b9892c375ba5a18b5967",
+      "kwin_6.7.4.orig.tar.xz": "db7a7dba71aaca1e5218733b80f90a998d84e2ab36e4d62d0e3ea00376c5802d",
+      "kwin_6.7.4.orig.tar.xz.asc": "ae6bc440a57f183c2801254c4ad9c1f91055832c53edb9d709a384ea290606c8",
+      "kwin_6.7.4-2.debian.tar.xz": "a5e897c375cc6c50e62d72cc7692608fb8a87483ce8b67a472dca8bd5d6867a4"
+    }
+  },
+  "plasma-workspace": {
+    "version": "4:6.7.4-2",
+    "baseUrl": "https://kali.download/kali/pool/main/p/plasma-workspace/",
+    "archives": {
+      "plasma-workspace_6.7.4-2.dsc": "5e4e5b9365978fa283c64784dd3c5d5251bf4ce1b5b5546bcc8d7ce426761a8e",
+      "plasma-workspace_6.7.4.orig.tar.xz": "21ec3c002929eb65377a1ae0eb105b9ab6f608049dac5493e188f51bd50398d5",
+      "plasma-workspace_6.7.4.orig.tar.xz.asc": "d934814ba2d5c428980c9a1df9e96fe190dceea5632efd31abb2a9b3dd7be48b",
+      "plasma-workspace_6.7.4-2.debian.tar.xz": "302f3c3195649558ba95011b8e6143aeab6632d1369e4ea28df4c205a7febd82"
+    }
+  },
+  "plasma-desktop": {
+    "version": "4:6.7.4-1",
+    "baseUrl": "https://kali.download/kali/pool/main/p/plasma-desktop/",
+    "archives": {
+      "plasma-desktop_6.7.4-1.dsc": "4ec41521fbf14d27a732a05f30d67ae4f45f0469ee023f522552bc096bd67a8a",
+      "plasma-desktop_6.7.4.orig.tar.xz": "c2f0c2b7ab70cbd99ef17ffad4c3117dab12ef6a71790da33e39688386474962",
+      "plasma-desktop_6.7.4.orig.tar.xz.asc": "2155ff0144ddc3204dc058195f474e2912378e776e5c2feb0ef277028b012cb8",
+      "plasma-desktop_6.7.4-1.debian.tar.xz": "d2b89f8a7b325434bfd44a88826d0a333296d1c04c4d472afe6bbdfddd5e697f"
+    }
+  },
+  "ksystemstats": {
+    "version": "6.7.4-1",
+    "baseUrl": "https://kali.download/kali/pool/main/k/ksystemstats/",
+    "archives": {
+      "ksystemstats_6.7.4-1.dsc": "3a3b4b5b6c505c314a7a566a40f8e4ecdd325a3b2e22459a2c7530f42d26e655",
+      "ksystemstats_6.7.4.orig.tar.xz": "919f2436ff8da8ff6ea7d2c007bdaf6bcd8a2f096d0544ba450124ffac56dc94",
+      "ksystemstats_6.7.4.orig.tar.xz.asc": "6a3facb105374845977934d4c0b3dd1cfe3d7b72e6e5469d995f51a80023d27f",
+      "ksystemstats_6.7.4-1.debian.tar.xz": "4025c9c168b32c17544552430ddbd9574d2eb6b138e5110ee5bfc15512087892"
+    }
+  },
+  "network-manager": {
+    "version": "1.58.1-1",
+    "baseUrl": "https://kali.download/kali/pool/main/n/network-manager/",
+    "archives": {
+      "network-manager_1.58.1-1.dsc": "4019446cd3e731da0fe8e45aecde9da2113666072d4d6f80f080dd2cb5135ade",
+      "network-manager_1.58.1.orig.tar.bz2": "50f0beefa02ff16159177e88379d7819edf6527b2cc25639ab4e62d8a15ca127",
+      "network-manager_1.58.1-1.debian.tar.xz": "4580cb366a62c68d04df14a23cf4d4deaddff4187bfb299dc24f209429e16da4"
+    }
+  }
+}

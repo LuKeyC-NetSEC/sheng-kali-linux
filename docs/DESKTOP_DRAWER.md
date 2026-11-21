@@ -30,10 +30,10 @@ All Apps / Alphabetically 等上游长列表沿用其滚动方式，没有 Dashb
 | [ShengDock.qml](../device/linexin-dock/ShengDock.qml) | 从 Linexin 提取的运行应用 Dock，增加持久固定项、菜单和九点入口 |
 | [CompactRepresentation.qml](../device/linexin-dock/CompactRepresentation.qml) | 承载唯一 Dock 和全屏抽屉窗口 |
 | [touch-edit.patch](../device/linexin-dock/touch-edit.patch) | 全面板导航、触屏长按编辑；滑动时接管触摸，取消上游背景点击关闭 |
-| [install-desktop-drawer.py](../scripts/install-desktop-drawer.py) | 备份、迁移固定应用/抽屉布局、添加手势部件、关闭 Dock 宿主原生背景 |
+| [install-desktop-drawer.py](../scripts/install-desktop-drawer.py) | 备份、迁移固定应用/抽屉布局、移除旧手势部件、关闭 Dock 宿主原生背景 |
 | [desktop-touch-guard](../device/desktop-touch-guard/README.md) | KWin 原生桌面防框选；把真实 Dock 约束在标记的全屏抽屉上方 |
-| [desktop-policy.py](../device/desktop-policy/desktop-policy.py) | 指针检测、D-Bus 激活入口和面板显隐 |
-| [DesktopPolicy.qml](../device/recents/contents/ui/DesktopPolicy.qml) | 监视活动应用最大化/全屏；抽屉被排除，不触发 Dock 隐藏 |
+| [原生Plasma策略](../device/plasma-integration/shengdesktoppolicy.cpp) | 直接管理PanelView、激活部件、观察原生窗口模型 |
+| [输入设备检测](../device/desktop-touch-guard/inputpresence.cpp) | 原生事件与PIN通知，提供实体键盘/鼠标/触摸板事实 |
 
 KWin 的 stacking constraint 同时用于绘制与输入顺序，因此全屏抽屉中的 Dock 仍能正常点击。约束只针对同一输出上的 Sheng 抽屉和底部 Plasma 面板，关闭后移除；不提升其他应用或锁屏。原生插件与 QML 都不抢占应用窗口的 evdev 输入。
 
@@ -56,13 +56,13 @@ python3 scripts/install-desktop-drawer.py --launcher-id "$(python3 -c \
 
 随后按[原生插件说明](../device/desktop-touch-guard/README.md)在匹配 KWin/Qt 的目标环境编译、安装并启用。没有此插件，仅 QML 抢触摸无法可靠阻止 Folder View 框选，也不能保证全屏抽屉上方显示原 Dock。不能把其他 Plasma 版本的 `.so` 拼装进来。
 
-任务效果使用 `python3 scripts/build-task-cards.py --install` 构建并按输出启用最新 ID，先停用旧副本。安装策略包/启动器会重启策略用户服务；最后重新加载一次当前任务效果，使其立即发布活动窗口状态，无需重启 KWin 或 Plasma。
+任务效果使用 `python3 scripts/build-task-cards.py --install` 构建并按输出启用最新 ID，先停用旧副本。原生策略需要匹配KWin/Plasma及输入法一起在下次正常登录加载。旧策略服务和任务效果中的Dock状态发布器已删除。
 
 ## 排查与回退
 
 ```bash
-systemctl --user status sheng-desktop-policy.service
-qdbus6 org.sheng.DesktopPolicy /org/sheng/DesktopPolicy org.sheng.DesktopPolicy.GetState
+systemctl --user status plasma-plasmashell.service
+qdbus6 org.sheng.DesktopPolicy /org/sheng/DesktopPolicy org.sheng.DesktopPolicy.GetNativeState
 qdbus6 org.sheng.DesktopTouch /org/sheng/DesktopTouch org.sheng.DesktopTouch.GetStatus
 journalctl --user -u plasma-plasmashell.service --since '5 minutes ago'
 ```

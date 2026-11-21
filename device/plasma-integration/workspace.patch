@@ -1,0 +1,86 @@
+--- a/shell/shellcorona.h
++++ b/shell/shellcorona.h
+@@ -22,6 +22,7 @@
+ #include <KConfigWatcher>
+ #include <KPackage/Package>
+ 
++class ShengDesktopPolicy;
+ class DesktopView;
+ class PanelView;
+ class QMenu;
+@@ -336,6 +337,7 @@
+     QTimer m_appConfigSyncTimer;
+ 
+     // For getting the active window on Wayland
++    ShengDesktopPolicy *m_shengDesktopPolicy = nullptr;
+     KWayland::Client::PlasmaWindowManagement *m_waylandWindowManagement = nullptr;
+     QPointer<KWayland::Client::PlasmaWindow> m_previousPlasmaWindow;
+     bool m_closingDown : 1;
+--- a/shell/shellcorona.cpp
++++ b/shell/shellcorona.cpp
+@@ -8,6 +8,8 @@
+ */
+ 
+ #include "shellcorona.h"
++#include "shengdesktoppolicy.h"
++#include <QFile>
+ 
+ #include "config-ktexteditor.h" // HAVE_KTEXTEDITOR
+ #include <config-plasma.h>
+@@ -123,6 +125,13 @@
+ 
+ void ShellCorona::init()
+ {
++    QFile compatible(QStringLiteral("/sys/firmware/devicetree/base/compatible"));
++    if (KWindowSystem::isPlatformWayland() && compatible.open(QIODevice::ReadOnly)
++        && compatible.readAll().split('\0').contains(QByteArrayLiteral("xiaomi,sheng"))) {
++        m_shengDesktopPolicy = new ShengDesktopPolicy(this);
++        if (m_waylandWindowManagement) m_shengDesktopPolicy->setWindowManagement(m_waylandWindowManagement);
++    }
++
+ #if USE_SCRIPTING
+     connect(this, &Plasma::Corona::containmentCreated, this, [this](Plasma::Containment *c) {
+         executeSetupPlasmoidScript(c, c);
+@@ -1643,6 +1652,7 @@
+ 
+         m_panelViews[cont] = panel;
+         panel->setContainment(cont);
++        if (m_shengDesktopPolicy) m_shengDesktopPolicy->panelCreated();
+         cont->reactToScreenChange();
+         Q_EMIT cont->screenGeometryChanged(cont->screenGeometry());
+ 
+@@ -2954,6 +2964,7 @@
+     registry->create(connection);
+     connect(registry, &KWayland::Client::Registry::plasmaWindowManagementAnnounced, this, [this, registry](quint32 name, quint32 version) {
+         m_waylandWindowManagement = registry->createPlasmaWindowManagement(name, version, this);
++        if (m_shengDesktopPolicy) m_shengDesktopPolicy->setWindowManagement(m_waylandWindowManagement);
+     });
+     registry->setup();
+     connection->roundtrip();
+--- a/shell/CMakeLists.txt
++++ b/shell/CMakeLists.txt
+@@ -45,6 +45,7 @@
+     panelconfigview.cpp
+     panelshadows.cpp
+     shellcorona.cpp
++    shengdesktoppolicy.cpp
+     osd.cpp
+     strutmanager.cpp
+     debug.cpp
+--- a/components/containmentlayoutmanager/appletslayout.cpp
++++ b/components/containmentlayoutmanager/appletslayout.cpp
+@@ -624,7 +624,13 @@
+ 
+ void AppletsLayout::touchEvent(QTouchEvent *event)
+ {
+-    const auto &point = *(event->points().cbegin());
++    // TouchCancel may have no points, including compositor-claimed gestures.
++    // Stop the long-press timer before inspecting points or their states.
++    if (event->type() == QEvent::TouchCancel || event->points().isEmpty()) {
++        handleReleaseEvent();
++        return;
++    }
++    const auto &point = event->points().first();
+ 
+     // Do a long press to go in edit mode only with a single point
+     if (event->points().length() != 1) {

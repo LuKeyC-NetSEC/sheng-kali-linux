@@ -1,0 +1,245 @@
+--- a/fcitx5-osk-kwin-launcher/src/dbus.rs
++++ b/fcitx5-osk-kwin-launcher/src/dbus.rs
+@@ -21,11 +21,29 @@
+     }
+ 
+     #[zbus::proxy(
+-        default_service = "org.kde.keyboard",
++        default_service = "org.kde.KWin",
+         default_path = "/VirtualKeyboard",
+         interface = "org.kde.kwin.VirtualKeyboard"
+     )]
+     pub trait KwinVirtualKeyboardService {
++        #[zbus(property(emits_changed_signal = "false"), name = "configuredInputMethod")]
++        fn configured_input_method(&self) -> ZbusResult<String>;
++
++        #[zbus(property(emits_changed_signal = "false"), name = "shengIntegrationVersion")]
++        fn sheng_integration_version(&self) -> ZbusResult<i32>;
++
++        #[zbus(name = "restartInputMethod")]
++        fn restart_input_method(&self, expected_desktop_file: &str) -> ZbusResult<bool>;
++
++        #[zbus(property(emits_changed_signal = "false"), name = "mode")]
++        fn mode(&self) -> ZbusResult<i32>;
++
++        #[zbus(property, name = "mode")]
++        fn set_mode(&self, value: i32) -> ZbusResult<()>;
++
++        #[zbus(property(emits_changed_signal = "false"), name = "activeClientSupportsTextInput")]
++        fn active_client_supports_text_input(&self) -> ZbusResult<bool>;
++
+         #[tracing::instrument(level = "debug", skip(self), err, ret)]
+         #[zbus(property(emits_changed_signal = "false"), name = "active")]
+         fn active(&self) -> ZbusResult<bool>;
+--- a/fcitx5-osk-kwin-launcher/src/kwin.rs
++++ b/fcitx5-osk-kwin-launcher/src/kwin.rs
+@@ -1,4 +1,4 @@
+-use std::{path::PathBuf, process::Stdio, time::Duration};
++use std::{path::PathBuf, process::Stdio};
+ 
+ use anyhow::{Context, Result};
+ use tokio::process::Command;
+@@ -52,41 +52,11 @@
+     }
+ }
+ 
+-pub async fn cur_input_method(kreadconfig: Option<&PathBuf>) -> Result<String> {
+-    let mut command = if let Some(exec) = kreadconfig {
+-        Command::new(exec)
+-    } else {
+-        Command::new("kreadconfig6")
+-    };
+-    let child = command
+-        .args([
+-            "--file",
+-            "kwinrc",
+-            "--group",
+-            "Wayland",
+-            "--key",
+-            "InputMethod",
+-        ])
+-        .stdin(Stdio::null())
+-        .stdout(Stdio::piped())
+-        .stderr(Stdio::piped())
+-        .spawn()?;
+-    let output = child
+-        .wait_with_output()
+-        .await
+-        .context("Unable to run a process to read current input method")?;
+-    if output.status.success() {
+-        String::from_utf8(output.stdout)
+-            .map(|s| s.trim().to_string())
+-            .context("The path of InputMethod is not a valid utf8 string")
+-    } else {
+-        anyhow::bail!(
+-            "Running the process failed with code[{:?}], stdout: {:?}, stderr: {:?}",
+-            output.status.code(),
+-            String::from_utf8_lossy(&output.stdout),
+-            String::from_utf8_lossy(&output.stderr)
+-        );
+-    }
++pub async fn cur_input_method(_kreadconfig: Option<&PathBuf>) -> Result<String> {
++    let connection = zbus::Connection::session().await?;
++    let proxy = crate::dbus::client::KwinVirtualKeyboardServiceProxy::new(&connection).await?;
++    anyhow::ensure!(proxy.sheng_integration_version().await? >= 1, "Native KWin input API required");
++    Ok(proxy.configured_input_method().await?)
+ }
+ 
+ pub async fn restart_input_method(
+@@ -115,10 +85,9 @@
+     {
+         set_input_method(kwriteconfig, Some(next)).await?;
+     } else if !input_method.is_empty() {
+-        set_input_method(kwriteconfig, None).await?;
+-        // wait a moment
+-        tokio::time::sleep(Duration::from_secs(1)).await;
+-        set_input_method(kwriteconfig, Some(input_method)).await?;
++        let connection = zbus::Connection::session().await?;
++        let proxy = crate::dbus::client::KwinVirtualKeyboardServiceProxy::new(&connection).await?;
++        anyhow::ensure!(proxy.restart_input_method(input_method).await?, "Input method changed or native restart unavailable");
+     }
+     Ok(())
+ }
+--- a/fcitx5-osk-kwin-launcher/src/main.rs
++++ b/fcitx5-osk-kwin-launcher/src/main.rs
+@@ -37,10 +37,15 @@
+ 
+ mod dbus;
+ mod kwin;
++mod native_policy;
+ 
+ #[derive(Parser, Debug)]
+ #[command(version, about, long_about = None)]
+ struct Args {
++    /// Report native integration requirements without opening input services.
++    #[arg(long)]
++    sheng_native_version: bool,
++
+     /// Force the program running on wayland.
+     #[arg(long, default_missing_value = "true")]
+     log_timestamp: bool,
+@@ -221,20 +226,12 @@
+     } else {
+         WindowManagerMode::Normal
+     };
+-    loop {
+-        let mode = fcitx5_osk_services.controller().mode().await;
+-        if (in_lockscreen && mode == Ok(expected_mode))
+-            || (!in_lockscreen && mode == Ok(expected_mode))
+-        {
+-            break;
+-        } else {
+-            // make sure mode is set
+-            fcitx5_osk_services
+-                .controller()
+-                .change_mode(expected_mode)
+-                .await?;
+-        }
+-        time::sleep(Duration::from_millis(200)).await;
++    let mut mode_changes = fcitx5_osk_services.controller().receive_mode_changed().await;
++    if fcitx5_osk_services.controller().mode().await? != expected_mode {
++        fcitx5_osk_services.controller().change_mode(expected_mode).await?;
++        while fcitx5_osk_services.controller().mode().await? != expected_mode {
++            anyhow::ensure!(mode_changes.next().await.is_some(), "OSK mode signal stream ended");
++        }
+     }
+     if in_lockscreen {
+         // The keyboard will be open through activate signal of wayland input-method, there is no
+@@ -289,23 +286,9 @@
+             last_visible = visible;
+         }
+     } else {
+-        let mut stream = kwin_services
+-            .virtual_keyboard()
+-            .receive_active_changed()
+-            .await?;
+-        while stream.next().await.is_some() {
+-            let active = kwin_services.virtual_keyboard().active().await?;
+-            let tablet_mode = kwin_services.tablet_mode().tablet_mode().await?;
+-            // check tablet mode, show only if it is in tablet mode.
+-            tracing::debug!("kwin virtual keyboard active: {active}, tablet mode: {tablet_mode}");
+-            if active
+-                && tablet_mode
+-                && let Err(e) = fcitx5_osk_services.controller().show().await
+-            {
+-                // allow error
+-                tracing::error!("Unable to call `show` of fcitx5 osk: {e:#?}");
+-            }
+-        }
++        // Normal visibility is owned by the native policy below, including
++        // keyboard hotplug and desktop/lockscreen suppression.
++        std::future::pending::<()>().await;
+     }
+     Ok(())
+ }
+@@ -503,7 +486,7 @@
+     };
+ 
+     let fcitx5_osk_exited = Arc::new(AtomicBool::new(false));
+-    let fcitx5_osk_handler = tokio::spawn({
++    let mut fcitx5_osk_handler = tokio::spawn({
+         let connection = connection.clone();
+         let wayland_display = wayland_display.clone();
+         let shutdown_flag = shutdown_flag.clone();
+@@ -566,6 +549,9 @@
+                 tracing::info!("watch_kwin_virtual_keyboard exits");
+             }
+         }
++        res = native_policy::watch() => {
++            tracing::error!("Native keyboard signal stream ended: {res:#?}");
++        }
+         _ = shutdown_flag.wait_for_shutdown() => {
+         }
+     }
+@@ -573,9 +559,12 @@
+     let mut shutdown_res = None;
+     if !fcitx5_osk_exited.load(Ordering::Relaxed) {
+         // shutdown fcitx5-osk
+-        shutdown_res = Some(services.controller().shutdown().await);
+-        // wait fcitx5-osk to shutdown
+-        let _ = fcitx5_osk_handler.await;
++        shutdown_res = Some(tokio::time::timeout(Duration::from_millis(1000), async {
++            let result = services.controller().shutdown().await;
++            let _ = (&mut fcitx5_osk_handler).await;
++            result
++        }).await);
++        fcitx5_osk_handler.abort();
+     }
+ 
+     tracing::info!("shutdown fcitx5-osk result: {:?}", shutdown_res,);
+@@ -614,7 +603,7 @@
+     let kwin_services = KwinServices::new_with(&connection).await?;
+ 
+     let fcitx5_osk_exited = Arc::new(AtomicBool::new(false));
+-    let fcitx5_osk_handler = tokio::spawn({
++    let mut fcitx5_osk_handler = tokio::spawn({
+         let connection = connection.clone();
+         let wayland_display = wayland_display.clone();
+         let shutdown_flag = shutdown_flag.clone();
+@@ -650,9 +639,12 @@
+     let mut shutdown_res = None;
+     if !fcitx5_osk_exited.load(Ordering::Relaxed) {
+         // shutdown fcitx5-osk
+-        shutdown_res = Some(services.controller().shutdown().await);
+-        // wait fcitx5-osk to shutdown
+-        let _ = fcitx5_osk_handler.await;
++        shutdown_res = Some(tokio::time::timeout(Duration::from_millis(1000), async {
++            let result = services.controller().shutdown().await;
++            let _ = (&mut fcitx5_osk_handler).await;
++            result
++        }).await);
++        fcitx5_osk_handler.abort();
+     }
+ 
+     // There is no need to restart in sddm
+@@ -664,6 +656,10 @@
+ #[tokio::main]
+ pub async fn main() {
+     let args = Args::parse();
++    if args.sheng_native_version {
++        println!("kwin-api=1 input-context=2 visibility-policy=1");
++        return;
++    }
+     let res = if args.sddm {
+         run_in_sddm(&args).await
+     } else if args.dbus_server {

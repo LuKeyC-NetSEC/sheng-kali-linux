@@ -12,11 +12,13 @@ from pathlib import Path
 import sys
 source=Path(sys.argv[1]); path=source/'debian/changelog'
 text=path.read_text()
-if not text.startswith('powerdevil (4:6.7.4-2+sheng1)'):
-    header='''powerdevil (4:6.7.4-2+sheng1) unstable; urgency=medium
+if not text.startswith('powerdevil (4:6.7.4-2+sheng2)'):
+    header='''powerdevil (4:6.7.4-2+sheng2) unstable; urgency=medium
 
   * Integrate sheng power policy, lock synchronization and resume handling
     natively into PowerDevil; retain all Debian patches.
+  * Blank and lock after one idle minute while preserving the separate
+    five-minute low-battery suspend policy and user customizations.
 
  -- Sheng Kali builders <noreply@localhost>  Sat, 21 Nov 2026 12:00:00 +0800
 
