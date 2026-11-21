@@ -1,6 +1,6 @@
 {
-  "checkedAtUTC": "2026-11-15T15:36:34+00:00",
-  "sourceCommit": "1548fdc7df2f8d7773b1e7cbc388650e2c6f2ac8",
+  "checkedAtUTC": "2026-11-21T03:43:46+00:00",
+  "sourceCommit": "8fe7cb1a8280df8547a5303ee4fb4ba0bb3d0cb2",
   "components": {
     "linexin": {
       "checked": 20,
@@ -15,12 +15,12 @@
       "matched": 4
     },
     "device": {
-      "checked": 11,
-      "matched": 11
+      "checked": 13,
+      "matched": 13
     },
     "scripts": {
-      "checked": 2,
-      "matched": 2
+      "checked": 4,
+      "matched": 4
     },
     "lockscreen": {
       "checked": 1,
@@ -47,9 +47,9 @@
   "differences": [],
   "activeShengEffects": [
     "sheng-task-cards-35ed679b1408",
-    "sheng_desktop_touch_guard_049d7d7951b7"
+    "sheng_desktop_touch_guard_5e3a927fc736"
   ],
-  "nativeGuardArtifactSha256": "95345179605d1a1675aa9ee8ae56cc99a903af549bcff8322fd68f9b3dece26f",
+  "nativeGuardArtifactSha256": "e15f89b4d98f9bf3d70de76f6b1cbb52bfd6ab8cfa72083687381d13821626a7",
   "activePlasmaPlugins": [
     "org.kontrol.center",
     "org.sheng.desktop-gesture.drawer-b16bf14a74",
@@ -64,8 +64,8 @@
     "runningOskMatchesLocalBuild": true,
     "runningOskUsesDeletedFile": false,
     "wholeOskProcessMemory": {
-      "RssKiB": 189008,
-      "PssKiB": 131260
+      "RssKiB": 41744,
+      "PssKiB": 37885
     },
     "pagingWireSignature": "NextPage()/PrevPage(), no arguments; Fcitx 5.1.23"
   },
