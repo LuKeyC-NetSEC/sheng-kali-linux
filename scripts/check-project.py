@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only source and publication checks. Never print matched secret values."""
 import ast
+import hashlib
 import json
 import pathlib
 import re
@@ -67,6 +68,17 @@ def main():
                         problems.append(name + ': broken local link: ' + relative)
         except (UnicodeError, SyntaxError, ValueError, ET.ParseError) as error:
             problems.append(name + ': parse error (' + type(error).__name__ + ')')
+    native = PROJECT / 'device/power-management/provenance.json'
+    if native.is_file():
+        for name, expected in json.loads(native.read_text(encoding='utf-8'))['local_files'].items():
+            relative = pathlib.PurePosixPath(name)
+            if relative.is_absolute() or '..' in relative.parts:
+                problems.append('power-management provenance: invalid local path')
+                continue
+            source = native.parent.joinpath(*relative.parts)
+            actual = hashlib.sha256(source.read_bytes().replace(b'\r\n', b'\n')).hexdigest() if source.is_file() else None
+            if actual != expected:
+                problems.append('power-management/' + name + ': reviewed source hash mismatch')
     for problem in problems:
         print(problem)
     print(json.dumps({'files': len(names), 'checked': counts, 'problems': len(problems)}))

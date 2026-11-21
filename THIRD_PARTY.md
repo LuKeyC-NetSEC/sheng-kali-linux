@@ -25,6 +25,7 @@
 | Miku 壁纸 | [桌面来源](device/theme/wallpaper.json)、[锁屏来源](device/theme/lockscreen-wallpaper.json) | 仅来源、作者与哈希；图片不随仓库分发，下载/使用自行核查原作者条件 |
 | KDE Wayland 锁屏键盘 | `KDE/plasma-workspace@v6.7.4` 的 `lookandfeel/components/VirtualKeyboard_wayland.qml` | [锁屏专用适配](device/theme/lockscreen/ShengVirtualKeyboard.qml)，保留原作者与 LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL 声明；未修改 PAM 验证 |
 | 小米PIN连接状态参考 | `MiCode/Xiaomi_Kernel_OpenSource@29db5d592c5b577aa9d9611da988a5e071d100dd` 的 `drivers/power/supply/pogoChg/extSOC/nanosic_platform.c` | Nanosic / GPL-2.0；[热插拔适配](device/keyboard-driver/0002-fix-hotplug-input-restore.patch)参考其连接状态解析，继续保留原主线HID作者与许可证 |
+| PowerDevil原生电源适配 | KDE 6.7.4 `7c97bbcd0e90ccb43eca1debd36191fc97f9f987` / Debian 4:6.7.4-2 | 保留原版权、许可证及Debian补丁；本地C++适配GPL-2.0-or-later，[固定归档与补丁](device/power-management/provenance.json) |
 
 根目录三张 JPEG 和 `parted` 为继承自上游的历史文件，不是本次桌面资产或新部署必要工具。新流程使用发行版工具，不执行旧 `parted`。历史 postmarketOS 文档/工作流仅供参考。
 

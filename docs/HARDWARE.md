@@ -11,9 +11,10 @@
 | 原生网络 applet | `plasma-nm 4:6.7.4-2+b1` | 补丁包严格绑定此 Debian 包版本 |
 | 图形 | Adreno 740、Mesa 26.1.6、主线 drm/msm | freedreno GL、Turnip Vulkan；无 Android KGSL |
 | 触屏 | `xiaomi-sheng-thp 0.3.9`、libssc | 固定资产与哈希见 sources.json |
-| PIN | `sheng-dock-fix 1.2-2`、模块 `1.2-shengfix` | 必须配合安全存储认证服务 |
+| PIN | `sheng-dock-fix 1.3-2`、模块 `1.3.1-shengfix` | 必须配合安全存储认证服务 |
+| 电源 | PowerDevil `4:6.7.4-2+sheng1` 原生C++适配 | 与Qt 6.11.2及匹配核心库/data一起部署 |
 | 控制中心 | `0.7.7-sheng-privacy4` | 固定 Kontrol Center 上游 + 本地 patch |
-| 输入法集成 | msime-linux 0.16.1、Fcitx5 5.1.23、OSK 0.2.1 + 集成包 0.2.1-3 | PIN/触屏中文、抑制软键盘、连续弹出及新界面拖动/模式切换已确认；锁屏/挂起恢复待验收 |
+| 输入法集成 | msime-linux 0.16.1、Fcitx5 5.1.23、OSK 0.2.1 + 集成包 0.2.1-9 | 中文/软键盘及锁屏两页已确认；挂起恢复按当前版本另验 |
 
 ## 硬件范围
 

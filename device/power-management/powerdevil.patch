@@ -1,0 +1,75 @@
+--- a/daemon/powerdevilcore.cpp
++++ b/daemon/powerdevilcore.cpp
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include "powerdevilcore.h"
++#include "shengpolicy.h"
+ 
+ #include "powerdevil_debug.h"
+ #include "powerdevilaction.h"
+@@ -106,6 +107,9 @@
+     const bool canHibernate = m_suspendController->canHibernate();
+ 
+     PowerDevil::migrateConfig(isMobile, isVM, canSuspend);
++    if (ShengPolicy::isDevice()) {
++        ShengPolicy::migrateDefaults(KSharedConfig::openConfig(QStringLiteral("powerdevilrc")), canSuspend);
++    }
+     m_globalSettings = new PowerDevil::GlobalSettings(canSuspend, canHibernate, this);
+ 
+     // Get the battery devices ready
+@@ -218,6 +222,8 @@
+     }
+ 
+ #endif
++
++    ShengPolicy::initialize(this);
+ 
+     // All systems up Houston, let's go!
+     Q_EMIT coreReady();
+--- a/daemon/CMakeLists.txt
++++ b/daemon/CMakeLists.txt
+@@ -10,6 +10,7 @@
+     powerdevil_debug.cpp
+     powerdevilaction.cpp powerdevilaction.h
+     powerdevilcore.cpp
++    shengpolicy.cpp shengpolicy.h
+     powerdevilenums.cpp powerdevilenums.h
+     powerdevilmigrateconfig.cpp powerdevilmigrateconfig.h
+     powerdevilpolicyagent.cpp
+--- a/autotests/CMakeLists.txt
++++ b/autotests/CMakeLists.txt
+@@ -1,2 +1,9 @@
+ include(ECMMarkAsTest)
+ add_subdirectory(migrateconfig)
++
++# Sheng policy migration runs against an isolated KConfig file.
++find_package(Qt6 REQUIRED COMPONENTS Test)
++add_executable(shengpolicytest shengpolicytest.cpp ../daemon/shengpolicy.cpp)
++target_include_directories(shengpolicytest PRIVATE ${CMAKE_BINARY_DIR}/daemon)
++target_link_libraries(shengpolicytest powerdevilcore KF6::ConfigCore KF6::Screen Qt6::Test Qt6::DBus)
++add_test(NAME shengpolicy_native_migration COMMAND shengpolicytest)
+--- a/daemon/actions/bundled/dpms.cpp
++++ b/daemon/actions/bundled/dpms.cpp
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include "dpms.h"
++#include "shengpolicy.h"
+ #include <KScreenDpms/Dpms>
+ 
+ #include <PowerDevilProfileSettings.h>
+@@ -127,6 +128,13 @@
+ 
+ void DPMS::turnOffOnIdleTimeout()
+ {
++    // Keep sheng's native idle lock and display-off deadline together.
++    if (ShengPolicy::isDevice() && m_lockBeforeTurnOff) {
++        const auto lock = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.ScreenSaver"),
++            QStringLiteral("/ScreenSaver"), QStringLiteral("org.freedesktop.ScreenSaver"), QStringLiteral("Lock"));
++        QDBusConnection::sessionBus().asyncCall(lock);
++    }
++
+     qCDebug(POWERDEVIL) << "DPMS: triggered on idle timeout, turning off display and keyboard backlight";
+ 
+     const int keyboardBrightness = core()->keyboardBrightnessController()->brightness();
