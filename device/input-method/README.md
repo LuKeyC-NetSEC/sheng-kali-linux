@@ -67,7 +67,7 @@ sheng-osk-mode dock
 
 可选 [FUTO 原生移植](../futo-keyboard/README.md)在本输入面板上接入 FUTO/LatinIME 的英文 C++ 候选核心、QWERTY 布局和默认调色板；中文引擎仍为水杉。两者来源和许可证分开记录，不把 Linux 适配器称为完整 Android FUTO 应用。
 
-## 原生策略迁移（待统一加载）
+## 原生策略迁移
 
 [native-policy.rs](native-policy.rs)把独立Python显示策略移入OSK的Rust启动器。监听KWin文本上下文、窗口角色、原生输入设备事实、OSK模式/ManualMode确认及服务owner变化；没有每秒轮询。实体键盘连接时隐藏面板但保留Fcitx中文组合上下文，无键盘时通过Fcitx正式接口进入屏幕键盘模式。桌面禁止残留输入焦点误弹；锁屏仅由greeter控制安全面板，不强制显示。
 
@@ -79,3 +79,11 @@ bash scripts/build-native-launcher.sh out/osk-native-source
 ```
 
 这两条只准备源码、运行13项策略测试并编译启动器，不安装或重启。也可把 `prepare-native-launcher.py SOURCE` 应用到已核验的、尚未修改启动器的FUTO源码树，保留其UI和中文引擎。2026-11-21在sheng ARM64上13项测试与release编译通过，包含ScreenSaver提前锁定信号，防止合成器锁状态尚未更新时误弹普通面板；已安装原生启动器并正常重新登录完成代码加载，实际中文、密码页、PIN热插拔仍待在用户方便时正常重新登录后验收。旧版仅保留在Git历史和设备私有回退包中。
+
+上述是原生迁移时的阶段记录。后续用户已确认PIN中文/触摸板、断开PIN后应用软键盘、抽屉不自动聚焦搜索，以及背折/展开的输入策略；参见[原生迁移记录](../plasma-integration/validation.json)与[背折验收](../desktop-touch-guard/fold-validation.json)。
+
+## PIN回车偶发失效的现场记录
+
+2026-11-21用户反馈主要发生在刚亮屏/解锁后。普通空白Qt输入窗口测试收到内核回车10次按下/10次松开、应用10次按下；一次息屏解锁后不重新点击窗口，收到内核5/5、应用5次按下，用户确认两轮均正常。回车未保持在按下状态，PIN认证和报告计数正常。只记录回车次数与焦点/预编辑是否存在等布尔状态，没有保存输入文字，临时观察器已结束。
+
+故障本轮未复现，没有据此修改或重绑PIN驱动，也没有重启输入栈掩盖现场。锁屏模式切换期间普通输入法进程的退出需要结合会话状态判断，不能只看进程是否存在。下一次失效时应保持原窗口和连接，先读 `nanosic_hinge/input_stats`、原生 `GetInputContext()` 及焦点/输入法状态，再决定修复位置。当前不标记为已修复，详细计数和未测项见 [enter-validation.json](enter-validation.json)。

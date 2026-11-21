@@ -17,7 +17,7 @@ PROJECT=Path(__file__).resolve().parents[1]
 LOCAL=PROJECT/'device/power-management'
 STATE=Path('/var/lib/sheng-power-management')
 NAMES=('libpowerdevilcore2','powerdevil-data','powerdevil')
-VERSION='4:6.7.4-2+sheng4'
+VERSION='4:6.7.4-2+sheng5'
 POLICY_VERSION=2
 DISPLAY_OFF_POLICY_VERSION=2
 BASE_VERSION='4:6.7.4-2'
@@ -113,7 +113,7 @@ def main():
     for name,version in previous.items():
         if version==BASE_VERSION:
             subprocess.run(['apt-get','download',name+'='+version],cwd=packages,check=True)
-        elif version in ('4:6.7.4-2+sheng1','4:6.7.4-2+sheng2','4:6.7.4-2+sheng3',VERSION):
+        elif version in ('4:6.7.4-2+sheng1','4:6.7.4-2+sheng2','4:6.7.4-2+sheng3','4:6.7.4-2+sheng4',VERSION):
             cached=[path for path in (STATE/'installed-packages').glob('*.deb')
                     if run(['dpkg-deb','-f',str(path),'Package'])==name
                     and run(['dpkg-deb','-f',str(path),'Version'])==version]

@@ -1,0 +1,38 @@
+{
+  "checkedAtUTC": "2026-11-21T12:31:31+00:00",
+  "device": "sheng",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "pinModule": "1.3.1-shengfix",
+  "issue": "Intermittent PIN Enter failure, reported mainly just after display wake/unlock",
+  "status": "not_reproduced_no_input_fix_deployed",
+  "normalTest": {
+    "kernelFocusedPresses": 10,
+    "kernelFocusedReleases": 10,
+    "applicationPresses": 10,
+    "applicationReleases": 11,
+    "userConfirmedAllReceived": true
+  },
+  "postUnlockTest": {
+    "kernelFocusedPresses": 5,
+    "kernelFocusedReleases": 5,
+    "applicationPresses": 5,
+    "applicationReleases": 7,
+    "userConfirmedAllReceivedWithoutRefocusing": true
+  },
+  "applicationReleaseNote": "Application release totals span focus/unlock transitions; no missed press was captured in these tests. Their relationship to the reported intermittent fault is unverified.",
+  "enterHeldAtChecks": false,
+  "authServiceActive": true,
+  "authServiceRestarts": 0,
+  "launcherDbusBrokerMatchesInstalledBinary": true,
+  "driverReloadedByAgent": false,
+  "inputStackManuallyRestartedByAgent": false,
+  "inputTextRecorded": false,
+  "temporaryObserversStopped": true,
+  "notVerified": [
+    "capture of the actual failing state",
+    "specific Firefox/Burp failure after unlock",
+    "Chinese composition during the failing state",
+    "long-term repeated unlock cycles"
+  ],
+  "nextStep": "On recurrence retain the failing window and existing PIN connection, then read count-only input stats and compositor/input-method focus state before any restart"
+}

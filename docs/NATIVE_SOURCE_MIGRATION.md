@@ -8,7 +8,7 @@
 
 | 功能 | 源码归属与结果 | 构建/测试 | 设备状态 |
 | --- | --- | --- | --- |
-| 电源/恢复 | [PowerDevil C++](../device/power-management/README.md)：各档位1分钟锁屏息屏；短按原生DPMS直接关屏并锁定；普通供电继续后台，仅离电10%低电量档闲置5分钟挂起，5%临界保护 | 6组CTest/8项原生QtTest、3项隔离KConfig测试通过 | +sheng4已部署，短按复验通过；默认仍s2idle |
+| 电源/恢复 | [PowerDevil C++](../device/power-management/README.md)：各档位1分钟锁屏息屏；短按直接关屏并锁定；回移KDE亮度恢复修复；普通供电继续后台，仅离电10%低电量档闲置5分钟挂起，5%临界保护 | 6组原生CTest/8项QtTest、亮度1组CTest/5项QtTest通过 | +sheng5已部署，两次亮屏亮度正常；默认仍s2idle，偶发问题继续观察 |
 | 键盘自动显示 | [Rust启动器](../device/input-method/native-policy.rs)监听真实输入/窗口/锁状态及ManualMode确认，保留Fcitx中文上下文 | 13项测试与release通过；FUTO UI ELF未变 | 新版已正常登录加载，实体输入待用户复验 |
 | 输入面板重载 | [KWin InputMethod](../device/kwin-integration/README.md)原生异步重载，不临时清空持久输入法配置 | 私有D-Bus和配置环境7项通过 | +sheng1已正常登录加载，API v1活动 |
 | 三指Alt+Tab | KWin原生TabBox过滤器消费已有触摸板事件，直接选窗/确认，不模拟Alt | 匹配ARM64/Qt构建通过 | 实体PIN的新路径未验证 |

@@ -137,5 +137,6 @@
   ],
   "rollback": "Original Debian packages and related configuration in private /var/lib/sheng-power-management backups; installer --restore",
   "historicalSnapshot": true,
-  "currentDisplayOffValidation": "direct-display-off-validation.json"
+  "currentDisplayOffValidation": "direct-display-off-validation.json",
+  "currentWakeBrightnessValidation": "brightness-validation.json"
 }

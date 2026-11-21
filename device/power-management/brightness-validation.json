@@ -1,0 +1,77 @@
+{
+  "checkedAtUTC": "2026-11-21T12:27:51+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "plasma": "6.7.4",
+  "qt": "6.11.2+dfsg-5",
+  "version": "4:6.7.4-2+sheng5",
+  "upstreamFix": {
+    "commit": "76dc5ace88031d03a86acd93767730e389e2b8ab",
+    "url": "https://github.com/KDE/powerdevil/commit/76dc5ace88031d03a86acd93767730e389e2b8ab",
+    "bug": "https://bugs.kde.org/show_bug.cgi?id=523988",
+    "upstream_fixed_in": "6.7.6",
+    "patch_sha256": "5cf23befd22d037564270ce38f9c54f0dd370ff872d2046d7e51acaaa2019621"
+  },
+  "sourceSha256": {
+    "powerdevil.patch": "4b9c329826bbd088f594866e769099a34ad91db075d9f19b0c5940764d1a79ab",
+    "shengpolicy.cpp": "175fa53a16d34b6afa73fbf9a23fc7e689aff69af56ec3bbf554ffbf14163c5f",
+    "shengpolicy.h": "8b304104cecadb7639be06494c677ae115955f47bcafd6b8693cdb29ac3dbbde",
+    "shengpolicytest.cpp": "5b8ee46d017d41431ebb7ffa71827c0575fc963e07a66e5f428121eb53b2b81b",
+    "upstream-brightness-restore.patch": "5cf23befd22d037564270ce38f9c54f0dd370ff872d2046d7e51acaaa2019621",
+    "brightness-tests/CMakeLists.txt": "1642877c7d03a7432d28863126703b3d4c2fc92def309671c2dc0fb4e96a6103",
+    "brightness-tests/brightnessrestoretest.cpp": "9062a68bacfd032294eeb11ceac1f120bd70a119c1ae531d2a8538d220ba47d9"
+  },
+  "packageSha256": {
+    "powerdevil": "201d68205d6be3088727e136becc7a08e7e7c3797f22c4451c4433858590d2c3",
+    "powerdevil-data": "a0581ee78dc3c66e6490e99de69b7dccaa4dea8b8ea55b91481c832d11844b62",
+    "libpowerdevilcore2": "768f55b50184a9cb87adf7696885bc5749544c1bdb42ed238204f0ae524da8b0"
+  },
+  "coreLibrarySha256": "84a1a69dec1dc24c548bf37fed888044cb31ff9b7847a594e16acdfa0c659679",
+  "runningCoreMatchesInstalledFile": true,
+  "kwinAndPlasmaPreserved": true,
+  "nativeCtestGroupsPassed": 6,
+  "policyQtTestTotalsPassed": 8,
+  "brightnessRegression": {
+    "baselineExpectedFailure": true,
+    "baselineFailedCase": "restoresInheritedDimmingWithoutChangingUserBrightness",
+    "baselineDimmingActual": 0.3,
+    "expectedActiveDimming": 1.0,
+    "patchedCtestGroupsPassed": 1,
+    "patchedQtTestTotalsPassed": 5,
+    "businessCasesPassed": 3,
+    "realOutputsTouchedByUnitTest": false
+  },
+  "before": {
+    "brightnessSetting": 0.8026,
+    "outputDimming": 0.3,
+    "slider": 8026,
+    "backlight": 1643,
+    "dpms": "Off"
+  },
+  "after": {
+    "brightnessSetting": 0.8026,
+    "outputDimming": 1,
+    "slider": 8026,
+    "backlight": 1643,
+    "actualBacklight": 1643,
+    "dpms": "Off"
+  },
+  "userBrightnessSelectionPreserved": true,
+  "userConfirmedTwoDisplayCyclesNormal": true,
+  "originalIntermittentWakeFailureReproducedOnDevice": false,
+  "kernelChanged": false,
+  "agentTriggeredSuspend": false,
+  "batteryProviderRetained": true,
+  "newRuntimePolicyDaemonAdded": false,
+  "dpkgAuditClean": true,
+  "notVerified": [
+    "long-term intermittent recurrence",
+    "real suspend/resume",
+    "physical AC/battery transitions",
+    "external monitor disconnect/reconnect"
+  ],
+  "rollback": "Installer --restore uses the private backup of +sheng4 packages and power/locker/kwinrc settings",
+  "sourceMatchesRepository": true,
+  "debianSourceSignatureVerified": true
+}

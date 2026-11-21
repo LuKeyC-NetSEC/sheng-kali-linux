@@ -31,8 +31,13 @@ def add_native_patch(source):
     patch.write_bytes(combined_patch())
     series=source/'debian/patches/series'
     entries=series.read_text().splitlines()
+    brightness_patch='sheng-upstream-brightness-restore.diff'
+    (series.parent/brightness_patch).write_bytes((LOCAL/'upstream-brightness-restore.patch').read_bytes().replace(b'\r\n',b'\n'))
+    if brightness_patch not in entries:
+        entries.append(brightness_patch)
     if patch.name not in entries:
-        series.write_text('\n'.join(entries+[patch.name])+'\n')
+        entries.append(patch.name)
+    series.write_text('\n'.join(entries)+'\n')
     subprocess.run(['dpkg-source','--before-build',str(source)],check=True)
 
 

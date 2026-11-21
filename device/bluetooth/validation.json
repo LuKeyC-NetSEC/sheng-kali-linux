@@ -1,0 +1,38 @@
+{
+  "checkedAtUTC": "2026-11-21T12:33:11+00:00",
+  "device": "sheng",
+  "headset": "Sony WF-1000XM6",
+  "packages": {
+    "bluez": "5.87-5",
+    "pipewire": "1.6.9-2",
+    "wireplumber": "0.5.18-1",
+    "libspa-0.2-bluetooth": "1.6.9-2",
+    "libldacbt-enc2": "2.0.2.3+git20200429+ed310a0-5+b2"
+  },
+  "paired": true,
+  "connected": true,
+  "servicesResolved": true,
+  "codec": "ldac",
+  "profile": "a2dp-sink",
+  "defaultOutputIsHeadset": true,
+  "applicationPlaybackStreams": 1,
+  "applicationPlaybackStreamsOnHeadset": 1,
+  "internalVirtualStreamsElsewhere": 1,
+  "headsetVolumeUnchangedByAgent": true,
+  "headsetVolumeAtRouteSwitchPercent": 40,
+  "existingSinkInputsMoved": 2,
+  "userConfirmedHeadsetAudio": true,
+  "pairingCompletedByUser": true,
+  "driverChanged": false,
+  "pairingRecordsDeletedByAgent": false,
+  "microphoneRouteChangedByAgent": false,
+  "audioCaptured": false,
+  "notVerified": [
+    "LDAC bitrate",
+    "headset microphone/HFP",
+    "LE Audio/LC3",
+    "automatic routing after reconnect/reboot",
+    "long-term stability"
+  ],
+  "discoveryRootCause": "Not established; final device paired and connected normally. No radio firmware or driver changes were made."
+}

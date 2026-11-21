@@ -155,7 +155,7 @@ Burp 官方安装及 6 GiB/170%/OpenGL 参数见 [burp-tablet.md](burp-tablet.md
 
 ### 8. 原生PowerDevil电源适配
 
-按[原生电源说明](../device/power-management/README.md)从固定Debian/KDE 6.7.4-2源码构建 `4:6.7.4-2+sheng4`，保留发行版补丁并运行6组CTest。用 `scripts/install-power-management.py` 安装匹配的核心库、PowerDevil和data包；只重启PowerDevil，不退出会话。安装器备份原deb及电源/锁屏/kwinrc配置，停用已知旧桌面恢复钩子，并检查电池提供者未被卸载。原生组件一次性关闭DPMS渐黑特效，将关屏和锁屏激活等待减至1ms调度最小值；受保护的短按动作迁移到原生DPMS直接关屏并锁定，保留其他动画及后台策略。
+按[原生电源说明](../device/power-management/README.md)从固定Debian/KDE 6.7.4-2源码构建 `4:6.7.4-2+sheng5`，保留发行版补丁并回移KDE亮度恢复修复；运行6组原生CTest及1组隔离亮度回归测试。用 `scripts/install-power-management.py` 安装匹配的核心库、PowerDevil和data包；只重启PowerDevil，不退出会话。安装器备份原deb及电源/锁屏/kwinrc配置，停用已知旧桌面恢复钩子，并检查电池提供者未被卸载。原生组件关闭DPMS渐黑特效，将关屏和锁屏激活等待减至1ms调度最小值；受保护的短按动作经原生DPMS直接关屏并锁定，亮度恢复保留用户设定值，其他动画及后台策略保留。
 
 运行时低电量策略、档位锁屏时间同步及显示恢复在PowerDevil C++进程内执行。普通插电/离电不自动挂起；只有10%低电量档闲置5分钟挂起，保留5%临界保护。挂起模式需实机恢复验收后选择，不把内核列出deep当作通过；基础镜像的配置兼容工具不能代替这个原生增量。
 

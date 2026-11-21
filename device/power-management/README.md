@@ -2,7 +2,7 @@
 
 电源策略运行在 **PowerDevil 的 C++ 进程内**，使用现有 UPower、电源档、KIdleTime、logind/systemd 与 KScreen。没有新增电源策略守护进程，不通过定时脚本决定休眠，也不在电源档切换时执行锁屏配置脚本。
 
-目标：sheng / Kali ARM64 / Plasma 6.7.4 / Qt 6.11.2。当前本地包为 `4:6.7.4-2+sheng4`，同时更新 PowerDevil、其核心库及匹配 data 包；保留 Debian 的 `upstream_avoid_low_battery_notification.diff`。更换 Plasma/Qt 后需重新移植和编译，不能复用不匹配的 ELF。
+目标：sheng / Kali ARM64 / Plasma 6.7.4 / Qt 6.11.2。当前本地包为 `4:6.7.4-2+sheng5`，同时更新 PowerDevil、其核心库及匹配 data 包；保留 Debian 的 `upstream_avoid_low_battery_notification.diff`。更换 Plasma/Qt 后需重新移植和编译，不能复用不匹配的 ELF。
 
 ## 当前策略
 
@@ -23,6 +23,7 @@
 - `migrateDisplayOffDefaults()` 一次性写入原生KWin的 `Effect-Kscreen/Duration=1`、`Plugins/kscreenEnabled=false`，卸载当前渐黑特效并请求KWin重新读取配置；按 `DisplayOffPolicyVersion=2` 标记迁移。后续用户明确修改的配置不会被反复覆盖。其他特效、动画速度、闲置时限和低电量保护保持原配置。
 - 对仍配置为 `PowerButtonAction=32` 且 `LockBeforeTurnOffDisplay=true` 的档位，迁移为原生 `TurnOffScreen=64`，经HandleButtonEvents直接触发DPMSControl；原生DPMS仍发送锁屏请求，关屏不再等待锁屏页加载。迁移完成后调用现有 `Core::refreshStatus()` 重载按钮动作；显式选择的其他动作和未开启关屏前锁定的配置不改写，长按16保持不变。
 - 锁屏激活后的最短原生DPMS闲置等待仅在sheng上由100ms改为1ms，保留KIdleTime的唤醒/恢复生命周期、抑制策略以及锁屏后正常交互的10秒最小时限。自动息屏与短按电源键均不再先绘制KScreen的全屏渐黑层。
+- [上游亮度恢复补丁](upstream-brightness-restore.patch)：回移KDE Plasma/6.7的 `76dc5ace88031d03a86acd93767730e389e2b8ab`，保留原作者和补丁内容。停止管理输出时清除遗留调暗；重新接管时读取输出实际调暗系数，并应用当前控制器的有效系数。用户选择的亮度和当前有意设置的调暗限制均保留，不增加周期性亮度覆盖。
 - 原生挂起/恢复信号捕获当前会话；恢复时只允许回到同一用户、已锁定且原生锁屏仍活动的会话。KScreen仅在内屏缩放实际偏离保存值时修正。不会重启KWin/Plasma、关闭应用、杀死键盘或强制激活输入上下文。
 - 旧 `60-sheng-desktop` system-sleep脚本由安装器备份并停用；输入连接继续由现有KWin/Fcitx launcher管理。热点自己的硬件睡眠恢复钩子保留。
 
@@ -50,6 +51,14 @@ sudo python3 scripts/install-power-management.py --packages out --user kali --sl
 ```bash
 sudo python3 scripts/install-power-management.py --user kali --restore
 ```
+
+## 亮屏后变暗的回归验证
+
+上游 [KDE Bug 523988](https://bugs.kde.org/show_bug.cgi?id=523988)描述了滑条不变、输出保持调暗的故障，修复进入6.7.6。本机在固定6.7.4源码上回移该单项修复，保持现有Qt/KWin ABI。
+
+`brightness-tests`使用真实 `KWinDisplayBrightness` 源码与隔离的KScreen输出对象，将后端写入替换为测试捕获，不访问实际显示器或用户D-Bus。三个业务场景验证：接管0.3调暗的输出后恢复有效系数1.0且保留0.8亮度、保留当前有意请求的调暗限制、正常输出不产生多余写入。原6.7.4在首项失败；补丁后3项均通过（QtTest含初始化/清理共5项）。构建器自动运行这组额外CTest。
+
+实机安装前在息屏状态读取到亮度设定0.8026、调暗系数0.3；更新后系数为1.0，滑条8026/10000及背光1643/2047保持不变，KWin/Plasma未重启。用户再次测试两次息屏/亮屏均正常。息屏期间存在0.3系数本身可以是正常闲置调暗；本次没有捕捉到原偶发故障发生时的亮屏现场，不能仅凭两次正常就认定长期问题完全消失。方法、源码和包哈希、未测项见[亮度验证](brightness-validation.json)。
 
 ## 挂起模式与验收
 

@@ -3,7 +3,7 @@
   "upstream_version": "6.7.4",
   "upstream_commit": "7c97bbcd0e90ccb43eca1debd36191fc97f9f987",
   "debian_version": "4:6.7.4-2",
-  "native_package_version": "4:6.7.4-2+sheng4",
+  "native_package_version": "4:6.7.4-2+sheng5",
   "policy_version": 2,
   "archive_base": "https://kali.download/kali/pool/main/p/powerdevil/",
   "dsc_name": "powerdevil_6.7.4-2.dsc",
@@ -18,9 +18,19 @@
     "powerdevil.patch": "4b9c329826bbd088f594866e769099a34ad91db075d9f19b0c5940764d1a79ab",
     "shengpolicy.cpp": "175fa53a16d34b6afa73fbf9a23fc7e689aff69af56ec3bbf554ffbf14163c5f",
     "shengpolicy.h": "8b304104cecadb7639be06494c677ae115955f47bcafd6b8693cdb29ac3dbbde",
-    "shengpolicytest.cpp": "5b8ee46d017d41431ebb7ffa71827c0575fc963e07a66e5f428121eb53b2b81b"
+    "shengpolicytest.cpp": "5b8ee46d017d41431ebb7ffa71827c0575fc963e07a66e5f428121eb53b2b81b",
+    "upstream-brightness-restore.patch": "5cf23befd22d037564270ce38f9c54f0dd370ff872d2046d7e51acaaa2019621",
+    "brightness-tests/CMakeLists.txt": "1642877c7d03a7432d28863126703b3d4c2fc92def309671c2dc0fb4e96a6103",
+    "brightness-tests/brightnessrestoretest.cpp": "9062a68bacfd032294eeb11ceac1f120bd70a119c1ae531d2a8538d220ba47d9"
   },
   "licenses": "Upstream and Debian notices retained; native integration GPL-2.0-or-later",
   "legacy_sleep_hook_sha256": "55ea4a7d6118db9ac0fc218f5c44ec5f566d6dbafc1529a34787eeccdee13acf",
-  "display_off_policy_version": 2
+  "display_off_policy_version": 2,
+  "brightness_restore_fix": {
+    "commit": "76dc5ace88031d03a86acd93767730e389e2b8ab",
+    "url": "https://github.com/KDE/powerdevil/commit/76dc5ace88031d03a86acd93767730e389e2b8ab",
+    "bug": "https://bugs.kde.org/show_bug.cgi?id=523988",
+    "upstream_fixed_in": "6.7.6",
+    "patch_sha256": "5cf23befd22d037564270ce38f9c54f0dd370ff872d2046d7e51acaaa2019621"
+  }
 }

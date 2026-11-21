@@ -1,0 +1,76 @@
+From 76dc5ace88031d03a86acd93767730e389e2b8ab Mon Sep 17 00:00:00 2001
+From: Jakob Petsovits <jpetso@petsovits.com>
+Date: Tue, 27 Oct 2026 17:34:50 -0400
+Subject: [PATCH] Fix screens staying dimmed after losing brightness control
+
+When a DDC/CI write fails (for example after the monitor powered down and
+libddcutil invalidated its handle), DDCutilDisplay gives up on the display
+and KWin unsets its brightness device. KWinDisplayDetector then drops the
+output, but KWin keeps applying the last dimming factor in software, so a
+screen that was idle-dimmed to 30% stays at 30% until KWin restarts.
+Re-detecting the output didn't help either: the new KWinDisplayBrightness
+assumed a dimming of 1.0, so setting 1.0 was a no-op.
+
+Reset the dimming of outputs we stop managing, start from the dimming KWin
+reports, and apply the current dimming ratio to newly detected displays.
+
+BUG: 523988
+
+
+(cherry picked from commit 0ca9bdb82c927518ca60eef589bd89ec6192ef6d)
+
+Co-authored-by: Petru Mare <marepetru2015@gmail.com>
+---
+ daemon/controllers/kwinbrightness.cpp           | 17 ++++++++++++++---
+ .../controllers/screenbrightnesscontroller.cpp  |  2 ++
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/daemon/controllers/kwinbrightness.cpp b/daemon/controllers/kwinbrightness.cpp
+index deb42d849..e6147cd2b 100644
+--- a/daemon/controllers/kwinbrightness.cpp
++++ b/daemon/controllers/kwinbrightness.cpp
+@@ -69,9 +69,20 @@ void KWinDisplayDetector::checkOutputs()
+         });
+     });
+     // remove all that can't do brightness control (anymore)
+-    changed |= std::erase_if(m_displays, [](const auto &pair) {
+-        return !(pair.first->capabilities() & KScreen::Output::Capability::BrightnessControl) || !pair.first->isEnabled();
++    bool undimmed = false;
++    changed |= std::erase_if(m_displays, [&undimmed](const auto &pair) {
++        const bool remove = !(pair.first->capabilities() & KScreen::Output::Capability::BrightnessControl) || !pair.first->isEnabled();
++        // KWin keeps applying the dimming without a brightness device,
++        // and nothing would undim the output once we stop managing it
++        if (remove && pair.first->dimming() != 1.0) {
++            pair.first->setDimming(1.0);
++            undimmed = true;
++        }
++        return remove;
+     });
++    if (undimmed) {
++        scheduleSetConfig();
++    }
+     for (const auto &output : outputs) {
+         if (!(output->capabilities() & KScreen::Output::Capability::BrightnessControl) || !output->isEnabled()) {
+             continue;
+@@ -134,7 +145,7 @@ KWinDisplayBrightness::KWinDisplayBrightness(const KScreen::OutputPtr &output, K
+     , m_detector(detector)
+     , m_label(label)
+     , m_desiredBrightness(m_output->brightness())
+-    , m_desiredDimming(1.0)
++    , m_desiredDimming(m_output->dimming())
+ {
+     connect(m_output.get(), &KScreen::Output::brightnessChanged, this, &KWinDisplayBrightness::handleBrightnessChanged);
+ }
+diff --git a/daemon/controllers/screenbrightnesscontroller.cpp b/daemon/controllers/screenbrightnesscontroller.cpp
+index b114d35e1..b7d920ac5 100644
+--- a/daemon/controllers/screenbrightnesscontroller.cpp
++++ b/daemon/controllers/screenbrightnesscontroller.cpp
+@@ -204,6 +204,8 @@ void ScreenBrightnessController::onDetectorDisplaysChanged()
+         if (added || replaced) {
+             connect(info.display, &QObject::destroyed, this, &ScreenBrightnessController::onDisplayDestroyed);
+             connect(info.display, &DisplayBrightness::externalBrightnessChangeObserved, this, &ScreenBrightnessController::onExternalBrightnessChangeObserved);
++            // the display may still be dimmed from before it was (re-)detected
++            info.display->setDimmingMultiplier(dimmingRatioForDisplay(displayId));
+         } else {
+             // migrate any local state from the old element to its replacement
+             info.trackingError = it->second.trackingError;
