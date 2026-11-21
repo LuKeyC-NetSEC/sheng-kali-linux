@@ -104,7 +104,7 @@ dpkg-deb -x out/libkwin6_6.7.4-2+sheng1_arm64.deb out/kwin-sdk
 CMAKE_PREFIX_PATH="$PWD/out/kwin-sdk/usr" bash scripts/build-desktop-touch-guard.sh
 gcc -std=gnu11 -O2 -Wall -Wextra -Werror device/privacy/device-guard.c -o out/bin/sheng-privacy-bpf
 sudo out/bin/sheng-privacy-bpf probe
-python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-7+native1_arm64.deb --touch-guard-build out/build-desktop-touch-guard
+python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf out/packages/sheng-tablet-controls_1.0-8+native1_arm64.deb --touch-guard-build out/build-desktop-touch-guard
 # 新包依赖原生KWin/Plasma；先准备全部匹配包及回退，再安排正常重新登录。
 ```
 

@@ -55,3 +55,11 @@ qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.unloadEffect "$guard_id"
 控制中心打开时，桌面上滑序列在初次按下即归控制中心所有，后续面板隐藏不会改变它；底边Dock入口也让位于控制中心。滑条与Wi-Fi/蓝牙列表由控制中心自己的保护区域处理，不会触发关闭。取消序列不会打开底层抽屉。对应跨组件回归场景见Plasma策略测试，实机触屏仍待复验。
 
 原生部署包已包含该插件，安装迁移工具会设置新ID并删除旧副本，不需另启用键盘/桌面策略服务。构建插件时使用新KWin包提取的SDK；部署包通过CMake安装阶段移除临时RPATH。
+
+## PIN背折姿态
+
+`InputPresence` 在PIN物理连接的基础上，读取KWin原生TabletModeManager的硬件原始状态；只在确有物理 `SW_TABLET_MODE` 开关时采用该值。它不使用用户手动强制的平板模式设置，不增加evdev读取器或轮询服务。现有驱动已经接收霍尔开关并控制PIN输入，桌面侧把背折的PIN键盘及其触摸板视为不可用；另接的USB/蓝牙键鼠仍独立统计。
+
+输入上下文v2新增 `pinAttached`、`pinFoldedBack`、`pinAvailable` 三个只读诊断字段。折回背部时可解除软键盘抑制，并在没有其他指针设备时开放桌面右半区控制中心入口；展开后恢复正常PIN判定。认证和实际连接状态不被伪造或重置。
+
+2026-11-21已使用匹配的原生KWin SDK编译并热加载 `sheng_desktop_touch_guard_07ab61dd7a95`，包为桌面1.0-8+native1/输入法0.2.1-11+native1。正常展开实际读取attached=true、folded=false、available=true；认证仍active且NRestarts=0，KWin/Plasma未重启。背折、展开往返和外部键鼠共存的实机验收尚未完成，不能把存在SW能力或编译成功当作物理检测通过。

@@ -171,7 +171,8 @@ public slots:
         else if(workspace()->showingDesktop()||(window&&window->isDesktop()))foreground="desktop";
         else if(window&&window->isAppletPopup())foreground="shell-popup";
         else if(window&&!window->isDock()&&!window->isDeleted()&&(window->isNormalWindow()||window->isDialog()))foreground="application";
-        return {{"integrationVersion",2},{"locked",locked},{"foreground",foreground},{"generation",qlonglong(m_keyboardGeneration)},{"physicalKeyboard",m_presence->keyboard()},{"physicalPointer",m_presence->pointer()}};
+        return {{"integrationVersion",2},{"locked",locked},{"foreground",foreground},{"generation",qlonglong(m_keyboardGeneration)},{"physicalKeyboard",m_presence->keyboard()},{"physicalPointer",m_presence->pointer()},
+            {"pinAttached",m_presence->pinAttached()},{"pinFoldedBack",m_presence->pinFolded()},{"pinAvailable",m_presence->pinAvailable()}};
     }
     void dockVisibility(bool hidden){m_dockHidden=hidden;if(hidden)clearRevealConstraint();else{m_hintTimer.stop();m_hint.reset();m_hintOutput=nullptr;}}
     QString GetStatus()const{return QString::fromUtf8(QJsonDocument(QJsonObject{{"scope","desktop-and-bottom-edge"},{"desktopPresses",m_presses},{"cancelledDrags",m_cancelCount},{"actions",m_actions},{"trackedPoints",m_contacts.size()},{"pointerPresent",m_pointer},{"drawerDockLinked",!m_drawer.isNull()&&!m_dock.isNull()},{"dockHidden",m_dockHidden},{"dockHintVisible",m_hint!=nullptr},{"bottomEdgePresses",m_edgePresses},{"dockReveals",m_reveals},{"dockOutsideDismissals",m_dismissals},{"dockHomeGestures",m_homeGestures}}).toJson(QJsonDocument::Compact));}

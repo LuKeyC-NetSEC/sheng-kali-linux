@@ -65,3 +65,7 @@ sudo reboot
 新模块的编译需要精确匹配的内核源码、配置和工具链。本次使用 `make LLVM=-21 olddefconfig` 与 `prepare modules_prepare` 准备源码树，在独立模块目录编译。该内核 `CONFIG_MODVERSIONS=n`，从运行中内核的 `__ksymtab_*` 列表取得导出符号及所属模块，生成不使用 CRC 的符号表；最终 83 个依赖全部匹配，构建不再有未解析符号警告。没有强制加载不匹配 ABI 的模块。
 
 旧的重绑定休眠脚本已停用；最终方案由驱动自身恢复保活与认证。此前导出的 rootfs/boot 镜像尚未重新打包此修复，重新安装旧镜像需另行安装该包。更换内核后需要重新编译，不能把此模块用于另一内核版本。
+
+## 背折与桌面输入状态
+
+当前固定主线驱动的 `nanosic_wn8030_hall_event()` 已接收SW_LID/SW_TABLET_MODE，`input_state_work()` 在平板姿态禁用PIN输入并在展开后恢复。官方参考仍为上述MiCode固定pogo源码；其中的连接/认证信息不能当作物理展开状态。此次背折接入复用现有霍尔路径，未修改或重载PIN模块、未重绑I²C/TEE，也不把背折当作电气拔出。桌面实现、诊断字段和未验证项见[原生输入检测](../desktop-touch-guard/README.md)。

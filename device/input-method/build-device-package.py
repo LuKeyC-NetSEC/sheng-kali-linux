@@ -68,10 +68,10 @@ for asset in (source/'ui').glob('*.toml'):
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(asset, destination)
 metadata='''Package: sheng-msime-integration
-Version: 0.2.1-10+native1
+Version: 0.2.1-11+native1
 Architecture: arm64
 Maintainer: Sheng tablet local setup
-Depends: kwin-wayland (= 4:6.7.4-2+sheng1), sheng-tablet-controls (= 1.0-7+native1), msime-linux (>= 0.16.1), fcitx5 (>= 5.1.23), libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
+Depends: kwin-wayland (= 4:6.7.4-2+sheng1), sheng-tablet-controls (>= 1.0-7+native1), sheng-tablet-controls (<< 1.1), msime-linux (>= 0.16.1), fcitx5 (>= 5.1.23), libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
 Description: Metasequoia input and touch keyboard integration for sheng
  Pinned Fcitx5 OSK with physical-keyboard suppression and KWin launcher.
 '''

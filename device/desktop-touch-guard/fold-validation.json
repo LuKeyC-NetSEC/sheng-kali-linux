@@ -1,0 +1,33 @@
+{
+  "checkedAtUTC": "2026-11-21T10:07:06+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "qt": "6.11.2+dfsg-5",
+  "nativeGuard": "sheng_desktop_touch_guard_07ab61dd7a95",
+  "installedPackages": {
+    "sheng-tablet-controls": "1.0-8+native1",
+    "sheng-msime-integration": "0.2.1-11+native1",
+    "sheng-dock-fix": "1.3-2"
+  },
+  "hardwareTabletSwitchRecognized": true,
+  "observedContext": {
+    "pinAttached": true,
+    "pinFoldedBack": false,
+    "pinAvailable": true,
+    "physicalKeyboard": true,
+    "physicalPointer": true
+  },
+  "kernelDriverReloaded": false,
+  "authenticationRebound": false,
+  "physicalFoldVerified": false,
+  "notVerified": [
+    "physical back-fold and unfold round trip",
+    "soft keyboard on a focused field while folded",
+    "independent USB/Bluetooth device coexistence"
+  ],
+  "artifacts": {
+    "sheng-tablet-controls_1.0-8+native1_arm64.deb": "5387d519e4d99e7401314585ac608142e2145931e8da01a80943cc2aeda3ba8f",
+    "sheng-msime-integration_0.2.1-11+native1_arm64.deb": "d4430c861467e5e67bf2640246ae7ba9e8dc33f2b9d19eb06a7d759db0d07b0a"
+  }
+}

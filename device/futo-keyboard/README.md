@@ -56,7 +56,7 @@ CARGO_BUILD_JOBS=2 cmake --build out/futo-osk-build --parallel 2
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5Osk
 DESTDIR="$PWD/out/futo-osk-stage" cmake --install out/futo-osk-build --component Fcitx5OskKwinLauncher
 python3 device/input-method/build-device-package.py out/futo-osk-stage \
-  out/packages/sheng-msime-integration_0.2.1-10+native1_arm64.deb
+  out/packages/sheng-msime-integration_0.2.1-11+native1_arm64.deb
 # 仅构建；待正常重新登录的维护窗口成组安装匹配原生组件。
 ```
 

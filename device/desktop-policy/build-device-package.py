@@ -79,7 +79,7 @@ with tempfile.TemporaryDirectory(prefix='sheng-tablet-controls-package-') as dir
         target.parent.mkdir(parents=True,exist_ok=True);target.write_text('<busconfig>\n</busconfig>\n')
     control = stage/'DEBIAN';control.mkdir()
     metadata='''Package: sheng-tablet-controls
-Version: 1.0-7+native1
+Version: 1.0-8+native1
 Architecture: arm64
 Conflicts: sheng-task-gestures
 Replaces: sheng-task-gestures

@@ -11,6 +11,7 @@ import re
 import shutil
 import stat
 import signal
+import hashlib
 import subprocess
 import sys
 
@@ -113,6 +114,7 @@ def main():
             arguments=(process/'cmdline').read_bytes().split(b'\0')
             if executable!=str(launcher) or b'--dbus-server' not in arguments:continue
             if (process/'exe').stat().st_ino==launcher.stat().st_ino:continue
+            if hashlib.sha256((process/'exe').read_bytes()).digest()==hashlib.sha256(launcher.read_bytes()).digest():continue
             identity=(process/'stat').read_text().rsplit(')',1)[1].split()[19]
             if (process/'stat').read_text().rsplit(')',1)[1].split()[19]!=identity:continue
             os.kill(int(process.name),signal.SIGTERM);retired_launchers+=1

@@ -8,7 +8,7 @@
     "shengdesktoppolicy.cpp": "1538d068e27efc8d5e64c06254babbda25bd30db9265beea20043b5cfd315b6a",
     "shengdesktoppolicy.h": "884fb04a0cc6fb25084617d4947aefb945c1a59012d687183f31950fb1538df4",
     "org.sheng.DesktopPolicy.service": "3a7a0fd39eba7ce923eccbd6c31ef84e490791b69dd2b881daa8cd83ff4ebcd3",
-    "migrate-installed.py": "2e593d58d08a931b556dc5332f2e38c4b6fe18da5f2af1c4dd71e87685a9ed69"
+    "migrate-installed.py": "2d85d422c4ac73a79cd2e93f3bbbdbdc9fb40eb530aa141909d227f85ca140cc"
   },
   "license": "Upstream Plasma/KDE notices retained; native integration GPL-2.0-or-later"
 }

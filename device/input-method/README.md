@@ -11,7 +11,7 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING OUTPUT.deb` 只打包已完成上游安装的ARM64 staging，并要求启动器的 `--sheng-native-version` 返回匹配接口版本。当前源码只生成 `0.2.1-10+native1` 原生版，依赖KWin输入API v1、上下文v2及匹配的原生桌面包。旧Python策略、服务和兼容分支已删除；安装不再启用它们。实机当前运行的0.2.1-9仍是此前已验证基线，新版尚待成组维护和实机验收。
+`build-device-package.py STAGING OUTPUT.deb` 只打包已完成上游安装的ARM64 staging，并要求启动器的 `--sheng-native-version` 返回匹配接口版本。当前源码只生成 `0.2.1-11+native1` 原生版，依赖KWin输入API v1、上下文v2及匹配的原生桌面包。旧Python策略、服务和兼容分支已删除；安装不再启用它们。实机当前运行的0.2.1-9仍是此前已验证基线，新版尚待成组维护和实机验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
@@ -53,7 +53,7 @@ cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INS
 CARGO_BUILD_JOBS=2 cmake --build out/osk-cmake --parallel 2
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
-python3 device/input-method/build-device-package.py out/osk-stage out/packages/sheng-msime-integration_0.2.1-10+native1_arm64.deb
+python3 device/input-method/build-device-package.py out/osk-stage out/packages/sheng-msime-integration_0.2.1-11+native1_arm64.deb
 # 保存应用并准备正常重新登录后，成组安装匹配的原生组件；此处不立即安装。
 # 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
 sheng-osk-mode float --font-defaults --sheng-ui

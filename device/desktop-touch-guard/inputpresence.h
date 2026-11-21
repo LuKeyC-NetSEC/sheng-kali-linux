@@ -15,6 +15,9 @@ public:
     explicit InputPresence(QObject *parent=nullptr);
     bool keyboard() const { return m_keyboard; }
     bool pointer() const { return m_pointer; }
+    bool pinAttached() const { return m_pinAttached; }
+    bool pinFolded() const { return m_pinFolded; }
+    bool pinAvailable() const { return m_pinAttached && !m_pinFolded; }
     void reconcile() { refresh(); }
 Q_SIGNALS:
     void changed();
@@ -29,4 +32,5 @@ private:
     QFileSystemWatcher m_paths;
     QTimer m_debounce;
     bool m_keyboard=false,m_pointer=false;
+    bool m_pinAttached=false,m_pinFolded=false;
 };
