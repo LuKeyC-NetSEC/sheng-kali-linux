@@ -52,7 +52,7 @@ qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.unloadEffect "$guard_id"
 
 源码为 GPL-3.0-or-later，许可证见仓库根 [LICENSE](../../LICENSE)。
 
-控制中心打开时，桌面上滑序列在初次按下即归控制中心所有，后续面板隐藏不会改变它；底边Dock入口也让位于控制中心。滑条与Wi-Fi/蓝牙列表由控制中心自己的保护区域处理，不会触发关闭。取消序列不会打开底层抽屉。对应跨组件回归场景见Plasma策略测试，实机触屏仍待复验。
+控制中心打开时，桌面上滑序列在初次按下即归控制中心所有，后续面板隐藏不会改变它；底边Dock入口也让位于控制中心。滑条与Wi-Fi/蓝牙列表由控制中心自己的保护区域处理，不会触发关闭。取消序列不会打开底层抽屉。对应跨组件回归场景见Plasma策略测试；2026-11-21用户已确认上滑只收起控制中心，滑条/列表保留各自操作。
 
 原生部署包已包含该插件，安装迁移工具会设置新ID并删除旧副本，不需另启用键盘/桌面策略服务。构建插件时使用新KWin包提取的SDK；部署包通过CMake安装阶段移除临时RPATH。
 
@@ -62,4 +62,11 @@ qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.unloadEffect "$guard_id"
 
 输入上下文v2新增 `pinAttached`、`pinFoldedBack`、`pinAvailable` 三个只读诊断字段。折回背部时可解除软键盘抑制，并在没有其他指针设备时开放桌面右半区控制中心入口；展开后恢复正常PIN判定。认证和实际连接状态不被伪造或重置。
 
-2026-11-21已使用匹配的原生KWin SDK编译并热加载 `sheng_desktop_touch_guard_07ab61dd7a95`，包为桌面1.0-8+native1/输入法0.2.1-11+native1。正常展开实际读取attached=true、folded=false、available=true；认证仍active且NRestarts=0，KWin/Plasma未重启。背折、展开往返和外部键鼠共存的实机验收尚未完成，不能把存在SW能力或编译成功当作物理检测通过。
+2026-11-21已使用匹配的原生KWin SDK编译并部署 `sheng_desktop_touch_guard_07ab61dd7a95`，包为桌面1.0-8+native1/输入法0.2.1-11+native1。用户正常重新登录后完成背折/展开验收：
+
+| 姿态 | 底层开关 | PIN上下文 | 有效实体输入 | 用户实测 |
+| --- | --- | --- | --- | --- |
+| 保持背折 | SW_TABLET_MODE=1 | attached=true、folded=true、available=false | keyboard=false、pointer=false | 触屏点应用输入框，软键盘自动弹出并能输入中文 |
+| 正常展开 | SW_TABLET_MODE=0 | attached=true、folded=false、available=true | keyboard=true、pointer=true | 实体键盘/触摸板恢复，触屏点输入框时软键盘保持收起 |
+
+两端分别读取只读开关快照和原生输入上下文；用户确认了实际操作。未记录连续切换时序或量化恢复延迟，不以此宣称长期稳定性。认证始终active/NRestarts=0，本次没有重绑硬件、重载驱动或再次重启会话。独立USB/蓝牙键鼠共存、锁屏内背折及挂起恢复仍未验证，详见 [fold-validation.json](fold-validation.json)。

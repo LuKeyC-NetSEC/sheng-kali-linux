@@ -20,14 +20,46 @@
   },
   "kernelDriverReloaded": false,
   "authenticationRebound": false,
-  "physicalFoldVerified": false,
+  "physicalFoldVerified": true,
   "notVerified": [
-    "physical back-fold and unfold round trip",
-    "soft keyboard on a focused field while folded",
-    "independent USB/Bluetooth device coexistence"
+    "independent USB/Bluetooth device coexistence",
+    "fold/unfold while locked",
+    "suspend/resume",
+    "long-term repeated transitions"
   ],
   "artifacts": {
     "sheng-tablet-controls_1.0-8+native1_arm64.deb": "5387d519e4d99e7401314585ac608142e2145931e8da01a80943cc2aeda3ba8f",
     "sheng-msime-integration_0.2.1-11+native1_arm64.deb": "d4430c861467e5e67bf2640246ae7ba9e8dc33f2b9d19eb06a7d759db0d07b0a"
-  }
+  },
+  "foldedStateVerified": true,
+  "rawTabletSwitchWhileFolded": true,
+  "observedContextWhileFolded": {
+    "pinAttached": true,
+    "pinFoldedBack": true,
+    "pinAvailable": false,
+    "physicalKeyboard": false,
+    "physicalPointer": false
+  },
+  "authenticationActive": true,
+  "authenticationRestarts": 0,
+  "unfoldedStateVerified": true,
+  "rawTabletSwitchWhileUnfolded": false,
+  "observedContextWhileUnfolded": {
+    "pinAttached": true,
+    "pinFoldedBack": false,
+    "pinAvailable": true,
+    "physicalKeyboard": true,
+    "physicalPointer": true
+  },
+  "userConfirmed": {
+    "foldedSoftKeyboardShowsAndInputsChinese": true,
+    "unfoldedKeyboardAndTouchpadWork": true,
+    "unfoldedSoftKeyboardRemainsHidden": true
+  },
+  "observationMethod": "Separate read-only switch/context snapshots in user-confirmed folded and unfolded postures, plus user functional confirmation",
+  "continuousTransitionTraceCaptured": false,
+  "latencyMeasured": false,
+  "userNormallyReloggedIn": true,
+  "sessionRestartedByAgentDuringValidation": false,
+  "postLoginValidatedAtUTC": "2026-11-21T10:47:34+00:00"
 }

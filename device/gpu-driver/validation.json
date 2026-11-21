@@ -7,12 +7,12 @@
   "qt": "6.11.2",
   "before": "26.1.6-1",
   "target": "26.3.1-1+sheng1",
-  "status": "installed_and_offscreen_verified",
+  "status": "installed_post_login_backend_verified",
   "kernelChanged": false,
   "sessionRestarted": false,
   "frequencyChanged": false,
   "unverified": [
-    "new-session desktop display",
+    "post-login visual behaviour in desktop and applications",
     "suspend/resume",
     "long-term stability",
     "performance and power consumption"
@@ -85,6 +85,16 @@
   },
   "originalPackagesBackedUp": 7,
   "sessionProcessesPreserved": true,
-  "desktopNewDriverLoaded": false,
-  "rollback": "Restore the seven original debs from the private installer backup, then normally log in again"
+  "desktopNewDriverLoaded": true,
+  "rollback": "Restore the seven original debs from the private installer backup, then normally log in again",
+  "userReloginVerified": true,
+  "postLoginCompositor": {
+    "type": "OpenGL",
+    "vendor": "freedreno",
+    "renderer": "FD740",
+    "version": "4.6 (Core Profile) Mesa 26.3.1",
+    "platform": "EGL",
+    "newMesaLibraryMapped": true
+  },
+  "postLoginValidatedAtUTC": "2026-11-21T10:47:34+00:00"
 }

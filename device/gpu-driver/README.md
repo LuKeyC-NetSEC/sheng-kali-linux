@@ -87,6 +87,10 @@ sudo apt-get --allow-downgrades --no-remove install /var/lib/sheng-mesa-backup/<
 Burp 和重新登录后的桌面显示需分别验收。测试前后记录 GPU governor 与频率范围；
 本测试器没有写入这些参数。
 
+2026-11-21用户正常重新登录后，KWin `supportInformation` 已实读 OpenGL 4.6 / Mesa 26.3.1 /
+Freedreno FD740 / EGL，进程映射的 Gallium 也为26.3.1；已确认新桌面加载新版库。
+这项后续检查不替代桌面/应用的人工视觉与挂起恢复验收。
+
 上游：[发布说明](https://docs.mesa3d.org/relnotes/26.3.1.html)、
 [安装与隔离测试](https://docs.mesa3d.org/install.html)、
 [Freedreno/Turnip](https://docs.mesa3d.org/drivers/freedreno.html)。
