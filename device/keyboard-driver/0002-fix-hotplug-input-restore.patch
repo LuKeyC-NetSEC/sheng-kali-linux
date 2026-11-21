@@ -1,0 +1,170 @@
+--- a/drivers/hid/hid-nanosic-wn8030.c
++++ b/drivers/hid/hid-nanosic-wn8030.c
+@@ -62,6 +62,9 @@
+ 
+ 	bool suspended;
+ 	bool keyboard_attached;
++	bool keyboard_data_ready;
++	u8 keyboard_status;
++	u64 input_restores;
+ 	bool userspace_angle_enabled;
+ 	bool input_enabled;
+ 	bool lid_closed;
+@@ -603,9 +606,11 @@
+ 	} else {
+ 		nanosic->auth_responses++;
+ 		dev_info(nanosic->dev, "keyboard authentication response submitted\n");
+-		mutex_lock(&nanosic->conn_mutex);
+-		nanosic_wn8030_sync_kbd_backlight(nanosic);
+-		mutex_unlock(&nanosic->conn_mutex);
++		/* Configuration sent before authentication may have been ignored by
++		 * the keyboard firmware. Reapply it asynchronously after the token,
++		 * without bypassing the firmware's authentication decision. */
++		schedule_work(&nanosic->input_state_work);
++		mod_delayed_work(system_percpu_wq, &nanosic->wake_worker, 0);
+ 	}
+ out:
+ 	WRITE_ONCE(nanosic->auth_request_pending, false);
+@@ -729,13 +734,15 @@
+ {
+ 	struct nanosic_wn8030 *nanosic = dev_get_drvdata(dev->parent);
+ 	return sysfs_emit(buf,
+-		"enabled=%u suspended=%u auth_open=%u requests=%llu responses=%llu keyboard=%llu touchpad=%llu\n",
++		"enabled=%u suspended=%u auth_open=%u requests=%llu responses=%llu keyboard=%llu touchpad=%llu data_ready=%u status=%u restores=%llu\n",
+ 		READ_ONCE(nanosic->input_enabled), READ_ONCE(nanosic->suspended),
+ 		READ_ONCE(nanosic->auth_open),
+ 		(unsigned long long)READ_ONCE(nanosic->auth_requests),
+ 		(unsigned long long)READ_ONCE(nanosic->auth_responses),
+ 		(unsigned long long)READ_ONCE(nanosic->keyboard_reports),
+-		(unsigned long long)READ_ONCE(nanosic->touchpad_reports));
++		(unsigned long long)READ_ONCE(nanosic->touchpad_reports),
++		READ_ONCE(nanosic->keyboard_data_ready), READ_ONCE(nanosic->keyboard_status),
++		(unsigned long long)READ_ONCE(nanosic->input_restores));
+ }
+ static DEVICE_ATTR_RO(input_stats);
+ 
+@@ -766,8 +773,27 @@
+ 	}
+ 	/* WN8012(KB) -> HOST, kb detect/attach state info */
+ 	else if (buf[5] == 0x38 && buf[6] == 0x80 && buf[7] == 0xa2) {
++		/* Xiaomi sheng-u-oss nanosic_platform.c: cmd_state must be OK;
++		 * physical attachment (1 or 3) and a usable data link (0x20)
++		 * are separate states. A changed link must not be ignored just
++		 * because the physical attachment did not change. */
++		bool attached = (buf[12] & 0x3) == 0x1 || (buf[12] & 0x3) == 0x3;
++		bool data_ready = attached && (buf[12] & 0x60) == 0x20;
++
++		if (buf[10] != 0)
++			return;
+ 		mutex_lock(&nanosic->conn_mutex);
+-		if (((buf[12] & 0x3) == 0x3) && !nanosic->keyboard_attached) {
++		nanosic->keyboard_status = buf[12];
++		if (data_ready != nanosic->keyboard_data_ready) {
++			nanosic->keyboard_data_ready = data_ready;
++			notify_plugin = true;
++			plugin_attached = data_ready;
++			if (data_ready) {
++				schedule_work(&nanosic->input_state_work);
++				mod_delayed_work(system_percpu_wq, &nanosic->wake_worker, 0);
++			}
++		}
++		if (attached && !nanosic->keyboard_attached) {
+ 			bool input_enabled = READ_ONCE(nanosic->input_enabled);
+ 
+ 			/* Caps LED state saved between reconnects by WN8030 */
+@@ -786,10 +812,12 @@
+ 				nanosic_wn8030_set_indicator_led(nanosic, 0xF3);
+ 			}
+ 			nanosic_wn8030_sync_kbd_backlight(nanosic);
+-			schedule_delayed_work(&nanosic->wake_worker, msecs_to_jiffies(12000));
++			mod_delayed_work(system_percpu_wq, &nanosic->wake_worker, 0);
++			if (READ_ONCE(nanosic->auth_open))
++				mod_delayed_work(system_percpu_wq, &nanosic->auth_start_work, 0);
+ 			notify_plugin = true;
+-			plugin_attached = true;
+-		} else if (((buf[12] & 0x3) == 0x0) && nanosic->keyboard_attached) {
++			plugin_attached = data_ready;
++		} else if (!attached && nanosic->keyboard_attached) {
+ 			cancel_delayed_work_sync(&nanosic->wake_worker);
+ 			nanosic->micmute_key_down = false;
+ 			if (nanosic->hid_keyboard) {
+@@ -808,9 +836,9 @@
+ 
+ 		if (notify_plugin) {
+ 			int ret;
+-			if (plugin_attached && READ_ONCE(nanosic->auth_open))
++			if (READ_ONCE(nanosic->keyboard_attached) && READ_ONCE(nanosic->auth_open))
+ 				mod_delayed_work(system_percpu_wq, &nanosic->auth_start_work, 0);
+-			else if (!plugin_attached) {
++			else if (!READ_ONCE(nanosic->keyboard_attached)) {
+ 				cancel_delayed_work(&nanosic->auth_start_work);
+ 				complete_all(&nanosic->auth_token_ready);
+ 			}
+@@ -822,7 +850,7 @@
+ 					"failed to notify keyboard plugin=%u: %d\n",
+ 					plugin_attached, ret);
+ 
+-			hinge_flags = plugin_attached ?
++			hinge_flags = READ_ONCE(nanosic->keyboard_attached) ?
+ 				NANOSIC_HINGE_SAMPLE_ATTACHED : 0;
+ 			nanosic_wn8030_publish_hinge(nanosic, hinge_flags,
+ 						     0, 0, 0);
+@@ -1205,7 +1233,11 @@
+ 	if (!nanosic->keyboard_attached || READ_ONCE(nanosic->suspended))
+ 		goto out;
+ 
++	/* Waking on attach/authentication must not wait for the periodic
++	 * 12-second keepalive. Reapply the touchpad/LED state afterwards. */
++	nanosic_wn8030_set_kb_power(nanosic, true);
+ 	nanosic_wn8030_set_touchpad(nanosic, enable);
++	nanosic->input_restores++;
+ 	if (enable) {
+ 		nanosic_wn8030_set_indicator_led(nanosic, caps_led);
+ 		nanosic_wn8030_set_indicator_led(nanosic, micmute_led);
+@@ -1493,6 +1525,22 @@
+ 
+ 	return sizeof(token);
+ }
++
++/* Delay systemd device readiness until firmware, input handlers and IRQs
++ * are ready. Merely creating the character node is not sufficient. */
++static ssize_t ready_show(struct device *dev, struct device_attribute *attr,
++			  char *buf)
++{
++	struct nanosic_wn8030 *nanosic = dev_get_drvdata(dev->parent);
++
++	return sysfs_emit(buf, "%u\n", READ_ONCE(nanosic->ready));
++}
++static DEVICE_ATTR_RO(ready);
++static struct attribute *nanosic_auth_attrs[] = {
++	&dev_attr_ready.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(nanosic_auth);
+ 
+ static const struct file_operations nanosic_auth_fops = {
+ 	.owner = THIS_MODULE,
+@@ -1577,6 +1625,7 @@
+ 	nanosic->auth_misc.name = "nanosic_auth";
+ 	nanosic->auth_misc.fops = &nanosic_auth_fops;
+ 	nanosic->auth_misc.parent = nanosic->dev;
++	nanosic->auth_misc.groups = nanosic_auth_groups;
+ 	ret = misc_register(&nanosic->auth_misc);
+ 	if (ret) {
+ 		dev_err(nanosic->dev, "failed to register misc device\n");
+@@ -1643,7 +1692,8 @@
+ 	}
+ 
+ 	WRITE_ONCE(nanosic->ready, true);
+-	dev_info(nanosic->dev, "shengfix v1: asynchronous auth and resume keepalive\n");
++	kobject_uevent(&nanosic->auth_misc.this_device->kobj, KOBJ_CHANGE);
++	dev_info(nanosic->dev, "shengfix v2: data-link state and immediate input restore\n");
+ 	if (READ_ONCE(nanosic->auth_open) && READ_ONCE(nanosic->keyboard_attached))
+ 		mod_delayed_work(system_percpu_wq, &nanosic->auth_start_work, 0);
+ 	return 0;
+@@ -1770,4 +1820,4 @@
+ MODULE_DESCRIPTION("HID driver for Nanosic WN8030 keyboard MCU");
+ MODULE_LICENSE("GPL v2");
+ 
+-MODULE_VERSION("1.2-shengfix");
++MODULE_VERSION("1.3.1-shengfix");

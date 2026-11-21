@@ -11,7 +11,7 @@
 
 ## 复现与策略
 
-`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-8` 保留 `-3` 的卸载回退、字体依赖与模式切换器，并支持 FUTO 英文入口。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
+`build-device-package.py STAGING GUARD OUTPUT.deb` 只打包**已完成上游安装的 staging**（含 `usr/bin/fcitx5-osk`、helper、service 及上游许可证），GUARD 为仓库 `scripts/keyboard-policy.py`。源码打包版本 `0.2.1-9` 保留此前卸载回退、字体依赖、模式切换器和FUTO入口，并直接包含基础策略服务及graphical-session启用链接；安装时显式启用当前用户服务，离线安装后也能随会话启动。2026-11-21 已安装并核对服务enabled/active，OSK ELF哈希保持不变。新原生 UI/UX 需用 `prepare-osk-ui.py --futo-ui` 构建；默认构建仍保留原界面。安装新版后仍按验证矩阵逐项验收。
 
 KWin 的 `Wayland/InputMethod` 指向 `/usr/share/applications/sheng-msime-fcitx5.desktop`，其 wrapper 进入 `sheng-msime-launcher`。热切换用 `kwriteconfig6 ... --notify`；只调用 reconfigure 不足以替换输入面板。
 
@@ -53,8 +53,8 @@ cmake -S out/osk-source -B out/osk-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INS
 CARGO_BUILD_JOBS=2 cmake --build out/osk-cmake --parallel 2
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5Osk
 DESTDIR="$PWD/out/osk-stage" cmake --install out/osk-cmake --component Fcitx5OskKwinLauncher
-python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
-sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-8_arm64.deb
+python3 device/input-method/build-device-package.py out/osk-stage scripts/keyboard-policy.py out/packages/sheng-msime-integration_0.2.1-9_arm64.deb
+sudo apt-get install ./out/packages/sheng-msime-integration_0.2.1-9_arm64.deb
 # 桌面用户、解锁状态下，启用布局和字体；只重新加载输入面板
 sheng-osk-mode float --font-defaults --sheng-ui
 # 切回底部停靠

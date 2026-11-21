@@ -8,7 +8,7 @@ output=$4
 [[ $(dpkg --print-architecture) == arm64 ]]
 kernel=$(modinfo -F vermagic "$module" | cut -d' ' -f1)
 [[ $kernel == 7.3.4-sm8550-00104-g87ac0f2347eb ]]
-[[ $(modinfo -F version "$module") == 1.2-shengfix ]]
+[[ $(modinfo -F version "$module") == 1.3.1-shengfix ]]
 kernel_package_version=$(dpkg-query -W -f='${Version}' linux-xiaomi-sheng)
 work=$(mktemp -d /tmp/sheng-dock-package.XXXXXX)
 trap 'rm -rf -- "$work"' EXIT
@@ -26,10 +26,11 @@ target.write_bytes(zstd.compress(data,level=19))
 assert zstd.decompress(target.read_bytes())==data
 PY
 install -m755 "$auth" "$work/usr/libexec/sheng-devauth"
-sed 's@/usr/local/libexec/sheng-devauth@/usr/libexec/sheng-devauth@' \
-    "$source_root/device/keyboard-auth/sheng-devauth.service" > "$work/etc/systemd/system/sheng-devauth.service"
+install -m644 "$source_root/device/keyboard-auth/sheng-devauth.service" "$work/etc/systemd/system/sheng-devauth.service"
 install -m644 "$source_root/device/keyboard-auth/80-sheng-devauth.rules" "$work/etc/udev/rules.d/80-sheng-devauth.rules"
 install -m644 "$source_root/device/keyboard-driver/0001-fix-auth-and-resume.patch" "$work/usr/share/doc/sheng-dock-fix/driver.patch"
+install -m644 "$source_root/device/keyboard-driver/0002-fix-hotplug-input-restore.patch" "$work/usr/share/doc/sheng-dock-fix/hotplug.patch"
+install -m644 "$source_root/device/keyboard-driver/provenance.json" "$work/usr/share/doc/sheng-dock-fix/provenance.json"
 install -m644 "$source_root/device/keyboard-auth/service-fixes.patch" "$work/usr/share/doc/sheng-dock-fix/auth.patch"
 dependency_license="$(dirname "$auth")/libs/LICENSE"
 if [[ ! -f $dependency_license ]]; then dependency_license=/usr/share/doc/sheng-dock-fix/dependency-license; fi
@@ -48,7 +49,7 @@ Original copies and prototype files are removed at the user's request.
 EOF
 cat > "$work/DEBIAN/control" <<EOF
 Package: sheng-dock-fix
-Version: 1.2-2
+Version: 1.3-2
 Section: kernel
 Priority: optional
 Architecture: arm64
@@ -86,4 +87,4 @@ exit 0
 EOF
 chmod 755 "$work/DEBIAN/postinst" "$work/DEBIAN/prerm" "$work/DEBIAN/postrm"
 (cd "$work" && find . -type f ! -path './DEBIAN/*' -print0 | sort -z | xargs -0 md5sum | sed 's@  \./@  @' > DEBIAN/md5sums)
-dpkg-deb --build --root-owner-group "$work" "$output/sheng-dock-fix_1.2-2_arm64.deb"
+dpkg-deb --build --root-owner-group "$work" "$output/sheng-dock-fix_1.3-2_arm64.deb"

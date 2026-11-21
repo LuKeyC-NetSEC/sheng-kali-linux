@@ -31,7 +31,7 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 
 - 原生 ARM64 Kali rolling、Plasma Wayland；触屏、USB RNDIS/SSH、CDC ACM 串口。
 - Adreno 740：Mesa freedreno OpenGL 与 Turnip Vulkan 共存；[GPU 监控](device/gpu-monitor/README.md) 和[实机对比](docs/gpu-efficiency-measurement.md)。
-- PIN 键盘/触摸板认证和唤醒修复；扬声器、音量键；Wi-Fi 上网与并发热点。
+- PIN 键盘/触摸板认证、即时唤醒与热插拔恢复，按设备就绪自动认证；扬声器、音量键；Wi-Fi 上网与并发热点。原生模块构建和保留电池提供者的增量安装器见[驱动说明](device/keyboard-driver/README.md)。
 - MiPPS 用户态认证已增量部署：原装充电器及拔插自动认证通过，固件报告120W上限；实际持续功率未测，基础镜像尚未自动集成。
 - 6 GiB Zstd ZRAM + 8 GiB swapfile；不额外划分 swap 分区。
 - 上方状态栏、底部自动隐藏 Dock、下滑控制中心、原生 Alt+Tab 三指选窗、单虚拟桌面。

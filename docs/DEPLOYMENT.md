@@ -61,9 +61,11 @@ Windows 使用 256 MB 分块，部分写入可能较久。保留 `flash-record.j
 PIN 先读 [驱动说明](../device/keyboard-driver/README.md)：
 
 - 精确内核源码 `ianchb/sm8550-mainline@87ac0f2347eb433933841e6854950dd90e96e6b2`、运行内核配置和 Clang 21.1.8-13；在源码根应用驱动 patch，执行 `make LLVM=-21 olddefconfig prepare modules_prepare`，编译相应模块。
+- 当前提供 `sudo python3 scripts/build-pin-driver.py` 自动下载验哈希、准备精确配置并在独立目录应用两个补丁，编译1.3.1模块；它检查83个既有导入、原内核导出和vermagic，不会加载或刷写。具体要求见驱动README。
 - `CONFIG_MODVERSIONS=n` 仍需匹配导出符号/配置。没有完整的精确构建树与符号表时不能强行加载；本仓库目前没有一键重建该模块的完整工具链封装。
 - 认证使用 `ianchb/sheng_devauth@bac03b5bcfefa1467ebad490edd910a6cef8a207`，应用 [service-fixes.patch](../device/keyboard-auth/service-fixes.patch)，遵循上游构建并链接其授权的依赖。
 - `bash scripts/build-dock-fix-package.sh MODULE AUTH_BINARY "$PWD" out/packages` **仅打包已编译、已验 ABI 的产物**。安装后用 `modinfo`/服务状态及真实输入验收，不重绑整条 I²C/TEE 链路。二进制依赖许可需另行确认。
+- 当前包为 `sheng-dock-fix_1.3-2_arm64.deb`。增量使用 `sudo python3 scripts/install-pin-driver.py PACKAGE --reload`，只卸载/重载PIN并检查电池提供者实例保留；不加 `--reload` 等下次正常启动。不要用 `modprobe -r` 连带卸载 `qcom_battmgr`，否则电池重建可能误报0%。
 
 热点后端已在基础镜像安装，SSID/随机新密码位于 `/etc/sheng-hotspot/`，不会从本仓库获取作者密码。`sudo systemctl start sheng-hotspot.service` 开启，`stop` 关闭；本地查看 `/etc/sheng-hotspot/access.txt`，不要提交该文件。热点使用 `sheng-ap` 虚拟 AP、hostapd、dnsmasq 和专用 nftables 表，保留原 wlan 上网连接。默认关闭，必须用另一设备连接并确认互联网访问。
 

@@ -1,0 +1,63 @@
+{
+  "checkedAtUTC": "2026-11-21T04:21:35+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "plasma": "6.7.4",
+  "qt": "6.11.2",
+  "packageVersion": "1.3-2",
+  "loadedModuleVersion": "1.3.1-shengfix",
+  "installedModuleMatchesBuild": true,
+  "installedModuleSha256": "1ca7acff6de7095d7cc839dd80cce843f15de6bc35f79872c2cbaffb9d8de869",
+  "loadedSrcversionMatchesInstalled": true,
+  "build": {
+    "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+    "compiler": "Debian clang version 21.1.8 (13)",
+    "moduleSha256": "1ca7acff6de7095d7cc839dd80cce843f15de6bc35f79872c2cbaffb9d8de869",
+    "version": "1.3.1-shengfix",
+    "verifiedImports": 83,
+    "configDifferences": [
+      "CONFIG_PAHOLE_HAS_BTF_TAG",
+      "CONFIG_PAHOLE_HAS_LANG_EXCLUDE",
+      "CONFIG_PAHOLE_VERSION"
+    ],
+    "kernelCommit": "87ac0f2347eb433933841e6854950dd90e96e6b2",
+    "loaded": false
+  },
+  "authReady": true,
+  "authenticationService": {
+    "ActiveState": "active",
+    "UnitFileState": "enabled",
+    "NRestarts": "0"
+  },
+  "oskPackageVersion": "0.2.1-9",
+  "oskElfSha256": "3e42c014389e44475dc1b1e05a233261fcedf1352ecb319334a82838822809c5",
+  "oskSessionEnableLink": true,
+  "userConfirmed": {
+    "sameConnectionRecovered": true,
+    "finalTwoHotplugsRecoveredQuickly": true,
+    "earlierV13DelayedRecoveryReported": true,
+    "poweredOffPlugOnlyShowsChargingScreen": true
+  },
+  "preciseEndToEndLatencyMs": null,
+  "batteryReloadCheck": {
+    "batteryProviderRetained": true,
+    "batteryPercentBefore": 90,
+    "batteryPercentAfter": 90
+  },
+  "checks": {
+    "nativeArm64Build": true,
+    "importSymbolsVerified": 83,
+    "systemdUnitVerify": true,
+    "udevRulesVerify": true,
+    "keyboardPolicyTestsPassed": 11
+  },
+  "notVerified": [
+    "cold boot after final patch",
+    "suspend/resume with final patch",
+    "long-term connector bounce",
+    "natural low-battery warning",
+    "independent off-state charging measurement"
+  ],
+  "rollback": "Private module/unit/rule backups under /var/lib/sheng-pin-installer; preserve qcom_battmgr when reloading PIN."
+}

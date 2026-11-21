@@ -30,11 +30,18 @@ for original,relative,mode in [
     (source/'sheng-msime-launcher','usr/libexec/sheng-msime-launcher',0o755),
     (source/'sheng-msime-fcitx5.desktop','usr/share/applications/sheng-msime-fcitx5.desktop',0o644),
     (source/'82-sheng-osk.rules','etc/udev/rules.d/82-sheng-osk.rules',0o644),
+    (source.parents[1]/'device/sheng-keyboard-policy.service','usr/lib/systemd/user/sheng-keyboard-policy.service',0o644),
     (guard,'usr/libexec/sheng-fcitx-keyboard-policy.py',0o644),
     (source/'50-msime-keyboard-policy.conf','usr/lib/systemd/user/sheng-keyboard-policy.service.d/50-msime.conf',0o644),
 ]:
     destination=stage/relative;destination.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(original,destination);destination.chmod(mode)
+wants=stage/'usr/lib/systemd/user/graphical-session.target.wants/sheng-keyboard-policy.service'
+wants.parent.mkdir(parents=True,exist_ok=True)
+if wants.is_symlink() and str(wants.readlink()) != '../sheng-keyboard-policy.service':
+    raise SystemExit('Unexpected session startup link in staging')
+if not wants.is_symlink():
+    wants.symlink_to('../sheng-keyboard-policy.service')
 control=stage/'DEBIAN';control.mkdir(exist_ok=True)
 for name in ['FUTO-LICENSE.md', 'futo-ui.patch', 'provenance.json']:
     original = source.parents[1]/'device/futo-keyboard'/name
@@ -46,7 +53,7 @@ for asset in (source/'ui').glob('*.toml'):
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(asset, destination)
 (control/'control').write_text('''Package: sheng-msime-integration
-Version: 0.2.1-8
+Version: 0.2.1-9
 Architecture: arm64
 Maintainer: Sheng tablet local setup
 Depends: msime-linux (>= 0.16.1), fcitx5 (>= 5.1.23), libc6 (>= 2.38), libgcc-s1, libssl3t64, libwayland-client0, libxkbcommon0, libfontconfig1, libegl1, libvulkan1, python3 (>= 3.11), python3-dbus, python3-gi, qdbus-qt6, xdg-desktop-portal, xdg-desktop-portal-kde, fontconfig, fonts-noto-cjk, fonts-materialdesignicons-legacy, fonts-noto-color-emoji
@@ -61,6 +68,7 @@ if [ "$1" = configure ]; then
     systemctl enable --now fcitx5-osk-key-helper.service
     if [ -S /run/user/1000/bus ]; then
         runuser -u kali -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user daemon-reload
+        runuser -u kali -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user enable sheng-keyboard-policy.service
         runuser -u kali -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user restart sheng-keyboard-policy.service
     fi
 fi

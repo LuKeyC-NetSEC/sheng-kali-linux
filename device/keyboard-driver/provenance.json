@@ -1,0 +1,13 @@
+{
+  "kernel_repository": "https://github.com/ianchb/sm8550-mainline",
+  "kernel_commit": "87ac0f2347eb433933841e6854950dd90e96e6b2",
+  "archive_url": "https://api.github.com/repos/ianchb/sm8550-mainline/tarball/87ac0f2347eb433933841e6854950dd90e96e6b2",
+  "archive_sha256": "82ee131717d86c290aeee52940770bed0c4f0c64575aa521d9db72b54b292bdd",
+  "driver_baseline_sha256": "39719de7377d1e1e06bb8113b6691da8c27f51f3a22db8a1941ae6173ae44eea",
+  "kernel_abi": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "compiler": "Debian clang version 21.1.8 (13)",
+  "official_reference_repository": "https://github.com/MiCode/Xiaomi_Kernel_OpenSource",
+  "official_reference_commit": "29db5d592c5b577aa9d9611da988a5e071d100dd",
+  "official_reference_branch": "sheng-u-oss",
+  "official_reference_path": "drivers/power/supply/pogoChg/extSOC/nanosic_platform.c"
+}

@@ -1,15 +1,15 @@
 [Unit]
 Description=Xiaomi sheng keyboard authentication
-After=systemd-udevd.service
+Requires=dev-tee0.device dev-nanosic_auth.device
+After=systemd-udevd.service dev-tee0.device dev-nanosic_auth.device
 ConditionPathExists=/dev/tee0
 ConditionPathExists=/dev/nanosic_auth
 ConditionPathExists=/usr/lib/firmware/qcom/sm8550/sheng/devauth.mbn
-StartLimitIntervalSec=30
-StartLimitBurst=5
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-ExecStart=/usr/local/libexec/sheng-devauth
+ExecStart=/usr/libexec/sheng-devauth
 Restart=always
 RestartSec=2
 NoNewPrivileges=yes
