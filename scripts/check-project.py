@@ -68,7 +68,7 @@ def main():
                         problems.append(name + ': broken local link: ' + relative)
         except (UnicodeError, SyntaxError, ValueError, ET.ParseError) as error:
             problems.append(name + ': parse error (' + type(error).__name__ + ')')
-    for component in ('power-management', 'kwin-integration', 'plasma-integration'):
+    for component in ('power-management', 'kwin-integration', 'plasma-integration', 'desktop-edit-policy'):
         native = PROJECT / 'device' / component / 'provenance.json'
         if not native.is_file():
             continue

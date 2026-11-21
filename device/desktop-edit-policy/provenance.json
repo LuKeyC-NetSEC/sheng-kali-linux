@@ -1,0 +1,16 @@
+{
+  "platform": "sheng arm64",
+  "plasma": "6.7.4",
+  "qt": "6.11.2+dfsg-5",
+  "sourceReferences": [
+    "plasma-desktop 4:6.7.4-1 containments/desktop/package/contents/ui/main.qml",
+    "plasma-workspace 4:6.7.4-2 components/containmentlayoutmanager/itemcontainer.cpp"
+  ],
+  "local_files": {
+    "CMakeLists.txt": "97aeeb7d93430b052099c2181d817409a209c6689039f0d3b7bbe392e2c4d608",
+    "policy.cpp": "b53ce8aef54f353fe8f37fae6ea342199dd1aa1029280518c059494734df3121",
+    "metadata.json": "c483a6cb5ace9d8e56eea0342da90d91faebd2727ad8401853c87881bc4b7a01",
+    "contents/ui/main.qml": "76af50d72768041d991f23764ac4ed6a2080bb2e4257a22342de70de7eda89fe"
+  },
+  "license": "GPL-3.0-or-later; KDE dependency notices retained"
+}

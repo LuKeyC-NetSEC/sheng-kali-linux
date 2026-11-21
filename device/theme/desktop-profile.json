@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAtUTC": "2026-11-21T07:15:58+00:00",
+  "capturedAtUTC": "2026-11-21T09:40:34+00:00",
   "platform": {
     "device": "sheng",
     "architecture": "arm64",
@@ -11,17 +11,18 @@
       "fonts-noto-cjk": "1:20240730+repack1-1",
       "fonts-noto-core": "20201225-6",
       "fonts-roboto": "2:3.016-1",
-      "kwin-wayland": "4:6.7.4-2+b1",
+      "kwin-wayland": "4:6.7.4-2+sheng1",
       "libpowerdevilcore2:arm64": "4:6.7.4-2+sheng2",
       "libqt6core6t64:arm64": "6.11.2+dfsg-5",
       "plasma-desktop": "4:6.7.4-1+b1",
-      "plasma-workspace": "4:6.7.4-2",
+      "plasma-workspace": "4:6.7.4-2+sheng1",
       "powerdevil": "4:6.7.4-2+sheng2",
       "powerdevil-data": "4:6.7.4-2+sheng2",
+      "sheng-desktop-edit-policy": "1.0-1",
       "sheng-dock-fix": "1.3-2",
       "sheng-futo-keyboard": "0.3.0-3",
-      "sheng-msime-integration": "0.2.1-9",
-      "sheng-tablet-controls": "1.0-5",
+      "sheng-msime-integration": "0.2.1-10+native1",
+      "sheng-tablet-controls": "1.0-7+native1",
       "xiaomi-mipps-auth": "0.21+sheng1"
     }
   },
@@ -755,8 +756,8 @@
           }
         },
         {
-          "role": "org.sheng.desktop-gesture#1",
-          "plugin": "org.sheng.desktop-gesture",
+          "role": "org.sheng.desktopeditpolicy#1",
+          "plugin": "org.sheng.desktopeditpolicy",
           "settings": {}
         }
       ],

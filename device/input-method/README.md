@@ -78,4 +78,4 @@ python3 scripts/prepare-osk-ui.py --futo-ui --output-dir out/osk-native-source
 bash scripts/build-native-launcher.sh out/osk-native-source
 ```
 
-这两条只准备源码、运行13项策略测试并编译启动器，不安装或重启。也可把 `prepare-native-launcher.py SOURCE` 应用到已核验的、尚未修改启动器的FUTO源码树，保留其UI和中文引擎。2026-11-21在sheng ARM64上13项测试与release编译通过，包含ScreenSaver提前锁定信号，防止合成器锁状态尚未更新时误弹普通面板；已安装原生启动器，须正常重新登录完成交接，实际中文、密码页、PIN热插拔仍待在用户方便时正常重新登录后验收。旧版仅保留在Git历史和设备私有回退包中。
+这两条只准备源码、运行13项策略测试并编译启动器，不安装或重启。也可把 `prepare-native-launcher.py SOURCE` 应用到已核验的、尚未修改启动器的FUTO源码树，保留其UI和中文引擎。2026-11-21在sheng ARM64上13项测试与release编译通过，包含ScreenSaver提前锁定信号，防止合成器锁状态尚未更新时误弹普通面板；已安装原生启动器并正常重新登录完成代码加载，实际中文、密码页、PIN热插拔仍待在用户方便时正常重新登录后验收。旧版仅保留在Git历史和设备私有回退包中。

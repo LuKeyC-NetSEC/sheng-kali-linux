@@ -42,17 +42,17 @@ WIDGETS = {
     'luisbocanegra.panel.colorizer': {'General': ['hideWidget', 'isEnabled', 'globalSettings']},
     'org.kontrol.center': {'Appearance': ['panelWidth', 'panelHeight', 'opacity', 'transparency', 'showButton', 'hideButton']},
     'org.sheng.linexin.launcher': {'General': ['appNameFormat', 'alphaSort', 'recentOrdering', 'showRecentApps', 'showRecentDocs', 'showRecentFolders', 'useExtraRunners', 'appsIconSize', 'favsIconSize', 'systemIconSize', 'categoryFontSize', 'dashboardFontSize', 'allAppsFontSize', 'recentAppsFontSize', 'recentFilesFontSize', 'animationDuration', 'iconEntranceDuration', 'hoverEffectDuration', 'folderPopupDuration', 'appLaunchDuration', 'dragMoveDuration', 'folderCreateDuration', 'folderAddDuration', 'folderRemoveDuration', 'backgroundOpacity', 'useCustomBackgroundColor', 'backgroundColor', 'defaultCategory', 'showActiveApps', 'showAllAppsInDashboard']},
-    'org.sheng.panel-style': {}, 'org.sheng.desktop-gesture': {},
+    'org.sheng.panel-style': {}, 'org.sheng.desktopeditpolicy': {},
     'Redmi.Clock': {'General': ['colorHex', 'boldfonts', 'showSeconds', 'fontSize', 'timeFormat', 'dateFormat', 'use24hFormat']},
 }
 OSK_KEYS = ['placement', 'landscape_width', 'portrait_width', 'default_font', 'default_nerd_font', 'default_landscape_layout', 'default_portrait_layout', 'theme', 'light_theme', 'dark_theme', 'ignore_fcitx_show']
-PACKAGES = ['kwin-wayland', 'plasma-workspace', 'plasma-desktop', 'powerdevil', 'libpowerdevilcore2', 'powerdevil-data', 'libqt6core6t64', 'sheng-tablet-controls', 'sheng-msime-integration', 'sheng-futo-keyboard', 'sheng-dock-fix', 'xiaomi-mipps-auth', 'fcitx5', 'fonts-noto-core', 'fonts-noto-cjk', 'fonts-materialdesignicons-legacy', 'fonts-roboto']
+PACKAGES = ['kwin-wayland', 'plasma-workspace', 'plasma-desktop', 'powerdevil', 'libpowerdevilcore2', 'powerdevil-data', 'libqt6core6t64', 'sheng-tablet-controls', 'sheng-msime-integration', 'sheng-futo-keyboard', 'sheng-desktop-edit-policy', 'sheng-dock-fix', 'xiaomi-mipps-auth', 'fcitx5', 'fonts-noto-core', 'fonts-noto-cjk', 'fonts-materialdesignicons-legacy', 'fonts-roboto']
 PRIVATE = re.compile(r'/(?:home|root|run/user|tmp|var/tmp)/|file://|\b[A-Za-z]:[\\/]|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}', re.I)
 STYLE_KEY = re.compile(r'password|secret|token|path|filename|image|url|uri|uuid|latitude|longitude|location|cache', re.I)
 
 
 def canonical(plugin):
-    for prefix in ['org.sheng.linexin.launcher', 'org.sheng.panel-style', 'org.sheng.desktop-gesture']:
+    for prefix in ['org.sheng.linexin.launcher', 'org.sheng.panel-style', 'org.sheng.desktopeditpolicy']:
         if plugin == prefix or plugin.startswith(prefix + '.'):
             return prefix
     return plugin

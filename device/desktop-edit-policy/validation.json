@@ -1,0 +1,29 @@
+{
+  "checkedAtUTC": "2026-11-21T09:41:21+00:00",
+  "device": "sheng",
+  "architecture": "arm64",
+  "plasma": "6.7.4",
+  "qt": "6.11.2+dfsg-5",
+  "package": "sheng-desktop-edit-policy 1.0-1",
+  "pluginId": "org.sheng.desktopeditpolicy.48e80f90b962",
+  "nativeStatus": {
+    "automaticEdit": false,
+    "explicitEditing": false,
+    "layouts": 1,
+    "containers": 3,
+    "layoutConditions": [
+      1
+    ]
+  },
+  "sameKwinProcessRetained": true,
+  "samePlasmaProcessRetained": true,
+  "userConfirmed": {
+    "ordinaryTouchDoesNotEnterEditing": true,
+    "explicitManualEditingWorks": true
+  },
+  "packageSha256": "92ba0c121c0731a532f55a577bd91482786f119da58d07aede179fced7240881",
+  "notVerified": [
+    "cold-login initialization",
+    "long-duration touch use"
+  ]
+}

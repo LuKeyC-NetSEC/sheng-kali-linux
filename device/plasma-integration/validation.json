@@ -1,5 +1,5 @@
 {
-  "checkedAtUTC": "2026-11-21T08:58:03+00:00",
+  "checkedAtUTC": "2026-11-21T09:37:40+00:00",
   "device": "sheng",
   "architecture": "arm64",
   "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
@@ -163,7 +163,7 @@
   "guardId": "sheng_desktop_touch_guard_96793da01c9e",
   "guardBuiltAgainstNativeSdk": true,
   "rollback": "Private original packages/configuration in /var/lib/sheng-native-session; restore during a normal logged-out maintenance window",
-  "runningKwinNativeApi": 0,
-  "runningInputContextApi": 0,
-  "requiresNormalLogin": true
+  "runningKwinNativeApi": 1,
+  "runningInputContextApi": 2,
+  "requiresNormalLogin": false
 }

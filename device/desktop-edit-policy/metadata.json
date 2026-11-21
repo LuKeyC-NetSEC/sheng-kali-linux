@@ -1,0 +1,13 @@
+{
+  "KPackageStructure": "Plasma/Applet",
+  "KPlugin": {
+    "Id": "@POLICY_ID@",
+    "Name": "Sheng native desktop editing policy",
+    "Description": "Explicit desktop editing through Plasma's native layout API",
+    "Version": "1.0",
+    "License": "GPL-3.0-or-later",
+    "Category": "System Information"
+  },
+  "NoDisplay": true,
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

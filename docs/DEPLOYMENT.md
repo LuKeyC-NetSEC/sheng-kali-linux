@@ -114,6 +114,8 @@ python3 device/desktop-policy/build-device-package.py out/bin/sheng-privacy-bpf 
 
 隐私开关默认为允许访问；先读 [拦截范围](../device/privacy/README.md)。root 运行 `/usr/libexec/sheng-privacyctl off` 可恢复；本地活跃用户通过 `sheng-privacy on/off` 请求有限权限。冻结既有采集进程可能暂停整个相关应用，验收使用测试进程。
 
+触屏防误入编辑使用[桌面原生策略](../device/desktop-edit-policy/README.md)，同时覆盖布局触摸与部件的合成鼠标长按入口。编译并打包 `sheng-desktop-edit-policy 1.0-1` 后安装，可在当前Plasma中加载，无须为此退出用户会话。
+
 ### 4. 控制中心
 
 构建主机或平板需 Python 3 和 Git，无需本地秘密缓存：
