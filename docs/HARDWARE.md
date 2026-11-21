@@ -9,7 +9,7 @@
 | 内核源码 | `ianchb/sm8550-mainline@87ac0f2347eb433933841e6854950dd90e96e6b2` | 工具链 Clang 21.1.8-13、相同配置/导出符号 |
 | Plasma/KWin | 6.7.4，Wayland | QML 效果及内部面板对象依赖此接口，升级需复测 |
 | 原生网络 applet | `plasma-nm 4:6.7.4-2+b1` | 补丁包严格绑定此 Debian 包版本 |
-| 图形 | Adreno 740、Mesa 26.1.6、主线 drm/msm | freedreno GL、Turnip Vulkan；无 Android KGSL |
+| 图形 | Adreno 740、Mesa `26.3.1-1+sheng1`、主线 drm/msm | 用户态源码增量已部署；freedreno GL、Turnip Vulkan；无 Android KGSL；桌面合成器下次正常登录加载 |
 | 触屏 | `xiaomi-sheng-thp 0.3.9`、libssc | 固定资产与哈希见 sources.json |
 | PIN | `sheng-dock-fix 1.3-2`、模块 `1.3.1-shengfix` | 必须配合安全存储认证服务 |
 | 电源 | PowerDevil `4:6.7.4-2+sheng1` 原生C++适配 | 与Qt 6.11.2及匹配核心库/data一起部署 |

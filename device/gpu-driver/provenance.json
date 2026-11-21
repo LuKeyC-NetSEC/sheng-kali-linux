@@ -1,0 +1,45 @@
+{
+  "version": "26.3.1",
+  "packageVersion": "26.3.1-1+sheng1",
+  "upstream": {
+    "url": "https://archive.mesa3d.org/mesa-26.3.1.tar.xz",
+    "sha256": "4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961",
+    "releaseNotes": "https://docs.mesa3d.org/relnotes/26.3.1.html"
+  },
+  "packaging": {
+    "baseUrl": "https://kali.download/kali/pool/main/m/mesa/",
+    "version": "26.1.6-1",
+    "archives": {
+      "mesa_26.1.6-1.dsc": "062f1fe5cefd6d727bc13aea8733576d886c06297a9c6a3eadf75883128604c0",
+      "mesa_26.1.6-1.debian.tar.xz": "a2dae75b794d1b2d7f40f25a8ef0952c35dd42debbf0d557cb5f959df4b25249"
+    }
+  },
+  "galliumDrivers": [
+    "freedreno",
+    "zink",
+    "llvmpipe",
+    "softpipe"
+  ],
+  "vulkanDrivers": [
+    "freedreno",
+    "swrast"
+  ],
+  "kernelDrivers": [
+    "msm"
+  ],
+  "packages": [
+    "libgbm1",
+    "libgbm-dev",
+    "libegl-mesa0",
+    "libglx-mesa0",
+    "libgl1-mesa-dri",
+    "mesa-common-dev",
+    "mesa-libgallium",
+    "mesa-vulkan-drivers"
+  ],
+  "local_files": {
+    "rules": "bfc6700086f41f05255573c5477947ff6b6c1081335f85451e3912f0dbedb603",
+    "src_glx_dri_common.h.diff": "f89b4113b5fee00273c27e0dbee5ee9156e967e08bd9a5d237ef678dc5516c15",
+    "0001-gallivm-linux-arm64-runtime-features.patch": "df3abe5e7a5df1b7cbb22d2a9c75f40886990f0f8de87196baa9650d8223836f"
+  }
+}

@@ -1,0 +1,43 @@
+#!/usr/bin/make -f
+# SPDX-License-Identifier: GPL-3.0-or-later
+# sheng-specific Mesa build, based on Debian mesa debian/rules.
+# Original Debian rules: Copyright 2006 Thierry Reding <thierry@gilfi.de>.
+include /usr/share/dpkg/pkg-info.mk
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+export PATH := /usr/lib/llvm-21/bin/:$(PATH)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all optimize=-lto
+export DEB_CFLAGS_MAINT_APPEND = -Wall
+export DEB_CXXFLAGS_MAINT_APPEND = -Wall
+
+%:
+	dh $@ --builddirectory=build --buildsystem=meson
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-Dplatforms=x11,wayland -Dglvnd=enabled \
+		-Dgallium-drivers=freedreno,zink,llvmpipe,softpipe \
+		-Dvulkan-drivers=freedreno,swrast -Dfreedreno-kmds=msm \
+		-Dvulkan-layers=device-select,overlay,screenshot \
+		-Dvulkan-manifest-per-architecture=false \
+		-Dllvm=enabled -Dshared-llvm=enabled \
+		-Dgallium-rusticl=false -Dteflon=false \
+		-Dgallium-va=disabled \
+		-Dgles1=disabled -Dgles2=enabled -Dglx=dri -Dgbm=enabled \
+		-Ddri-drivers-path=/usr/lib/$(DEB_HOST_MULTIARCH)/dri \
+		-Dbuild-tests=true -Db_ndebug=true -Dtools= -Dvalgrind=disabled
+
+override_dh_auto_install:
+	dh_auto_install
+	for file in debian/*.links.in; do \
+		sed -e 's,$${DEB_HOST_MULTIARCH},$(DEB_HOST_MULTIARCH),g' $$file > $${file%%.in}; \
+	done
+
+override_dh_install:
+	rm debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libEGL_mesa.so
+	rm debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libGLX_mesa.so
+	install -d debian/libgl1-mesa-dri/usr/lib/$(DEB_HOST_MULTIARCH)/dri
+	mv debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/dri/*_dri.so debian/libgl1-mesa-dri/usr/lib/$(DEB_HOST_MULTIARCH)/dri/
+	dh_install
+
+override_dh_makeshlibs:
+	dh_makeshlibs -a -- -c4

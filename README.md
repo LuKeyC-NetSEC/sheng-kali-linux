@@ -23,6 +23,7 @@
 | 原生C++电源策略、构建与回退 | [PowerDevil适配](device/power-management/README.md) |
 | 既有脚本的源码归属、原生迁移与待验项 | [源码迁移记录](docs/NATIVE_SOURCE_MIGRATION.md) |
 | 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
+| Mesa 稳定版同步、隔离验证和整套回退 | [GPU 驱动增量](device/gpu-driver/README.md) |
 | 已验证功能、未完成项、验收方法 | [验证状态](docs/VALIDATION.md) |
 | 第三方来源与许可 | [THIRD_PARTY.md](THIRD_PARTY.md) |
 | 修改与提交 | [CONTRIBUTING.md](CONTRIBUTING.md) |

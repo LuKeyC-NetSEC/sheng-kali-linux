@@ -5,6 +5,7 @@
 | 组件 | 固定来源/入口 | 许可与分发说明 |
 | --- | --- | --- |
 | Linux sheng | [ianchb/sm8550-mainline](https://github.com/ianchb/sm8550-mainline)，commit `87ac0f2347eb433933841e6854950dd90e96e6b2` | 驱动补丁遵循 GPL-2.0-only；不随仓库提交内核二进制 |
+| Mesa Freedreno/Turnip | [Mesa 26.3.1](https://docs.mesa3d.org/relnotes/26.3.1.html) / Kali-Debian 打包26.1.6-1；固定归档见 [GPU provenance](device/gpu-driver/provenance.json) | 上游各文件多为 MIT、亦含其他许可；保留 Mesa 与 Debian copyright、许可证及发行版补丁，打包规则保留 Thierry Reding 版权；仓库只提供构建适配，不提交 ELF |
 | 固件/触屏/硬件库 | [sources.json](configs/sources.json) 内固定提交、下载和哈希 | 各上游许可；构建时获取，不把缓存打包入源仓库 |
 | Debian sheng 音频适配 | [alghiffaryfa19/debian-sheng](https://github.com/alghiffaryfa19/debian-sheng) | 固定来源见 sources.json，保留上游声明 |
 | PIN 认证 | [ianchb/sheng_devauth](https://github.com/ianchb/sheng_devauth)，`bac03b5bcfefa1467ebad490edd910a6cef8a207` | patch与上游依赖分开；静态依赖含各自 libs/LICENSE，重新分发前核查 |

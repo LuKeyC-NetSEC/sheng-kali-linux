@@ -1,0 +1,28 @@
+Description: LLVM 21 ARM64 JIT must explicitly disable absent SVE/RNG
+ LLVM 21 only records present Linux cpuinfo features (except crypto). An ARMv9
+ CPU name can therefore re-enable SVE even when the kernel does not expose it.
+ This follows LLVM 22.1.8 Host.cpp's missing-feature correction at the Mesa
+ client boundary; it affects software JIT only, with no GPU driver changes.
+ Reference: https://github.com/llvm/llvm-project/blob/llvmorg-22.1.8/llvm/lib/TargetParser/Host.cpp
+Author: Sheng Linux contributors
+Forwarded: no
+--- a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
++++ b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+@@ -330,6 +330,17 @@
+       llvm::sys::getHostCPUFeatures(features);
+    #endif
+ 
++#if DETECT_ARCH_AARCH64 && defined(__linux__) && LLVM_VERSION_MAJOR == 21
++   /* LLVM 21 omits absent SVE/RNG from its Linux feature map. Otherwise the
++    * detected CPU model may enable instructions unavailable to this process.
++    * Match LLVM 22's runtime correction before constructing target attributes.
++    */
++   if (features.find("sve") == features.end())
++      features["sve"] = false;
++   if (features.find("rand") == features.end())
++      features["rand"] = false;
++#endif
++
+    for (auto f = features.begin();
+         f != features.end();
+         ++f) {

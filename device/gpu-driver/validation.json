@@ -1,0 +1,90 @@
+{
+  "device": "Xiaomi Pad 6S Pro 12.4 / sheng",
+  "architecture": "arm64",
+  "date": "2026-11-21",
+  "kernel": "7.3.4-sm8550-00104-g87ac0f2347eb",
+  "plasma": "6.7.4",
+  "qt": "6.11.2",
+  "before": "26.1.6-1",
+  "target": "26.3.1-1+sheng1",
+  "status": "installed_and_offscreen_verified",
+  "kernelChanged": false,
+  "sessionRestarted": false,
+  "frequencyChanged": false,
+  "unverified": [
+    "new-session desktop display",
+    "suspend/resume",
+    "long-term stability",
+    "performance and power consumption"
+  ],
+  "upstreamTestGroups": {
+    "passed": 55,
+    "failed": 0
+  },
+  "initialTestFailure": {
+    "groups": 3,
+    "signal": "SIGILL",
+    "instruction": "SVE2 bsl2n",
+    "resolution": "LLVM 21 missing SVE/RNG runtime features explicitly disabled, following LLVM 22.1.8"
+  },
+  "recipeReproduced": true,
+  "packageArtifacts": {
+    "libegl-mesa0": "26e40eca053e4736cd8cfc4fe73afaa8e9eac85bcd025e6d6550daf0541e4a3b",
+    "libgbm-dev": "22ee92aa3f7cd9bab4d76081d4119817a87a27ad73746b8a250694967f9157d6",
+    "libgbm1": "a658536f3603694c92f6454ea053d11adf5d4b79a9e9bdd74424422820bd3cc2",
+    "libgl1-mesa-dri": "7fb13b75b5a397a91f4ec7789155eb0b165308cd95bd1bd948d6a80bebda29fe",
+    "libglx-mesa0": "24f1471f6ddabbe586ba6354567a25912b002e6b602821d1e19cd118eae563d1",
+    "mesa-common-dev": "5084dcb27e8d7f4e0d7cf77bdd9125f207741ee7f4740524b20b9e4d33147c8e",
+    "mesa-libgallium": "2650f45c8b9f2e34b3f45e8c9f61e0076998e20bda86b2d4d9a28141e4d77e2a",
+    "mesa-vulkan-drivers": "5dd067da55b6385c10a343c458ed04d1c9d55b1b11e4f3078e3c9572f273dbbb"
+  },
+  "installedPackages": [
+    "libegl-mesa0",
+    "libgbm-dev",
+    "libgbm1",
+    "libgl1-mesa-dri",
+    "libglx-mesa0",
+    "mesa-libgallium",
+    "mesa-vulkan-drivers"
+  ],
+  "stageSmoke": {
+    "freedreno": {
+      "renderer": "FD740",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    },
+    "turnip": {
+      "renderer": "Turnip Adreno (TM) 740",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    },
+    "zink": {
+      "renderer": "zink Vulkan 1.4(Turnip Adreno (TM) 740 (MESA_TURNIP))",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    }
+  },
+  "installedSmoke": {
+    "freedreno": {
+      "renderer": "FD740",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    },
+    "turnip": {
+      "renderer": "Turnip Adreno (TM) 740",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    },
+    "zink": {
+      "renderer": "zink Vulkan 1.4(Turnip Adreno (TM) 740 (MESA_TURNIP))",
+      "sha256": "e34412248f6d666a2fc8f18c444e1e0bfdf6009bfa03a3e354e959c6bdaebdfa"
+    }
+  },
+  "identicalReadback": true,
+  "gl": "OpenGL 4.6 / OpenGL ES 3.2 / Mesa 26.3.1",
+  "vulkan": "Turnip Adreno 740 / Mesa 26.3.1",
+  "gpuPolicyBeforeAndAfter": {
+    "governor": "simple_ondemand",
+    "minHz": 220000000,
+    "maxHz": 680000000
+  },
+  "originalPackagesBackedUp": 7,
+  "sessionProcessesPreserved": true,
+  "desktopNewDriverLoaded": false,
+  "rollback": "Restore the seven original debs from the private installer backup, then normally log in again"
+}

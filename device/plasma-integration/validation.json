@@ -150,12 +150,17 @@
   "hardwareRebound": false,
   "originalPackagesBackedUp": 25,
   "legacySourceImplementationsRemoved": true,
-  "actualTouchAndInputVerified": false,
+  "actualTouchAndInputVerified": true,
+  "userConfirmedOn20261121": [
+    "control center upward swipe closes it without opening drawer",
+    "brightness/volume sliders and Wi-Fi/Bluetooth lists retain their actions",
+    "PIN Chinese input and touchpad work",
+    "app fields open the soft keyboard after disconnecting PIN",
+    "desktop upward swipe opens drawer without focusing search or opening keyboard"
+  ],
   "notVerified": [
-    "new PIN keyboard/touchpad gesture path",
-    "soft keyboard on app and secure password page",
-    "control-center swipe conflict and protected lists/sliders",
-    "drawer search focus without keyboard",
+    "native three-finger selection gesture on the complete stack",
+    "secure password page on the complete native stack",
     "Dock transitions on the complete native stack",
     "suspend/resume on the complete native stack"
   ],

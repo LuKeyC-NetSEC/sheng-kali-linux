@@ -1,0 +1,12 @@
+Description: Preserve Debian standalone GLX header typedef with 26.3.1 context
+Origin: Debian mesa 26.1.6-1, src_glx_dri_common.h.diff
+Forwarded: not-needed
+--- a/src/glx/dri_common.h
++++ b/src/glx/dri_common.h
+@@ -57,2 +57,6 @@
++#ifndef __GLXDRIdrawable
++typedef struct __GLXDRIdrawableRec __GLXDRIdrawable;
++#endif
++
+ extern __GLXDRIdrawable *
+ driFetchDrawable(struct glx_context *gc, GLXDrawable glxDrawable);
