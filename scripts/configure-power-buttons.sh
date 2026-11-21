@@ -3,7 +3,8 @@ set -euo pipefail
 for profile in AC Battery LowBattery; do
     # Short press locks the session on every power source.
     kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerButtonAction 32
-    kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerDownAction 8
+    # KWin emits PowerDown for a long hold; use Plasma's native power menu.
+    kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key PowerDownAction 16
     kwriteconfig6 --file powerdevilrc --group "$profile" --group SuspendAndShutdown --key SleepMode 1
     if [[ $profile == AC ]]; then idle_minutes=60; suspend_action=0; else idle_minutes=30; suspend_action=1; fi
     idle_seconds=$((idle_minutes * 60))
@@ -20,7 +21,9 @@ kwriteconfig6 --file kscreenlockerrc --group Daemon --key Autolock true
 kwriteconfig6 --file kscreenlockerrc --group Daemon --key Timeout 60
 kwriteconfig6 --file kscreenlockerrc --group Daemon --key LockGrace 0
 if [[ ${1:-} != --config-only ]]; then
-    systemctl --user restart plasma-powerdevil.service
+    # reparseConfiguration() alone leaves the active profile's button actions
+    # cached. refreshStatus() also calls loadProfile(true), without a restart.
+    qdbus6 org.kde.Solid.PowerManagement /org/kde/Solid/PowerManagement org.kde.Solid.PowerManagement.refreshStatus
     profile=$(qdbus6 org.kde.Solid.PowerManagement /org/kde/Solid/PowerManagement org.kde.Solid.PowerManagement.currentProfile)
     if [[ $profile == AC ]]; then idle_minutes=60; else idle_minutes=30; fi
     /usr/libexec/sheng-set-screen-lock-timeout "$idle_minutes"

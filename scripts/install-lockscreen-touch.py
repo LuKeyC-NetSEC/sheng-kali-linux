@@ -33,6 +33,7 @@ def main():
         target.unlink()
         subprocess.run(['dpkg-divert', '--local', '--remove', '--rename', str(target)], check=True)
         (target.parent / 'ShengClock.qml').unlink(missing_ok=True)
+        (target.parent / 'ShengVirtualKeyboard.qml').unlink(missing_ok=True)
         print('Restored the KDE lockscreen. Applies to the next greeter; no session was restarted.')
         return
     baseline = distributed if distributed.exists() else target
@@ -51,8 +52,9 @@ def main():
     shutil.copy2(target, backup / target.name)
     if not distributed.exists():
         subprocess.run(['dpkg-divert', '--local', '--add', '--rename', str(target)], check=True)
-    shutil.copyfile(source / 'ShengClock.qml', target.parent / 'ShengClock.qml')
-    (target.parent / 'ShengClock.qml').chmod(0o644)
+    for name in ('ShengClock.qml', 'ShengVirtualKeyboard.qml'):
+        shutil.copyfile(source / name, target.parent / name)
+        (target.parent / name).chmod(0o644)
     temporary = target.with_suffix('.qml.sheng-new')
     temporary.write_bytes(patched)
     temporary.chmod(0o644)

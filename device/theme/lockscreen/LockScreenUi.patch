@@ -1,6 +1,63 @@
 --- a/LockScreenUi.qml
 +++ b/LockScreenUi.qml
-@@ -118,10 +118,12 @@
+@@ -17,6 +17,7 @@
+ import org.kde.kscreenlocker as ScreenLocker
+ 
+ import org.kde.plasma.private.sessions
++import org.kde.plasma.workspace.keyboardlayout as Keyboards
+ import org.kde.breeze.components
+ 
+ Item {
+@@ -79,7 +80,8 @@
+         }
+         function onPromptForSecretChanged(msg) {
+             mainBlock.showPassword = false;
+-            mainBlock.mainPasswordBox.forceActiveFocus();
++            if (lockScreenRoot.uiVisible) mainBlock.mainPasswordBox.forceActiveFocus();
++            else Qt.inputMethod.hide();
+         }
+     }
+ 
+@@ -107,9 +109,37 @@
+     MouseArea {
+         id: lockScreenRoot
+ 
++        function syncPasswordKeyboard() {
++            if (!uiVisible) {
++                mainBlock.mainPasswordBox.focus = false;
++                lockScreenRoot.forceActiveFocus();
++                inputPanel.state = "hidden";
++                Qt.inputMethod.hide();
++            } else if (mainStack.depth === 1 && mainBlock.enabled) {
++                mainBlock.mainPasswordBox.forceActiveFocus();
++                Qt.inputMethod.update(Qt.ImEnabled | Qt.ImHints);
++                // Plasma 6.7 exposes mode, not the removed enabled property.
++                // Never=0 is maintained by the physical-keyboard policy.
++                if (Keyboards.KWinVirtualKeyboard.mode !== 0 && Keyboards.KWinVirtualKeyboard.available
++                        && inputPanel.status === Loader.Ready) {
++                    inputPanel.state = "visible";
++                    Qt.inputMethod.show();
++                } else {
++                    inputPanel.state = "hidden";
++                    Qt.inputMethod.hide();
++                }
++            }
++        }
++
++        Connections {
++            target: Keyboards.KWinVirtualKeyboard
++            function onModeChanged() { Qt.callLater(lockScreenRoot.syncPasswordKeyboard); }
++            function onAvailableChanged() { Qt.callLater(lockScreenRoot.syncPasswordKeyboard); }
++        }
++
+         property bool uiVisible: false
+         property bool seenPositionChange: false
+-        property bool blockUI: containsMouse && (mainStack.depth > 1 || mainBlock.mainPasswordBox.text.length > 0 || inputPanel.keyboardActive)
++        property bool blockUI: containsMouse && (mainStack.depth > 1 || mainBlock.mainPasswordBox.text.length > 0 || (uiVisible && inputPanel.keyboardActive))
+ 
+         x: parent.x
+         y: parent.y
+@@ -118,12 +148,15 @@
          hoverEnabled: true
          cursorShape: uiVisible ? Qt.ArrowCursor : Qt.BlankCursor
          drag.filterChildren: true
@@ -16,8 +73,23 @@
 +            }
          }
          onUiVisibleChanged: {
++            Qt.callLater(syncPasswordKeyboard);
              if (uiVisible) {
-@@ -210,7 +212,7 @@
+                 Window.window.requestActivate();
+             }
+@@ -194,7 +227,10 @@
+             duration: Kirigami.Units.veryLongDuration * 2
+         }
+ 
+-        Component.onCompleted: launchAnimation.start();
++        Component.onCompleted: {
++            launchAnimation.start();
++            Qt.callLater(syncPasswordKeyboard);
++        }
+ 
+         WallpaperFader {
+             anchors.fill: parent
+@@ -210,7 +246,7 @@
              id: clockShadow
              anchors.fill: clock
              source: clock
@@ -26,7 +98,7 @@
              radius: 7
              verticalOffset: 0.8
              samples: 15
-@@ -225,13 +227,40 @@
+@@ -225,13 +261,40 @@
              }
          }
  
@@ -70,3 +142,40 @@
          }
  
          ListModel {
+@@ -327,7 +390,27 @@
+             }
+         }
+ 
++        Binding {
++            target: mainBlock.mainPasswordBox
++            property: "enabled"
++            value: lockScreenRoot.uiVisible && !authenticator.graceLocked
++        }
++
++        Binding {
++            target: mainBlock.mainPasswordBox
++            property: "inputMethodHints"
++            value: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
++        }
++
+         VirtualKeyboardLoader {
++            source: Qt.resolvedUrl("ShengVirtualKeyboard.qml")
++            onStatusChanged: if (status === Loader.Ready) Qt.callLater(lockScreenRoot.syncPasswordKeyboard)
++            onKeyboardActiveChanged: {
++                if (keyboardActive && !lockScreenRoot.uiVisible) {
++                    state = "hidden";
++                    Qt.inputMethod.hide();
++                }
++            }
+             id: inputPanel
+ 
+             z: 1
+@@ -378,7 +461,7 @@
+                     inputPanel.showHide()
+                 }
+ 
+-                visible: inputPanel.status === Loader.Ready
++                visible: lockScreenRoot.uiVisible && inputPanel.status === Loader.Ready
+ 
+                 Layout.fillHeight: true
+                 containmentMask: Item {

@@ -23,6 +23,7 @@
 | FUTO 原生输入适配 | [futo-org/android-keyboard](https://github.com/futo-org/android-keyboard)，`7d61ab4132cfcbb7aa713190d934f0125dc38b03`；布局子模块固定于 [provenance](device/futo-keyboard/provenance.json) | 上游 FUTO Source First License 1.1-kb，修改与分发有非商业限制；保留逐文件版权；布局 Apache-2.0，新 Linux 适配器 MIT。非完整 Android 应用，不混同 GPL/MIT 再许可；构建后安装上游 LICENSE/NOTICE |
 | Burp Suite | [PortSwigger 官方下载](https://portswigger.net/burp/releases) | 商业软件，仅提供性能参数；不分发安装包/许可证/激活工具 |
 | Miku 壁纸 | [桌面来源](device/theme/wallpaper.json)、[锁屏来源](device/theme/lockscreen-wallpaper.json) | 仅来源、作者与哈希；图片不随仓库分发，下载/使用自行核查原作者条件 |
+| KDE Wayland 锁屏键盘 | `KDE/plasma-workspace@v6.7.4` 的 `lookandfeel/components/VirtualKeyboard_wayland.qml` | [锁屏专用适配](device/theme/lockscreen/ShengVirtualKeyboard.qml)，保留原作者与 LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL 声明；未修改 PAM 验证 |
 
 根目录三张 JPEG 和 `parted` 为继承自上游的历史文件，不是本次桌面资产或新部署必要工具。新流程使用发行版工具，不执行旧 `parted`。历史 postmarketOS 文档/工作流仅供参考。
 

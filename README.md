@@ -17,7 +17,7 @@
 | 桌面布局、控制中心、手势、电源行为 | [桌面与交互](docs/DESKTOP_AND_INTERACTIONS.md) |
 | 原桌面上滑抽屉、Linexin Dock 与防框选 | [抽屉与 Dock 部署](docs/DESKTOP_DRAWER.md) |
 | 两段上滑 Dock、锁屏手势、缺字与新图标 | [触控和字体增量](docs/TOUCH_LOCKSCREEN_FONTS.md) |
-| 当前桌面配置快照、导出与源码核对 | [桌面配置同步](docs/DESKTOP_PROFILE.md) |
+| 当前桌面配置快照、导出与192项源码核对 | [桌面配置同步](docs/DESKTOP_PROFILE.md) |
 | 实验 FUTO 原生键盘移植、范围与构建 | [FUTO Linux 适配](device/futo-keyboard/README.md) |
 | MiPPS/120W 源码适配、部署与测量边界 | [充电说明](device/charging/README.md) |
 | 硬件与版本兼容性 | [适配矩阵](docs/HARDWARE.md) |
@@ -38,8 +38,8 @@ English entry: native Kali ARM64 / KDE for Xiaomi Pad 6S Pro (`sheng`). Start wi
 - 临时 Dock 点击外部立即向下收起；底边连续上滑依次显示白条、Dock、返回原桌面，应用保留在后台。
 - 原 Plasma 桌面全区域触屏上滑打开 Linexin 全屏抽屉；防触屏框选、长按编辑、左右分页。抽屉与桌面显示同一个 Linexin Dock，开关时保持静止。
 - 摄像头/麦克风/定位的统一隐私开关，含设备访问、门户请求与既有采集进程处理；范围和限制见[隐私说明](device/privacy/README.md)。
-- 电源短按锁屏；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。
-- 水杉 + Fcitx5 输入集成：PIN 中文、接入时禁止软键盘、无键盘时连续弹出，以及新界面的触屏中文、悬浮拖动和停靠切换均已用户确认。新输入法的锁屏/挂起恢复仍待独立验收；基础镜像默认使用 Plasma Keyboard。
+- 电源短按锁屏、长按原生电源菜单；插电闲置 60 分钟锁屏息屏、后台继续；离电闲置 30 分钟锁屏息屏并挂起。
+- 水杉 + Fcitx5 输入集成：PIN 中文、接入抑制、触屏中文、悬浮/停靠均已确认；锁屏时钟页不弹、密码页自动弹出及正常解锁，桌面不误弹而应用输入框正常均已用户复验。挂起恢复仍待独立验收；基础镜像默认使用 Plasma Keyboard。
 - 实验 FUTO 原生英文核心与触屏 UI/UX：原版图标/Roboto/配色、符号与分类表情、动作栏；400/300px 小浮窗及中英键帽显示、候选翻页/上屏已确认。中文保留水杉；语音和滑行未移植，详见 [范围与构建](device/futo-keyboard/README.md)。
 
 这些是当前实机的累计适配状态。**基础构建脚本未自动安装全部增量组件。** PIN 模块编译、热点面板编译、主题第三方资产与个别用户配置仍需按部署手册处理，不能仅刷入基础镜像就宣称完整复现。

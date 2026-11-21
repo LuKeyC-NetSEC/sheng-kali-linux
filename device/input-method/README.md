@@ -1,6 +1,6 @@
 # 实验：水杉输入法与触屏键盘
 
-用户目标为实体键盘和触屏都使用水杉。当前实现：**水杉 Fcitx5 引擎 + Fcitx5 OSK 屏幕键盘 + KWin Wayland 输入面板**，不是水杉内置独立软键盘。用户已确认 PIN 中文、接入时抑制软键盘、连续自动弹出，以及新界面的触屏中文、长按悬浮拖动和停靠切换正常。新输入法的锁屏/挂起恢复仍需独立验收，暂不属于默认基础镜像。
+用户目标为实体键盘和触屏都使用水杉。当前实现：**水杉 Fcitx5 引擎 + Fcitx5 OSK 屏幕键盘 + KWin Wayland 输入面板**，不是水杉内置独立软键盘。用户已确认 PIN 中文、接入时抑制软键盘、连续自动弹出，以及新界面的触屏中文、长按悬浮拖动和停靠切换正常。2026-11-21 另确认锁屏两页和正常解锁；挂起恢复仍需独立验收，暂不属于默认基础镜像。
 
 ## 固定来源
 
@@ -21,7 +21,11 @@ Fcitx 默认引擎为 msime，保留 keyboard-us；全拼 `quanpin`。本机关�
 
 Plasma 会话只设置 `XMODIFIERS=@im=fcitx`，不全局强制 `QT_IM_MODULE`/`GTK_IM_MODULE`，避免干扰 Wayland text-input。禁用重复的 Fcitx autostart，由 KWin launcher 管理。
 
-实体键盘连接时通过 OSK `ManualMode`/`ForceHide` 阻止触屏自动弹出；候选窗口同属 input-panel，不能强制清除 KWin active 来抑制，否则可能取消中文组合。新 guard 以包内 drop-in 覆盖服务 ExecStart，保留基础脚本可回退。helper 为受限修饰键用途，udev 和路径当前针对 kali/UID1000。
+实体键盘连接时通过 OSK `ManualMode`/`ForceHide` 阻止触屏自动弹出；候选窗口同属 input-panel，不能强制清除 KWin active 来抑制，否则可能取消中文组合。策略通过原生桌面 guard 的 `GetKeyboardContext()` 区分桌面、应用、抽屉和锁屏，只输出窗口角色、锁屏状态和变化序号，不读取输入内容。桌面残留文本上下文被隐藏；回到应用后等待 ManualMode 实际确认，再按输入焦点变化调用 Fcitx 正式接口。可选 guard 暂不可用时保留原来的应用输入能力，不能因此禁用全部软键盘。新 guard 以包内 drop-in 覆盖服务 ExecStart，保留基础脚本可回退。helper 为受限修饰键用途，udev 和路径当前针对 kali/UID1000。
+
+锁屏期间仍根据实体键盘热插拔更新 KWin `mode`，并为安全面板恢复正确的 ManualMode；策略不直接显示安全面板，由原生 greeter 在密码页管理。Plasma 6.7 的接口是 `mode`，不是已移除的 `enabled`，锁屏表现层需一起按[锁屏说明](../../docs/TOUCH_LOCKSCREEN_FONTS.md)更新。
+
+2026-11-21 首轮限制策略验收失败；恢复连接时发现 KWin `Wayland/InputMethod` 为空，OSK 窗口仍在但输入引擎没有正常连接。恢复原策略和正确的 InputMethod 后，用户确认 PIN 键盘/触摸板与应用软键盘恢复；没有重新绑定 I²C/TEE 或修改 PIN 驱动。修正版安装后，用户确认时钟页不弹、密码页自动弹出并能正常解锁，桌面等待不弹且应用输入框仍能弹出/输入。11 项策略单元测试通过；锁屏期间键盘热插拔仅有逻辑测试，休眠恢复和长期稳定性仍需独立验收。
 
 ## 待验收与恢复
 
@@ -59,6 +63,6 @@ sheng-osk-mode dock
 
 先安装固定版本 msime-linux，并按前文设置 Fcitx profile 与 KWin InputMethod；集成包不复制用户词库或账户。构建器不会自动编译实验 KWin 插件。此处路径从仓库根开始；干净源码构建可能需要较长时间和大量缓存空间。
 
-已完成：实体中文组合/上屏、触屏中文、PIN接入不弹软键盘、拔下后连续弹出，以及新界面的拖动和模式切换。剩余锁屏解锁及挂起恢复需要独立记录。保留 `/usr/share/applications/org.kde.plasma.keyboard.desktop` 回退入口，卸载集成包后确认 KWin InputMethod 与用户服务回到基础实现。不要为验收绕过锁屏或关闭已有应用。
+已完成：实体中文组合/上屏、触屏中文、PIN接入不弹软键盘、拔下后连续弹出，以及新界面的拖动和模式切换。锁屏时钟页/密码页与正常解锁本轮已确认；锁屏内热插拔、挂起恢复仍需独立记录。保留 `/usr/share/applications/org.kde.plasma.keyboard.desktop` 回退入口，卸载集成包后确认 KWin InputMethod 与用户服务回到基础实现。不要为验收绕过锁屏或关闭已有应用。
 
 可选 [FUTO 原生移植](../futo-keyboard/README.md)在本输入面板上接入 FUTO/LatinIME 的英文 C++ 候选核心、QWERTY 布局和默认调色板；中文引擎仍为水杉。两者来源和许可证分开记录，不把 Linux 适配器称为完整 Android FUTO 应用。

@@ -22,7 +22,7 @@ KCONFIG = {
         'Desktops': ['Number', 'Rows'],
         'org.kde.kdecoration2': ['library', 'theme', 'BorderSize', 'BorderSizeAuto'],
         'TabBox': ['LayoutName', 'LayoutNameAlternative'],
-        'Wayland': ['InputMethod', 'VirtualKeyboardEnabled'],
+        'Wayland': ['InputMethod', 'VirtualKeyboardMode'],
     },
     'kscreenlockerrc': {'Daemon': ['Autolock', 'LockGrace', 'Timeout'], 'Greeter': ['WallpaperPlugin']},
     'powerdevilrc': {

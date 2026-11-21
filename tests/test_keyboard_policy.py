@@ -60,6 +60,7 @@ class KeyboardPolicyTests(unittest.TestCase):
         self.kwin = Properties()
         self.osk = Osk()
         self.owner = ':1.5'
+        self.context = {'locked': False, 'foreground': 'application', 'generation': 1}
         self.bus = types.SimpleNamespace(
             get_object=lambda name, path: self.kwin if path == '/VirtualKeyboard' else self.osk,
             get_name_owner=lambda name: self.owner)
@@ -71,6 +72,7 @@ class KeyboardPolicyTests(unittest.TestCase):
         config = types.SimpleNamespace(read=lambda *_: None, get=lambda *_args, **_kwargs: '/usr/share/applications/sheng-msime-fcitx5.desktop')
         self.patches = [patch.dict(sys.modules, {'dbus': self.dbus}),
                         patch.object(policy.configparser, 'ConfigParser', return_value=config),
+                        patch.object(policy, 'session_context', side_effect=lambda bus: self.context),
                         patch.object(policy, 'physical_keyboards', return_value=[])]
         for item in self.patches:
             item.start()
@@ -121,6 +123,74 @@ class KeyboardPolicyTests(unittest.TestCase):
         self.owner = ':1.6'
         self.apply()
         self.assertEqual(self.osk.shown, 2)
+
+    def test_desktop_residual_text_context_cannot_show_keyboard(self):
+        self.context['foreground'] = 'desktop'
+        self.apply()
+        self.assertTrue(self.osk.requested_manual)
+        self.assertEqual(self.osk.shown, 0)
+        self.assertEqual(self.osk.forced_hidden, 1)
+        # An asynchronously acknowledged suppression remains in place.
+        self.osk.manual = True
+        self.apply()
+        for _ in range(4): self.apply()
+        self.assertEqual(self.osk.shown, 0)
+
+    def test_back_from_desktop_waits_for_manual_ack_before_showing(self):
+        self.context['foreground'] = 'desktop'
+        self.apply()
+        self.osk.manual = True
+        self.context.update(foreground='application', generation=2)
+        self.apply()
+        self.assertFalse(self.osk.requested_manual)
+        self.assertEqual(self.osk.shown, 0)
+        self.osk.manual = False
+        self.apply()
+        self.assertEqual(self.osk.shown, 1)
+
+    def test_locking_suppresses_stale_normal_panel(self):
+        self.context.update(locked=True, foreground='lockscreen', generation=2)
+        self.apply()
+        self.assertEqual(self.osk.shown, 0)
+        self.assertEqual(self.osk.forced_hidden, 1)
+        self.assertNotIn(('active', False), self.kwin.writes)
+        # Secure panel belongs to the greeter and is untouched without a keyboard.
+        self.osk.mode = 1
+        self.apply()
+        self.assertEqual(self.osk.forced_hidden, 1)
+
+    def test_drawer_search_can_show_keyboard_when_explicitly_focused(self):
+        self.context['foreground'] = 'drawer'
+        self.apply()
+        self.assertEqual(self.osk.shown, 1)
+
+    def test_optional_native_context_failure_preserves_application_input(self):
+        self.context['foreground'] = 'unknown'
+        self.apply()
+        self.assertIsNone(self.osk.requested_manual)
+        self.assertEqual(self.osk.shown, 1)
+        self.assertTrue(self.kwin.values['active'])
+
+    def test_detach_on_password_page_resets_never_and_secure_manual_mode(self):
+        self.context.update(locked=True, foreground='lockscreen')
+        self.osk.mode = 1
+        self.osk.manual = True
+        self.apply()
+        self.assertEqual(self.kwin.values['mode'], 2)
+        self.assertFalse(self.osk.requested_manual)
+        self.assertEqual((self.osk.shown, self.osk.forced_hidden), (0, 0))
+        self.assertTrue(self.kwin.values['active'])
+
+    def test_attaching_keyboard_on_password_page_hides_without_cancelling_input(self):
+        self.context.update(locked=True, foreground='lockscreen')
+        self.osk.mode = 1
+        self.kwin.values['mode'] = 2
+        with patch.object(policy, 'physical_keyboards', return_value=['Xiaomi PIN keyboard']):
+            self.apply()
+        self.assertEqual(self.kwin.values['mode'], 0)
+        self.assertTrue(self.osk.requested_manual)
+        self.assertEqual(self.osk.forced_hidden, 1)
+        self.assertTrue(self.kwin.values['active'])
 
 
 if __name__ == '__main__':

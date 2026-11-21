@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAtUTC": "2026-11-15T15:36:34+00:00",
+  "capturedAtUTC": "2026-11-21T03:41:55+00:00",
   "platform": {
     "device": "sheng",
     "architecture": "arm64",
@@ -58,7 +58,7 @@
       },
       "Wayland": {
         "InputMethod": "/usr/share/applications/sheng-msime-fcitx5.desktop",
-        "VirtualKeyboardEnabled": "true"
+        "VirtualKeyboardMode": "0"
       }
     },
     "kscreenlockerrc": {
@@ -74,21 +74,21 @@
     "powerdevilrc": {
       "AC][SuspendAndShutdown": {
         "PowerButtonAction": "32",
-        "PowerDownAction": "8",
+        "PowerDownAction": "16",
         "SleepMode": "1",
         "AutoSuspendAction": "0",
         "AutoSuspendIdleTimeoutSec": "3600"
       },
       "Battery][SuspendAndShutdown": {
         "PowerButtonAction": "32",
-        "PowerDownAction": "8",
+        "PowerDownAction": "16",
         "SleepMode": "1",
         "AutoSuspendAction": "1",
         "AutoSuspendIdleTimeoutSec": "1800"
       },
       "LowBattery][SuspendAndShutdown": {
         "PowerButtonAction": "32",
-        "PowerDownAction": "8",
+        "PowerDownAction": "16",
         "SleepMode": "1",
         "AutoSuspendAction": "1",
         "AutoSuspendIdleTimeoutSec": "1800"
@@ -121,7 +121,7 @@
       "alignment": "center",
       "lengthMode": "fit",
       "maximumLength": 1100,
-      "minimumLength": 1,
+      "minimumLength": 10,
       "floating": true,
       "applets": [
         {
@@ -717,11 +717,10 @@
         "org.kde.plasma.battery#1",
         "luisbocanegra.panel.colorizer#1",
         "org.kontrol.center#1",
-        "org.sheng.panel-style#1"
-      ],
-      "detachedApplets": [
+        "org.sheng.panel-style#1",
         "org.kde.plasma.digitalclock#1"
-      ]
+      ],
+      "detachedApplets": []
     },
     {
       "kind": "desktop",

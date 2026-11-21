@@ -14,7 +14,7 @@
 
 后续增量已改用单一 Linexin Dock（84px）和独立的白色电池绘制。电池图形向右移 4 逻辑像素，保留原生百分比/插电/弹窗后端；Burp 使用圆角矢量图标。锁屏采用明确字体与上滑显示密码页，修复 MDI 误参与 ASCII 回退造成的 Firefox/锁屏缺字。最新部署、版本核验和回退见[触控与字体说明](../../docs/TOUCH_LOCKSCREEN_FONTS.md)。
 
-当前会话的允许项快照见 [desktop-profile.json](desktop-profile.json)，188 个运行/构建源文件和生成资源的对应核对见 [source-audit.json](source-audit.json)。快照包含 FUTO/水杉外观和 400/300px 悬浮尺寸；审计已包含 Dock 外部点击收起及第三段上滑回桌面的新插件。[配置同步说明](../../docs/DESKTOP_PROFILE.md)描述统计口径、角色映射、复现和未导出范围，不包含用户完整配置。
+当前会话的允许项快照见 [desktop-profile.json](desktop-profile.json)，192 个运行/构建源文件、部署副本和生成资源的对应核对见 [source-audit.json](source-audit.json)。快照包含 FUTO/水杉外观和 400/300px 悬浮尺寸；审计已包含 Dock 新插件、键盘上下文策略、锁屏组件及电源菜单配置。[配置同步说明](../../docs/DESKTOP_PROFILE.md)描述统计口径、角色映射、复现和未导出范围，不包含用户完整配置。
 
 ## 来源
 
