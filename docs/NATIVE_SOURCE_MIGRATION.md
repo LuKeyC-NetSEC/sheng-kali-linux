@@ -15,7 +15,7 @@
 | 控制中心上滑冲突 | 起手确定手势归属；已显示的控制中心优先，关闭过程不会把同一触摸交给桌面抽屉；滑条/列表保护保留 | 标记真实弹窗、原生D-Bus发布可见性；3种冲突回归通过 | 实机触屏未验证 |
 | 抽屉搜索 | 无物理键盘时打开抽屉先聚焦应用网格；主动点搜索仍可输入 | 固定Linexin源码打包通过 | 新版未加载 |
 
-原生包版本：KWin/Plasma `4:6.7.4-2+sheng1`，桌面包 `1.0-7+native1`，输入法包 `0.2.1-10+native1`。目标为sheng / ARM64 / 内核 `7.3.4-sm8550-00104-g87ac0f2347eb` / Qt `6.11.2+dfsg-5`。固定官方源、dsc签名及SHA在 [native-source-pins.json](../configs/native-source-pins.json)，组件自己的provenance固定本地源文件。
+原生包版本：KWin/Plasma `4:6.7.4-2+sheng1`，桌面包 `1.0-8+native1`，输入法包 `0.2.1-11+native1`。目标为sheng / ARM64 / 内核 `7.3.4-sm8550-00104-g87ac0f2347eb` / Qt `6.11.2+dfsg-5`。固定官方源、dsc签名及SHA在 [native-source-pins.json](../configs/native-source-pins.json)，组件自己的provenance固定本地源文件。
 
 ## 已删除的旧实现
 

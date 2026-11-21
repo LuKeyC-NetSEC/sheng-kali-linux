@@ -38,7 +38,7 @@ qdbus6 org.sheng.DesktopTouch /org/sheng/DesktopTouch org.sheng.DesktopTouch.Get
 
 `GetInputContext()` 以 `a{sv}` 返回上下文v2，包含上述事实以及物理键盘、鼠标/触摸板状态。它由 [inputpresence.cpp](inputpresence.cpp) 监听KWin已有设备增删、启用状态和PIN属性的sysfs通知；USB/蓝牙按udev属性识别，排除触屏、笔和虚拟输入，PIN拔下时排除残留HID节点。设备事件合并350ms，恢复后重新检查，没有周期扫描或第二个libinput客户端。接口不返回设备名称、按键或输入内容。
 
-v2插件 `sheng_desktop_touch_guard_96793da01c9e` 已在匹配ARM64环境构建，已随原生包安装，当前会话已加载v2插件。它是[原生输入法启动器](../input-method/README.md)的必需接口，须与KWin/Plasma迁移一起安排加载。现有用户确认属于下面的v1部署；不能套用为v2的热插拔/锁屏验收。USB键盘、蓝牙鼠标暂无实物，本轮仍未验证。
+此前v2插件 `sheng_desktop_touch_guard_96793da01c9e` 已在匹配ARM64环境构建并加载；本次背折版替换为下述新ID。它是[原生输入法启动器](../input-method/README.md)的必需接口。此前用户确认不能套用为新版热插拔/锁屏验收；USB键盘、蓝牙鼠标暂无实物，本轮仍未验证。
 
 已获用户确认：原桌面左/中/右上滑打开抽屉；触屏无框选；临时 Dock 点击外部立即向下收起、原点击生效、Dock 本身不误收起；第三次底边上滑返回桌面及重新打开应用后 Dock 自动隐藏均正常。当前构建为 sheng ARM64 / KWin 6.7.4 / Qt 6.11.2，2026-11-21 增补键盘上下文接口并原生编译，启用的源码散列 ID 为 `sheng_desktop_touch_guard_5e3a927fc736`；用户确认桌面等待不弹软键盘，应用输入框仍正常。原 Dock 手势未在此次改动后全面复验；鼠标/触摸板的新按下观察路径未独立实测；横竖屏、挂起恢复仍待回归。
 
