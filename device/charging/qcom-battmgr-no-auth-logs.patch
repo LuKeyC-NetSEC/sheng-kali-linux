@@ -1,0 +1,14 @@
+--- a/drivers/power/supply/qcom_battmgr.c
++++ b/drivers/power/supply/qcom_battmgr.c
+@@ -2134,11 +2134,6 @@
+ 			memcpy(battmgr->xiaomi_prop_data, &resp->intval.value,
+ 			       data_len);
+ 			battmgr->xiaomi_prop_data_len = data_len;
+-			if (property == XM_BATT_VERIFY_DIGEST)
+-				dev_dbg(battmgr->dev,
+-					"verify digest response opcode=%#x len=%zu data=%*phN\n",
+-					opcode, payload_len, (int)data_len,
+-					battmgr->xiaomi_prop_data);
+ 			break;
+ 		}
+ 

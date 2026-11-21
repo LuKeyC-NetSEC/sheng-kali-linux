@@ -1,0 +1,21 @@
+{
+  "kernel_commit": "87ac0f2347eb433933841e6854950dd90e96e6b2",
+  "upstream": "https://github.com/ianchb/xiaomi-mipps-auth",
+  "commit": "9176efbdf276b874fc0a97912a914449a88155fb",
+  "archive_sha256": "07db28a526b87eb64adaddac0230ab1449dc3753fbc3266e3d6769d4dbd683bc",
+  "patch_sha256": "4779f866ded03378548475ad1ba754d6545a7195f9ea5f3d34a0719d8b40c246",
+  "base_files": {
+    "xiaomi-mipps-auth": "5b429aefe8c3f597ec4055775416e050479655200539d047387c51d95defd62e",
+    "xiaomi-mipps-auth.service": "6b3409e8cffebf4d9672be86c74aa3421d6109fceb410b2c55c86ae9d6663b4b"
+  },
+  "official_reference": {
+    "repository": "https://github.com/MiCode/Xiaomi_Kernel_OpenSource",
+    "branch": "sheng-u-oss",
+    "commit": "29db5d592c5b577aa9d9611da988a5e071d100dd",
+    "path": "drivers/power/supply/qti_battery_charger.c",
+    "sha256": "8198c9fa5959361dec714877c90058008a7f9c23034e08219bcc2e6e762963cf"
+  },
+  "status": "Offline review and simulated sysfs tests only; no device deployment or charging-power validation",
+  "optional_kernel_log_patch_sha256": "1f83429c54cc5e00237d0d2939d04caef6d5798c5384c237534aa22ef2bad1d2",
+  "kernel_battmgr_base_sha256": "51ac68823a08c6b850d50d98f645694d45eef8060cfc5a0d46436b6ed1d07d06"
+}

@@ -8,6 +8,7 @@
 | 固件/触屏/硬件库 | [sources.json](configs/sources.json) 内固定提交、下载和哈希 | 各上游许可；构建时获取，不把缓存打包入源仓库 |
 | Debian sheng 音频适配 | [alghiffaryfa19/debian-sheng](https://github.com/alghiffaryfa19/debian-sheng) | 固定来源见 sources.json，保留上游声明 |
 | PIN 认证 | [ianchb/sheng_devauth](https://github.com/ianchb/sheng_devauth)，`bac03b5bcfefa1467ebad490edd910a6cef8a207` | patch与上游依赖分开；静态依赖含各自 libs/LICENSE，重新分发前核查 |
+| MiPPS 静态适配 | [ianchb/xiaomi-mipps-auth](https://github.com/ianchb/xiaomi-mipps-auth)，`9176efbdf276b874fc0a97912a914449a88155fb`；优先对照 [MiCode 官方 sheng-u-oss](https://github.com/MiCode/Xiaomi_Kernel_OpenSource/tree/29db5d592c5b577aa9d9611da988a5e071d100dd) | GPL-2.0-only；固定来源/SHA见charging/provenance；仅提交补丁/准备器/模拟测试，不复制认证常量或运行材料，未部署到设备 |
 | Plasma NM | [KDE/plasma-nm](https://github.com/KDE/plasma-nm)，`b6c03fe24b30d2a963a41dd83784e36086d7257e` | applet与库按原文件 SPDX；打包保留 GPL/LGPL 文本 |
 | 控制中心 | [Kontrol Center](https://github.com/ItsNotMeBro87/plasma6-kontrol-center)，`137ba6c3b441c69dd3e59052ac9e8124367f40b4` | GPL-3.0-or-later；构建器保留 LICENSE、图标说明和新增 NOTICE |
 | 自定义任务效果/手势 | [device/recents/LICENSE](device/recents/LICENSE) | MIT，保留文件头与许可证 |
